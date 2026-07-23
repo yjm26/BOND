@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from '../hooks/useToast'
 import { authFetch, apiGet, API_URL } from '../lib/api'
 import OfferModal from './OfferModal'
 import OffersPanel from './OffersPanel'
 import ReputationBadge from './ReputationBadge'
 import { DEAL_TYPES } from '../utils/contract'
+import { APP_ACTIONS } from './app/appHomeData'
 
 const CATEGORIES = ['All', 'NFT', 'Wallet', 'Account', 'Service', 'Other']
 
@@ -182,458 +183,209 @@ export default function Market({ wallet }) {
   }, [listings, search, sort])
 
   return (
-    <section className="min-h-screen bg-[#ede9df] px-4 pb-32 pt-28 text-[#171716] sm:px-6">
-      <div className="mx-auto max-w-[1180px]">
-
-        {/* Header */}
-        <div className="mb-10 grid gap-8 border-b border-[#171716]/15 pb-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-          <div>
-            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.28em] text-[#6f6b62]">Market / Deal intake</div>
-            <h1 className="max-w-[520px] text-[clamp(44px,6vw,76px)] font-medium leading-[0.92] tracking-[-0.075em] text-[#171716]">
-              Browse settlement-ready deals.
-            </h1>
-            <p className="mt-5 max-w-[520px] text-[16px] leading-[1.65] tracking-[-0.02em] text-[#4d4942]">
-              Find a buyer or seller, review the terms, then open a private BOND escrow room where USDC only moves through release, refund, or arbitration.
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              ['Listings', `${sorted.length}`],
-              ['Asset', 'USDC'],
-              ['Path', 'Escrow room'],
-            ].map(([label, value]) => (
-              <div key={label} className="border border-[#171716]/15 bg-[#f4f0e7] p-4">
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#6f6b62]">{label}</div>
-                <div className="mt-2 text-[20px] font-medium tracking-[-0.04em] text-[#171716]">{value}</div>
-              </div>
+    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
+      <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
+        <aside className="hidden border border-[#ede9df]/10 bg-[#20201f] p-4 lg:block">
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">BOND App</div>
+          <div className="mt-6 space-y-1">
+            {APP_ACTIONS.map((item) => (
+              <Link key={item.label} to={item.to} className={`flex h-10 items-center justify-between border px-3 text-[13px] transition ${
+                item.label === 'Market'
+                  ? 'border-[#ede9df]/12 bg-[#ede9df]/6 text-[#ede9df]'
+                  : 'border-transparent text-[#ede9df]/62 hover:border-[#ede9df]/10 hover:bg-[#ede9df]/5 hover:text-[#ede9df]'
+              }`}>
+                {item.label}
+                <span className="text-[#ede9df]/24">→</span>
+              </Link>
             ))}
           </div>
+          <div className="mt-8 border-t border-[#ede9df]/10 pt-4 font-mono text-[10px] uppercase leading-[1.9] tracking-[0.14em] text-[#ede9df]/40">
+            Wallet<br />
+            <span className="text-[#ede9df]/78">{wallet?.address ? formatAddress(wallet.address) : 'Not connected'}</span>
+          </div>
+        </aside>
 
-          {wallet && (
-            <div className="flex shrink-0 gap-2 lg:col-span-2 lg:justify-end">
-              <button
-                onClick={() => { setShowOffers(!showOffers); setShowForm(false) }}
-                className={`border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition ${showOffers ? 'border-[#171716] bg-[#171716] text-[#ede9df]' : 'border-[#171716]/20 text-[#171716] hover:border-[#171716]'}`}
-              >
-                Offers
-              </button>
-              <button
-                onClick={() => { setShowForm(!showForm); setShowOffers(false) }}
-                className="shrink-0 border border-[#171716] bg-[#171716] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#ede9df] transition hover:bg-transparent hover:text-[#171716]"
-              >
-                {showForm ? 'Cancel' : '+ Post Listing'}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Create form */}
-        {showForm && (
-          <div className="card-3d p-6 mb-8">
-            <div className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 mb-4">New Listing</div>
-
-            {/* Role toggle */}
-            <div className="mb-4">
-              <label className="font-mono text-[10px] uppercase tracking-[2px] text-zinc-400 block mb-2">// i am</label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, role: 'seller' })}
-                  className={`flex-1 py-2.5 rounded text-[13px] font-mono border transition ${
-                    form.role === 'seller'
-                      ? 'bg-zinc-900 text-zinc-100 border-zinc-700'
-                      : 'bg-white dark:bg-white/5 text-zinc-500 dark:text-gray-400 border-zinc-200 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20'
-                  }`}
-                >
-                  ◆ SELLER — I have something to sell
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, role: 'buyer' })}
-                  className={`flex-1 py-2.5 rounded text-[13px] font-mono border transition ${
-                    form.role === 'buyer'
-                      ? 'bg-zinc-900 text-zinc-100 border-zinc-700'
-                      : 'bg-white dark:bg-white/5 text-zinc-500 dark:text-gray-400 border-zinc-200 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20'
-                  }`}
-                >
-                  ◈ BUYER — I want to buy something
-                </button>
-              </div>
-            </div>
-
-            <input
-              className={`stripe-input mb-3 ${touched.title && !form.title.trim() ? 'border-red-300 dark:border-red-500/50 bg-red-50/30' : ''}`}
-              placeholder="Title (e.g. Azuki NFT Whitelist Spot) *"
-              value={form.title}
-              onChange={(e) => { setForm({ ...form, title: e.target.value }); setTouched(t => ({ ...t, title: true })) }}
-              onBlur={() => setTouched(t => ({ ...t, title: true }))}
-              maxLength={100}
-            />
-            <textarea className="stripe-input mb-3 resize-none" placeholder="Description — what are you selling?" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} maxLength={500} />
-
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-1.5">Category</label>
-                <select className="stripe-input w-full" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                  {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-1.5">Price *</label>
-                <div className="relative">
-                  <input
-                    className={`stripe-input w-full ${touched.price && (!form.price || Number(form.price) <= 0) ? 'border-red-300 dark:border-red-500/50 bg-red-50/30' : ''}`}
-                    type="number"
-                    placeholder="0.00"
-                    min="0.01"
-                    step="0.01"
-                    value={form.price}
-                    onChange={(e) => { setForm({ ...form, price: e.target.value }); setTouched(t => ({ ...t, price: true })) }}
-                    onBlur={() => setTouched(t => ({ ...t, price: true }))}
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-stripe-body dark:text-gray-500">USDC</span>
+        <main className="overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
+          <div className="p-4 sm:p-5 lg:p-6">
+            {showForm && (
+              <div className="mb-5 border border-[#ede9df]/10 bg-[#20201f] p-5 sm:p-6">
+                <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#d8b15f]">New listing</div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <input className="h-12 border border-[#ede9df]/12 bg-[#111110] px-4 text-[14px] text-[#ede9df] outline-none placeholder:text-[#ede9df]/28 focus:border-[#d8b15f]/60" placeholder="Title *" value={form.title} onChange={(e) => { setForm({ ...form, title: e.target.value }); setTouched(t => ({ ...t, title: true })) }} />
+                  <div className="relative">
+                    <input className="h-12 w-full border border-[#ede9df]/12 bg-[#111110] px-4 pr-16 text-[14px] text-[#ede9df] outline-none placeholder:text-[#ede9df]/28 focus:border-[#d8b15f]/60" type="number" placeholder="Price *" value={form.price} onChange={(e) => { setForm({ ...form, price: e.target.value }); setTouched(t => ({ ...t, price: true })) }} />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#ede9df]/44">USDC</span>
+                  </div>
+                  <select className="h-12 border border-[#ede9df]/12 bg-[#111110] px-4 text-[13px] text-[#ede9df] outline-none focus:border-[#d8b15f]/60" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                    {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <div className="grid grid-cols-[140px_1fr] gap-2">
+                    <select className="h-12 border border-[#ede9df]/12 bg-[#111110] px-3 text-[13px] text-[#ede9df] outline-none focus:border-[#d8b15f]/60" value={form.contactMethod} onChange={(e) => setForm({ ...form, contactMethod: e.target.value })}>
+                      {SOCIAL_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                    </select>
+                    <input className="h-12 border border-[#ede9df]/12 bg-[#111110] px-4 text-[14px] text-[#ede9df] outline-none placeholder:text-[#ede9df]/28 focus:border-[#d8b15f]/60" placeholder={SOCIAL_OPTIONS.find(s => s.key === form.contactMethod)?.placeholder || '@username'} value={form.contactHandle} onChange={(e) => setForm({ ...form, contactHandle: e.target.value })} />
+                  </div>
+                  <textarea className="min-h-[96px] border border-[#ede9df]/12 bg-[#111110] px-4 py-3 text-[14px] text-[#ede9df] outline-none placeholder:text-[#ede9df]/28 focus:border-[#d8b15f]/60 sm:col-span-2" placeholder="Description — terms, proof, delivery expectations" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                 </div>
-              </div>
-            </div>
-
-            {/* Estimated Delivery — only for Event-based & Service */}
-            {Number(form.dealType) !== 0 && (
-              <div className="mb-4">
-                <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-1.5">
-                  {Number(form.dealType) === 1 ? 'Estimated Delivery' : 'Custom Timeline'}
-                </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    className="stripe-input flex-1"
-                    type="number"
-                    min={1}
-                    max={90}
-                    step={1}
-                    value={form.deliveryDays}
-                    onChange={(e) => setForm({ ...form, deliveryDays: Math.max(1, Math.min(90, Number(e.target.value) || 1)) })}
-                  />
-                  <span className="text-[13px] text-stripe-body dark:text-gray-400 font-medium">days</span>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#ede9df]/38">Contact is required before a listing goes live.</div>
+                  <button onClick={handleSubmit} className="h-11 border border-[#ede9df] bg-[#ede9df] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition hover:bg-transparent hover:text-[#ede9df]">Post listing</button>
                 </div>
-                <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-1">
-                  {Number(form.dealType) === 1
-                    ? 'When the NFT / event item will be available (e.g. mint in 7 days).'
-                    : 'Agreed delivery window for the service.'}
-                </p>
+                {formError && <div className="mt-3 border border-[#c98b4a]/30 bg-[#c98b4a]/10 px-4 py-3 text-[13px] text-[#c98b4a]">{formError}</div>}
               </div>
             )}
 
-            {/* Collateral */}
-            <div className="mb-4">
-              <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-1.5">Collateral {form.role === 'buyer' ? '(N/A)' : ''}</label>
-              {form.role === 'seller' ? (
-                <div className="relative">
-                  <input className="stripe-input w-full" type="number" placeholder="0 (optional)" min="0" step="0.01" value={form.collateral} onChange={(e) => setForm({ ...form, collateral: Math.max(0, Number(e.target.value) || 0).toString() })} />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-stripe-body dark:text-gray-500">USDC</span>
+            {deleteError && <div className="mb-4 border border-[#c98b4a]/30 bg-[#c98b4a]/10 px-4 py-3 text-[13px] text-[#c98b4a]">{deleteError}</div>}
+
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">Market</div>
+              {wallet && (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => { setShowOffers(!showOffers); setShowForm(false) }}
+                    className={`h-10 border px-4 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] transition ${showOffers ? 'border-[#ede9df] bg-[#ede9df] text-[#20201f]' : 'border-[#ede9df]/16 text-[#ede9df]/70 hover:border-[#ede9df]/34 hover:text-[#ede9df]'}`}
+                  >
+                    Offers
+                  </button>
+                  <button
+                    onClick={() => { setShowForm(!showForm); setShowOffers(false) }}
+                    className="h-10 border border-[#ede9df] bg-[#ede9df] px-4 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition hover:bg-transparent hover:text-[#ede9df]"
+                  >
+                    {showForm ? 'Cancel' : 'Post listing'}
+                  </button>
                 </div>
-              ) : (
-                <div className="stripe-input w-full text-[13px] text-stripe-body dark:text-gray-500 bg-stripe-surface dark:bg-white/5">Buyers don't pay collateral</div>
               )}
             </div>
 
-            {/* Deal Type */}
-            <div className="mb-4">
-              <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-1.5">Deal Type</label>
-              <div className="grid grid-cols-3 gap-2">
-                {DEAL_TYPES.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setForm({ ...form, dealType: t.id })}
-                    className={`rounded border text-left px-3 py-2 transition text-[12px] ${
-                      Number(form.dealType) === t.id
-                        ? 'bg-[#0a2540] dark:bg-white text-white dark:text-[#0c0f1a] border-[#0a2540] dark:border-white font-medium'
-                        : 'bg-white dark:bg-[#1a1d2e] text-stripe-body dark:text-gray-400 border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20'
-                    }`}
-                  >
-                    <div className="font-medium">{t.label}</div>
-                    <div className="text-[10px] opacity-70 leading-tight mt-0.5">{t.confirmWindow}</div>
+            <div className="mb-5 border border-[#ede9df]/10 bg-[#20201f] p-3">
+              <div className="grid gap-3 lg:grid-cols-[1fr_220px]">
+                <input
+                  className="h-12 w-full border border-[#ede9df]/12 bg-[#111110] px-4 text-[14px] text-[#ede9df] outline-none transition placeholder:text-[#ede9df]/28 focus:border-[#d8b15f]/60"
+                  placeholder="Search listings…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <select className="h-12 w-full border border-[#ede9df]/12 bg-[#111110] px-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[#ede9df] outline-none transition focus:border-[#d8b15f]/60" value={sort} onChange={(e) => setSort(e.target.value)}>
+                  {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+                </select>
+              </div>
+              <div className="mt-3 flex gap-2 overflow-x-auto border-t border-[#ede9df]/10 pt-3">
+                {CATEGORIES.map((cat) => (
+                  <button key={cat} onClick={() => setFilter(cat)} className={`whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition ${filter === cat ? 'border-[#ede9df] bg-[#ede9df] text-[#20201f]' : 'border-[#ede9df]/12 bg-transparent text-[#ede9df]/52 hover:border-[#ede9df]/34 hover:text-[#ede9df]'}`}>
+                    {cat !== 'All' && <span className="mr-1 opacity-60">{CATEGORY_ICON[cat]}</span>}{cat}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Contact — required */}
-            <div className="mb-4">
-              <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-2">
-                Contact <span className="text-red-400">*</span>
-              </label>
-              <div className="flex gap-2">
-                <select
-                  className="stripe-input w-[140px] shrink-0"
-                  value={form.contactMethod}
-                  onChange={(e) => setForm({ ...form, contactMethod: e.target.value })}
-                >
-                  {SOCIAL_OPTIONS.map(s => (
-                    <option key={s.key} value={s.key}>{s.icon} {s.label}</option>
-                  ))}
-                </select>
-                <input
-                  className="stripe-input flex-1"
-                  placeholder={SOCIAL_OPTIONS.find(s => s.key === form.contactMethod)?.placeholder || '@username'}
-                  value={form.contactHandle}
-                  onChange={(e) => setForm({ ...form, contactHandle: e.target.value })}
-                />
-              </div>
-              <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-1">
-                Buyers will use this to contact you directly. Required for all listings.
-              </p>
-            </div>
-
-            <button onClick={handleSubmit} className="btn-primary w-full py-3">Post Listing</button>
-            {formError && (
-              <div className="mt-3 px-4 py-2.5 rounded text-[13px] font-medium border bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20">
-                {formError}
+            {loading && (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-[240px] animate-pulse border border-[#ede9df]/10 bg-[#20201f]" />)}
               </div>
             )}
-          </div>
-        )}
 
-        {deleteError && (
-          <div className="mb-4 px-4 py-2.5 rounded text-[13px] font-medium border bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20">
-            {deleteError}
-          </div>
-        )}
+            {!loading && sorted.length === 0 && (
+              <div className="grid min-h-[260px] place-items-center border border-[#ede9df]/10 bg-[#20201f] p-8 text-center">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center border border-[#ede9df]/12 bg-[#111110] font-mono text-[20px] text-[#ede9df]/44">⌕</div>
+                <h3 className="mb-2 text-[26px] font-medium tracking-[-0.06em] text-[#ede9df]">{search ? 'No results found' : 'No listings yet'}</h3>
+                <p className="max-w-[420px] text-[14px] leading-[1.65] text-[#b9b2a5]">
+                  {search ? `No listings match "${search}"` : wallet ? 'Post the first listing and define the escrow terms before value moves.' : 'Connect your wallet to post a listing. Deals should start with clear terms, price, proof, and settlement path.'}
+                </p>
+              </div>
+            )}
 
-        {/* Search + Sort + Category filter — deal desk controls */}
-        <div className="mb-6 border border-[#171716]/15 bg-[#f4f0e7] p-3">
-          <div className="grid gap-3 lg:grid-cols-[1fr_220px]">
-          <div className="relative">
-            <input
-              className="h-12 w-full border border-[#171716]/15 bg-[#ede9df] pl-10 pr-9 text-[14px] text-[#171716] outline-none transition placeholder:text-[#6f6b62]/60 focus:border-[#171716]/40"
-              placeholder="Search listings…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6f6b62]" width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2"/>
-              <path d="M16 16l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#6f6b62] hover:text-[#171716]">
-                ✕
-              </button>
+            {!loading && sorted.length > 0 && (
+              <div className="grid gap-px bg-[#ede9df]/10 p-px md:grid-cols-2 xl:grid-cols-3">
+                {sorted.map((listing) => (
+                  <ListingCard key={listing.id} listing={listing} wallet={wallet} onOpenDeal={() => handleOpenDeal(listing)} onDelete={() => handleDelete(listing.id)} onExpand={() => setExpandedListing(listing)} />
+                ))}
+              </div>
+            )}
+
+            {showOffers && wallet && <OffersPanel wallet={wallet} API_URL={API_URL} />}
+            {offerTarget && wallet && <OfferModal listing={offerTarget} wallet={wallet} onClose={() => setOfferTarget(null)} onSubmitted={() => { setOfferTarget(null); fetchListings() }} />}
+            {expandedListing && (
+              <ListingDetailModal listing={expandedListing} wallet={wallet} API_URL={API_URL} onClose={() => setExpandedListing(null)} onOpenDeal={() => { setExpandedListing(null); handleOpenDeal(expandedListing) }} onDelete={() => { setExpandedListing(null); handleDelete(expandedListing.id) }} />
             )}
           </div>
-          <select
-            className="h-12 w-full border border-[#171716]/15 bg-[#ede9df] px-3 font-mono text-[12px] uppercase tracking-[0.12em] text-[#171716] outline-none transition focus:border-[#171716]/40"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23171716' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-          >
-            {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-          </select>
-          </div>
-
-          <div className="mt-3 flex gap-2 overflow-x-auto border-t border-[#171716]/10 pt-3">
-            {CATEGORIES.map((cat) => (
-              <button key={cat} onClick={() => setFilter(cat)} className={`whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition ${filter === cat ? 'border-[#171716] bg-[#171716] text-[#ede9df]' : 'border-[#171716]/15 bg-[#ede9df] text-[#6f6b62] hover:border-[#171716]/40 hover:text-[#171716]'}`}>
-                {cat !== 'All' && <span className="mr-1 opacity-60">{CATEGORY_ICON[cat]}</span>}{cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Skeleton loading */}
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="border border-stripe-border dark:border-white/10 rounded-[10px] overflow-hidden p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="skeleton-shimmer w-16 h-[18px]" />
-                  <div className="skeleton-shimmer w-12 h-[14px] ml-auto" />
-                </div>
-                <div className="skeleton-shimmer w-full h-5 mb-4" />
-                <div className="skeleton-shimmer w-20 h-7 mb-4" />
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="skeleton-shimmer w-5 h-5 rounded-full" />
-                  <div className="skeleton-shimmer w-24 h-3" />
-                </div>
-                <div className="skeleton-shimmer w-full h-9 rounded-md" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Listings */}
-        {!loading && sorted.length === 0 && (
-          <div className="grid min-h-[260px] place-items-center border border-[#171716]/15 bg-[#f4f0e7] p-8 text-center">
-            <div className="mb-5 flex h-14 w-14 items-center justify-center border border-[#171716]/15 bg-[#ede9df] font-mono text-[20px] text-[#6f6b62]">⌕</div>
-            <h3 className="mb-2 text-[22px] font-medium tracking-[-0.05em] text-[#171716]">
-              {search ? 'No results found' : 'No listings yet'}
-            </h3>
-            <p className="max-w-[420px] text-[14px] leading-[1.65] text-[#6f6b62]">
-              {search ? `No listings match "${search}"` : wallet ? 'Post the first listing and define the escrow terms before value moves.' : 'Connect your wallet to post a listing. Deals should start with clear terms, price, proof, and settlement path.'}
-            </p>
-          </div>
-        )}
-
-        {!loading && sorted.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {sorted.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                wallet={wallet}
-                onOpenDeal={() => handleOpenDeal(listing)}
-                onDelete={() => handleDelete(listing.id)}
-                onExpand={() => setExpandedListing(listing)}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Offers panel */}
-        {showOffers && wallet && (
-          <OffersPanel wallet={wallet} API_URL={API_URL} />
-        )}
-
-        {/* Offer modal */}
-        {offerTarget && wallet && (
-          <OfferModal
-            listing={offerTarget}
-            wallet={wallet}
-            onClose={() => setOfferTarget(null)}
-            onSubmitted={() => { setOfferTarget(null); fetchListings() }}
-          />
-        )}
-        {/* Listing detail modal */}
-        {expandedListing && (
-          <ListingDetailModal
-            listing={expandedListing}
-            wallet={wallet}
-            API_URL={API_URL}
-            onClose={() => setExpandedListing(null)}
-            onOpenDeal={() => { setExpandedListing(null); handleOpenDeal(expandedListing) }}
-            onDelete={() => { setExpandedListing(null); handleDelete(expandedListing.id) }}
-          />
-        )}
+        </main>
       </div>
     </section>
   )
+
 }
 
 function ListingCard({ listing, wallet, onOpenDeal, onDelete, onExpand }) {
   const isOwner = wallet && listing.creator?.toLowerCase() === wallet.address?.toLowerCase()
   const hasSocials = listing.socials && Object.keys(listing.socials).length > 0
-  const catStyle = CATEGORY_STYLES[listing.category] || CATEGORY_STYLES.Other
   const isBuyerListing = listing.role === 'buyer'
+  const dealType = DEAL_TYPES.find(t => t.id === Number(listing.dealType))?.label || 'Instant'
 
   return (
-    <div
-      onClick={onExpand}
-      className="listing-card listing-card-enter relative rounded-[10px] border border-stripe-border dark:border-white/10 overflow-hidden transition-all duration-200 hover:shadow-stripe-md cursor-pointer"
-      data-role={listing.role}
-      style={{
-        background: isBuyerListing
-          ? 'linear-gradient(to right, rgba(37,99,235,0.03), var(--tw-bg-opacity,1) 40px)'
-          : 'linear-gradient(to right, rgba(107,114,128,0.03), var(--tw-bg-opacity,1) 40px)',
-      }}
-    >
-      {/* Role accent stripe */}
-      <div
-        className="absolute left-0 top-0 bottom-0 w-[3px]"
-        style={{ background: isBuyerListing ? '#2563eb' : '#9ca3af' }}
-      />
-
-      <div className="p-4 pl-5 flex flex-col">
-        {/* Meta row: category + time + status */}
-        <div className="flex items-center gap-2 mb-2.5 flex-wrap">
-          <span
-            className="inline-flex items-center gap-1 px-2.5 py-[3px] rounded-full text-[10px] font-semibold tracking-wide uppercase"
-            style={{ background: catStyle.bg, color: catStyle.color, border: `1px solid ${catStyle.border}` }}
-          >
-            {CATEGORY_ICON[listing.category] || '▪'} {listing.category?.toUpperCase()}
-          </span>
-          <span className="text-[11px] text-zinc-400 dark:text-gray-500 font-mono">{timeAgo(listing.createdAt)}</span>
-          {listing.taken ? (
-            <span className="ml-auto text-[10px] font-medium px-2 py-[2px] rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20">⏳ In Progress</span>
-          ) : (
-            <span className="ml-auto text-[10px] font-medium px-2 py-[2px] rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20">Active</span>
-          )}
+    <div onClick={onExpand} className="group min-h-[300px] cursor-pointer bg-[#111110] p-5 transition hover:bg-[#1a1a18] sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/38">
+          {listing.category || 'Other'} / {timeAgo(listing.createdAt)}
         </div>
+        <span className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] ${listing.taken ? 'border-[#c98b4a]/30 text-[#c98b4a]' : 'border-[#b7c8a3]/30 text-[#b7c8a3]'}`}>
+          {listing.taken ? 'In progress' : 'Active'}
+        </span>
+      </div>
 
-        {/* Title */}
-        <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-white leading-snug mb-3 tracking-tight line-clamp-2">
-          {listing.title}
-        </h3>
+      <h3 className="mt-10 min-h-[58px] max-w-[330px] text-[28px] font-medium leading-[0.98] tracking-[-0.06em] text-[#ede9df]">
+        {listing.title}
+      </h3>
 
-        {/* Price row */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className={`inline-flex items-center text-[10px] font-medium px-2 py-[2px] rounded border font-mono uppercase tracking-[1px] ${
-            Number(listing.dealType) === 0 ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-100 dark:border-indigo-500/20' :
-            Number(listing.dealType) === 1 ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-500/20' :
-            'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-100 dark:border-sky-500/20'
-          }`}>
-            {DEAL_TYPES.find(t => t.id === Number(listing.dealType))?.label || 'Instant'}
-          </span>
-        </div>
-        <div className="flex items-baseline gap-2 mb-3 pb-3 border-b border-stripe-border/60 dark:border-white/5">
-          <span className="text-[26px] font-semibold text-zinc-900 dark:text-white tracking-tight leading-none font-mono">
-            {listing.price}
-          </span>
-          <span className="text-[13px] text-zinc-400 dark:text-gray-500 font-normal">USDC</span>
-          {Number(listing.collateral) > 0 ? (
-            <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-[3px] rounded-full border border-amber-100 dark:border-amber-500/20 font-mono">
-              🔒 {listing.collateral}
-            </span>
-          ) : (
-            <span className="ml-auto text-[11px] text-zinc-400 dark:text-gray-500">No collateral</span>
-          )}
-        </div>
-
-        {/* Seller row */}
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-[22px] h-[22px] rounded-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-600 flex items-center justify-center text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 shrink-0">
-            0x
+      <div className="mt-7 flex items-end justify-between gap-4 border-b border-[#ede9df]/10 pb-5">
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#ede9df]/34">Price</div>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="font-mono text-[30px] leading-none tracking-[-0.04em] text-[#ede9df]">{listing.price}</span>
+            <span className="text-[13px] text-[#ede9df]/42">USDC</span>
           </div>
-          <span className="text-[12px] text-zinc-400 dark:text-gray-500 font-mono">{formatAddress(listing.creator)}</span>
-          <span className="ml-auto">
-            <ReputationBadge provider={wallet?.provider} address={listing.creator} />
-          </span>
         </div>
-
-        {/* Delivery + chat row */}
-        <div className="flex items-center gap-1.5 text-[12px] text-zinc-400 dark:text-gray-500 mt-1">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span>Delivery in {listing.deliveryDays || 5} days</span>
-          {hasSocials && (
-            <span className="ml-auto flex items-center gap-1">
-              <span className="w-[6px] h-[6px] rounded-full bg-emerald-500"></span>
-              DM ready
-            </span>
-          )}
+        <div className="text-right font-mono text-[10px] uppercase leading-[1.7] tracking-[0.14em] text-[#ede9df]/38">
+          {isBuyerListing ? 'Buyer listing' : 'Seller listing'}<br />
+          {dealType}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="px-4 pl-5 pb-4 pt-0">
+      <div className="mt-5 grid gap-3 text-[13px] text-[#b9b2a5]">
+        <div className="flex items-center justify-between gap-4">
+          <span>Creator</span>
+          <span className="font-mono text-[#ede9df]/58">{formatAddress(listing.creator)}</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span>Delivery</span>
+          <span className="font-mono text-[#ede9df]/58">{listing.deliveryDays || 5} days</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span>Contact</span>
+          <span className="font-mono text-[#ede9df]/58">{hasSocials ? 'DM ready' : 'Not added'}</span>
+        </div>
+      </div>
+
+      <div className="mt-7">
         {isOwner ? (
           listing.taken ? (
-            <span className="text-[12px] text-amber-600 dark:text-amber-400 font-medium px-1">⏳ Room Active</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#c98b4a]">Room active</span>
           ) : (
-            <button onClick={(e) => { e.stopPropagation(); onDelete() }} className="text-[12px] px-4 py-2 rounded-md border border-red-200 dark:border-red-500/20 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
-              Delete Listing
+            <button onClick={(e) => { e.stopPropagation(); onDelete() }} className="h-10 border border-[#c98b4a]/40 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#c98b4a] transition hover:bg-[#c98b4a]/10">
+              Delete listing
             </button>
           )
         ) : listing.taken ? (
-          <span className="text-[12px] text-amber-600 dark:text-amber-400 font-medium px-1">⏳ Room in progress</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#c98b4a]">Room in progress</span>
         ) : (
-          <button onClick={(e) => { e.stopPropagation(); onOpenDeal() }} className="btn-primary text-[13px] px-5 py-2.5 w-full">
-            {listing.role === 'buyer' ? 'Sell to Them →' : 'Open Deal →'}
+          <button onClick={(e) => { e.stopPropagation(); onOpenDeal() }} className="h-11 w-full border border-[#ede9df] bg-[#ede9df] font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition hover:bg-transparent hover:text-[#ede9df]">
+            {listing.role === 'buyer' ? 'Sell to them' : 'Open deal'}
           </button>
         )}
       </div>
     </div>
   )
 }
+
 
 /* ═══════════════════════════════════════════
    Listing Detail Modal — click card to expand
