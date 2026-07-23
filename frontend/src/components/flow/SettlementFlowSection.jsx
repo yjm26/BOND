@@ -17,7 +17,7 @@ export default function SettlementFlowSection() {
           </p>
           <FlowStepList steps={FLOW_STEPS} />
         </div>
-        <div className="hidden lg:block">
+        <div className="hidden min-h-screen lg:block [&>div]:h-full [&>div]:min-h-screen">
           <FlowTextMap />
         </div>
       </div>
