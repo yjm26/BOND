@@ -8,7 +8,7 @@ export default function CreateRoomHeader({ fromMarket, creatorIsSeller }) {
             {fromMarket ? 'Confirm your room.' : 'Define your room.'}
           </h1>
           <p className="mt-4 max-w-[560px] text-[14px] leading-[1.7] text-[#b9b2a5]">
-            {fromMarket ? 'Review the listing terms, then create the escrow room.' : 'Set the role, price, collateral, delivery window, and deal type.'}
+            {fromMarket ? 'Review the listing terms, then create the escrow room.' : 'Set the role, price, collateral, seller deadline, and review timeout.'}
           </p>
         </div>
         <div className="border border-[#ede9df]/10 bg-[#111110] px-4 py-3 font-mono text-[10px] uppercase leading-[1.8] tracking-[0.14em] text-[#ede9df]/40">

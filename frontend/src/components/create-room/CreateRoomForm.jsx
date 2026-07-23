@@ -1,7 +1,7 @@
 import CollateralField from './CollateralField'
 import CreateRoomField from './CreateRoomField'
 import CreateRoomFlow from './CreateRoomFlow'
-import DealTypeSelector from './DealTypeSelector'
+import ReviewTimeoutSelector from './ReviewTimeoutSelector'
 import RoleSelector from './RoleSelector'
 
 const inputClass = 'h-12 w-full border border-[#ede9df]/12 bg-[#111110] px-4 text-[14px] text-[#ede9df] outline-none transition placeholder:text-[#ede9df]/24 focus:border-[#d8b15f]/60 disabled:cursor-not-allowed disabled:opacity-60'
@@ -22,12 +22,10 @@ export default function CreateRoomForm({ state, setters, fromMarket, canSubmit, 
           <input className={`${inputClass} pr-16`} type="number" placeholder="0.00" min="0.01" step="0.01" value={price} onChange={(event) => !fromMarket && setPrice(event.target.value)} readOnly={fromMarket} disabled={fromMarket} />
         </CreateRoomField>
         <CollateralField creatorIsSeller={creatorIsSeller} collateral={collateral} noCollateral={noCollateral} fromMarket={fromMarket} onCollateralChange={(value) => !fromMarket && setCollateral(value)} onNoCollateralChange={(checked) => { if (fromMarket) return; setNoCollateral(checked); if (checked) setCollateral('') }} />
-        {dealType !== 0 && (
-          <CreateRoomField label="Delivery window" suffix="days" note="Seller must deliver within this window or buyer can use refund/dispute path." disabled={fromMarket}>
-            <input className={`${inputClass} pr-16`} type="number" min={1} max={90} step={1} value={deliveryDays} onChange={(event) => !fromMarket && setDeliveryDays(Math.max(1, Math.min(90, Number(event.target.value) || 1)))} readOnly={fromMarket} disabled={fromMarket} />
-          </CreateRoomField>
-        )}
-        <DealTypeSelector dealType={dealType} fromMarket={fromMarket} onChange={(key) => !fromMarket && setDealType(key)} />
+        <CreateRoomField label="Seller deadline" suffix="days" note="Seller should deliver before this deadline. This is separate from buyer review timeout." disabled={fromMarket}>
+          <input className={`${inputClass} pr-16`} type="number" min={1} max={90} step={1} value={deliveryDays} onChange={(event) => !fromMarket && setDeliveryDays(Math.max(1, Math.min(90, Number(event.target.value) || 1)))} readOnly={fromMarket} disabled={fromMarket} />
+        </CreateRoomField>
+        <ReviewTimeoutSelector dealType={dealType} fromMarket={fromMarket} onChange={(key) => !fromMarket && setDealType(key)} />
         <button onClick={onRequestCreate} disabled={loading || !canSubmit} className="h-12 border border-[#ede9df] bg-[#ede9df] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition hover:bg-transparent hover:text-[#ede9df] disabled:cursor-not-allowed disabled:opacity-40">
           {loading ? step || 'Processing…' : fromMarket ? 'Confirm deal →' : `Create room${creatorIsSeller && !noCollateral && collateral ? ' + collateral' : ''}`}
         </button>
