@@ -9,6 +9,7 @@ export default function ProfileSetupField({ step, value, onChange }) {
       </p>
       <label className="mt-10 block">
         <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/44">{step.label}</span>
+        {step.note && <span className="mt-2 block text-[12px] leading-[1.55] text-[#ede9df]/38">{step.note}</span>}
         <input
           autoFocus
           value={value}

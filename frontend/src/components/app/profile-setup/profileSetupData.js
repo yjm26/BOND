@@ -13,6 +13,7 @@ export const SETUP_STEPS = [
     title: 'Add your X profile.',
     placeholder: 'e.g. @yjm26',
     helper: 'Optional for now. Useful later when counterparties need off-chain context.',
+    note: 'For now this is self-reported. Verified X connection will replace manual handles later.',
   },
   {
     key: 'discord',

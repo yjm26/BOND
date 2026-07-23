@@ -13,7 +13,7 @@ import CreateRoomPage from './pages/CreateRoomPage'
 import DocsPage from './pages/DocsPage'
 import LandingPage from './pages/LandingPage'
 import MarketPage from './pages/MarketPage'
-import OffersPage from './pages/OffersPage'
+import OffersRedirectPage from './pages/OffersRedirectPage'
 import ProfilePage from './pages/ProfilePage'
 import RoomDetailPage from './pages/RoomDetailPage'
 import RoomsIndexPage from './pages/RoomsIndexPage'
@@ -124,7 +124,7 @@ export default function App() {
         <Route path="/room/:id" element={<RoomDetailPage wallet={wallet} />} />
         <Route path="/docs/:section?" element={<DocsPage />} />
         <Route path="/market" element={<MarketPage wallet={wallet} />} />
-        <Route path="/offers" element={<OffersPage wallet={wallet} />} />
+        <Route path="/offers" element={<OffersRedirectPage />} />
         <Route path="/profile" element={<ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
         <Route path="/arbiter" element={<ArbiterPage wallet={wallet} />} />
       </Routes>

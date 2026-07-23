@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { authFetch, API_URL } from '../lib/api'
 import OfferModal from './OfferModal'
-import OffersPanel from './OffersPanel'
 import ListingDetailModal from './market/ListingDetailModal'
 import MarketFilters from './market/MarketFilters'
 import MarketListingForm from './market/MarketListingForm'
 import MarketListings from './market/MarketListings'
+import MarketOffersModal from './market/offers/MarketOffersModal'
 import MarketSidebar from './market/MarketSidebar'
 import MarketToolbar from './market/MarketToolbar'
 import { EMPTY_FORM } from './market/marketConstants'
 import { sortListings } from './market/marketUtils'
 
 export default function Market({ wallet }) {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [listings, setListings] = useState([])
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
@@ -25,6 +27,10 @@ export default function Market({ wallet }) {
   const [formError, setFormError] = useState('')
   const [touched, setTouched] = useState({ title: false, price: false })
   const [deleteError, setDeleteError] = useState('')
+
+  useEffect(() => {
+    if (searchParams.get('offers') === '1' && wallet) setShowOffers(true)
+  }, [searchParams, wallet])
 
   const fetchListings = useCallback(async () => {
     try {
@@ -114,8 +120,13 @@ export default function Market({ wallet }) {
               wallet={wallet}
               showOffers={showOffers}
               showForm={showForm}
-              onToggleOffers={() => { setShowOffers(!showOffers); setShowForm(false) }}
-              onToggleForm={() => { setShowForm(!showForm); setShowOffers(false) }}
+              onToggleOffers={() => {
+                const next = !showOffers
+                setShowOffers(next)
+                setShowForm(false)
+                setSearchParams(next ? { offers: '1' } : {})
+              }}
+              onToggleForm={() => { setShowForm(!showForm); setShowOffers(false); setSearchParams({}) }}
             />
 
             <MarketFilters
@@ -137,7 +148,7 @@ export default function Market({ wallet }) {
               onExpand={setExpandedListing}
             />
 
-            {showOffers && wallet && <OffersPanel wallet={wallet} API_URL={API_URL} />}
+            {showOffers && wallet && <MarketOffersModal wallet={wallet} API_URL={API_URL} onClose={() => { setShowOffers(false); setSearchParams({}) }} />}
             {offerTarget && wallet && <OfferModal listing={offerTarget} wallet={wallet} onClose={() => setOfferTarget(null)} onSubmitted={() => { setOfferTarget(null); fetchListings() }} />}
             {expandedListing && (
               <ListingDetailModal

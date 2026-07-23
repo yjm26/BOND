@@ -11,7 +11,6 @@ export default function HeaderNavLinks({ isAdmin, tone = 'light', mode = 'landin
       <div className="hidden items-center gap-6 md:flex">
         <Link to="/market" className={navLink}>Market</Link>
         <Link to="/rooms" className={navLink}>My rooms</Link>
-        <Link to="/offers" className={navLink}>Offers</Link>
         <Link to="/profile" className={navLink}>Profile</Link>
         <Link to="/profile" className={navLink}>Settings</Link>
         {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Arbiter</Link>}

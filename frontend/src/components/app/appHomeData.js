@@ -17,12 +17,7 @@ export const APP_ACTIONS = [
     body: 'Define buyer, seller, amount, deadline, and fallback path before value moves.',
     to: '/create',
   },
-  {
-    label: 'Offers',
-    title: 'Review incoming deal offers.',
-    body: 'Accept, decline, or inspect proposed room terms from other wallets.',
-    to: '/offers',
-  },
+
   {
     label: 'Profile',
     title: 'Manage workspace identity.',
