@@ -1,16 +1,54 @@
-export const HERO_TAGS = ['Arc Testnet', 'USDC Escrow', 'Agent Ready']
-
 export const HERO_FACTS = [
-  ['ROOM', '#42'],
-  ['LOCKED', '500 USDC'],
-  ['STATUS', 'FUNDED'],
-  ['PATH', 'CCTP READY'],
+  ['BUYER', 'Funds room'],
+  ['ESCROW', 'Holds USDC'],
+  ['SELLER', 'Delivers proof'],
+  ['ARBITER', 'Fallback path'],
 ]
 
 export const SETTLEMENT_NODES = [
-  { id: 'BUYER', x: '15%', y: '31%', tone: 'light', note: 'Wallet signs funding' },
-  { id: 'ARC USDC', x: '48%', y: '22%', tone: 'accent', note: 'Native gas + escrow' },
-  { id: 'ESCROW', x: '45%', y: '51%', tone: 'active', note: '500.00 locked' },
-  { id: 'AGENT', x: '67%', y: '35%', tone: 'light', note: 'Submits proof' },
-  { id: 'ARBITER', x: '62%', y: '74%', tone: 'muted', note: 'Dispute fallback' },
+  {
+    id: 'BUYER',
+    x: '20%',
+    y: '44%',
+    tone: 'light',
+    note: 'Funds room',
+    align: 'top',
+    detail: 'Buyer deposits USDC into escrow. Funds cannot move until release, refund, or dispute resolution.',
+  },
+  {
+    id: 'ARC USDC',
+    x: '48%',
+    y: '18%',
+    tone: 'accent',
+    note: 'Payment rail',
+    align: 'right',
+    detail: 'Arc keeps the payment path stable: USDC is used for gas and the escrowed amount.',
+  },
+  {
+    id: 'ESCROW',
+    x: '48%',
+    y: '44%',
+    tone: 'active',
+    note: 'Locks value',
+    align: 'bottom',
+    detail: 'The contract is the center of the room. It holds funds while buyer and seller complete the deal.',
+  },
+  {
+    id: 'SELLER',
+    x: '76%',
+    y: '44%',
+    tone: 'light',
+    note: 'Delivers proof',
+    align: 'topLeft',
+    detail: 'Seller delivers the item or service and attaches proof before funds can be released.',
+  },
+  {
+    id: 'ARBITER',
+    x: '48%',
+    y: '75%',
+    tone: 'muted',
+    note: 'Dispute fallback',
+    align: 'right',
+    detail: 'If buyer and seller disagree, the arbiter reviews evidence and resolves the locked funds.',
+  },
 ]

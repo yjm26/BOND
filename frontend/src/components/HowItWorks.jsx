@@ -2,7 +2,7 @@ const STEPS = [
   {
     num: '01',
     title: 'Open a private room',
-    desc: 'Set the asset, service, or agent task. Share a private join code so only the counterparty can enter.',
+    desc: 'Set the asset, service, or trade terms. Share a private join code so only the counterparty can enter.',
   },
   {
     num: '02',
@@ -12,7 +12,7 @@ const STEPS = [
   {
     num: '03',
     title: 'Submit delivery proof',
-    desc: 'Seller or agent marks the room delivered. Evidence, links, hashes, and dispute context stay attached to the room.',
+    desc: 'Seller marks the room delivered. Evidence, links, hashes, and dispute context stay attached to the room.',
   },
   {
     num: '04',
@@ -22,8 +22,8 @@ const STEPS = [
 ]
 
 const CAPABILITIES = [
-  { label: 'Human deals', desc: 'Freelance work, digital delivery, bounties, and marketplace trades.' },
-  { label: 'Agent tasks', desc: 'Task rooms for autonomous services with delivery proof and evaluator-style review.' },
+  { label: 'Digital work', desc: 'Freelance tasks, creative work, audits, code delivery, and client approvals.' },
+  { label: 'Marketplace trades', desc: 'Private escrow rooms for seller delivery, buyer release, refunds, and disputes.' },
   { label: 'Crosschain ready', desc: 'Designed for CCTP/App Kit onboarding so users can bring USDC into Arc before funding.' },
 ]
 
@@ -106,7 +106,7 @@ export default function HowItWorks() {
                 The UI should make risk visible: who pays, who delivers, how much is locked, when deadlines expire, and what happens if either side disappears.
               </p>
               <p>
-                Agentic and CCTP features should extend the room model, not replace it. The core remains simple: lock value, verify delivery, settle safely.
+                Crosschain funding can extend the room model later, not replace it. The core remains simple: lock value, verify delivery, settle safely.
               </p>
             </div>
           </div>

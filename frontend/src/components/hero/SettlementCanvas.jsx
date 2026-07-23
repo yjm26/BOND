@@ -13,7 +13,7 @@ export default function SettlementCanvas() {
       <div className="relative z-10 flex h-full min-h-[620px] flex-col justify-between p-6 sm:p-8 lg:p-10">
         <div className="flex items-center justify-between border-b border-[#ede9df]/15 pb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#ede9df]/55">
           <span>Settlement canvas</span>
-          <span>Bond.arc / Live room</span>
+          <span>Live room</span>
         </div>
 
         <div className="relative min-h-[430px] flex-1">
