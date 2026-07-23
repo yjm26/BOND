@@ -40,6 +40,4 @@ export const EMPTY_FORM = {
   collateral: '',
   deliveryDays: 5,
   dealType: 0,
-  contactMethod: 'telegram',
-  contactHandle: '',
 }

@@ -8,7 +8,7 @@ import MarketListingForm from './market/MarketListingForm'
 import MarketListings from './market/MarketListings'
 import MarketSidebar from './market/MarketSidebar'
 import MarketToolbar from './market/MarketToolbar'
-import { EMPTY_FORM, SOCIAL_OPTIONS } from './market/marketConstants'
+import { EMPTY_FORM } from './market/marketConstants'
 import { sortListings } from './market/marketUtils'
 
 export default function Market({ wallet }) {
@@ -54,12 +54,6 @@ export default function Market({ wallet }) {
     if (!form.title.trim()) { setTouched((current) => ({ ...current, title: true })); setFormError('Title is required'); return }
     if (!form.price || Number(form.price) <= 0) { setTouched((current) => ({ ...current, price: true })); setFormError('Price must be greater than 0'); return }
 
-    const method = SOCIAL_OPTIONS.find((social) => social.key === form.contactMethod)
-    const handle = form.contactHandle.trim()
-    if (!handle) { setFormError('Contact handle is required so buyer/seller can reach you'); return }
-    const validation = method?.validate?.(handle)
-    if (validation) { setFormError(`Contact: ${validation}`); return }
-
     try {
       await authFetch('/api/listings', {
         method: 'POST',
@@ -72,7 +66,6 @@ export default function Market({ wallet }) {
           collateral: form.collateral || '0',
           deliveryDays: Number(form.deliveryDays) || 5,
           dealType: Number(form.dealType) || 0,
-          socials: { [form.contactMethod]: handle },
         }),
       }, wallet)
       setForm(EMPTY_FORM)
