@@ -156,8 +156,10 @@ Use motion only to clarify state or guide attention.
 Allowed:
 
 - smooth scroll;
+- scroll reveal for lower sections, subtle translate/fade only;
 - subtle hover transitions;
 - low-opacity animated dashed settlement lines;
+- small moving flow particles on the hero settlement rail when they clarify direction;
 - gentle reveal animation;
 - node hover explanation.
 

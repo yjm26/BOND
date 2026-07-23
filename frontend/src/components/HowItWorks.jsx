@@ -1,3 +1,5 @@
+import ScrollReveal from './ScrollReveal'
+
 const STEPS = [
   {
     num: '01',
@@ -38,7 +40,7 @@ export default function HowItWorks() {
     <section id="how" className="border-t border-white/[0.08] px-4 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-[1120px]">
         <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          <div>
+          <ScrollReveal>
             <div className="section-kicker">How BOND works</div>
             <h2 className="mt-4 max-w-[440px] text-[36px] font-medium leading-[1.02] tracking-[-0.055em] text-bond-text sm:text-[48px]">
               A deal room with settlement logic built in.
@@ -46,9 +48,9 @@ export default function HowItWorks() {
             <p className="mt-5 max-w-[460px] text-[15px] leading-[1.75] text-bond-muted">
               BOND keeps the familiar web2 pattern — create a deal, invite a counterparty, submit work — but moves the money and resolution path onto Arc.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="card-3d overflow-hidden rounded-2xl">
+          <ScrollReveal delay={90} className="card-3d overflow-hidden rounded-2xl">
             {STEPS.map((step, index) => (
               <div key={step.num} className={`grid gap-4 p-5 sm:grid-cols-[64px_1fr] sm:p-6 ${index > 0 ? 'border-t border-white/[0.08]' : ''}`}>
                 <div className="font-mono text-[12px] text-bond-faint">{step.num}</div>
@@ -58,20 +60,20 @@ export default function HowItWorks() {
                 </div>
               </div>
             ))}
-          </div>
+          </ScrollReveal>
         </div>
 
         <div className="mt-20 grid gap-4 md:grid-cols-3">
           {CAPABILITIES.map((item) => (
-            <div key={item.label} className="card-3d rounded-2xl p-6">
+            <ScrollReveal key={item.label} delay={80} className="card-3d rounded-2xl p-6">
               <div className="mb-5 h-9 w-9 rounded-lg border border-white/[0.08] bg-white/[0.035]" />
               <h3 className="text-[18px] font-medium tracking-[-0.025em] text-bond-text">{item.label}</h3>
               <p className="mt-3 text-[14px] leading-[1.65] text-bond-muted">{item.desc}</p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 
-        <div className="mt-20 rounded-[28px] border border-white/[0.08] bg-white/[0.025] p-6 sm:p-8 lg:p-10">
+        <ScrollReveal className="mt-20 rounded-[28px] border border-white/[0.08] bg-white/[0.025] p-6 sm:p-8 lg:p-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_1.15fr] lg:items-end">
             <div>
               <div className="section-kicker">Why Arc</div>
@@ -93,9 +95,9 @@ export default function HowItWorks() {
               </div>
             ))}
           </div>
-        </div>
+        </ScrollReveal>
 
-        <div className="mt-20 border-t border-white/[0.08] pt-14">
+        <ScrollReveal className="mt-20 border-t border-white/[0.08] pt-14">
           <div className="section-kicker">Product stance</div>
           <div className="mt-5 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
             <h2 className="text-[30px] font-medium leading-[1.06] tracking-[-0.05em] text-bond-text sm:text-[40px]">
@@ -110,7 +112,7 @@ export default function HowItWorks() {
               </p>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   )

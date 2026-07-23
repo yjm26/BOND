@@ -15,6 +15,13 @@ export default function SettlementPaths() {
           <stop offset="0%" stopColor="#ede9df" stopOpacity="0.22" />
           <stop offset="100%" stopColor="#c98b4a" stopOpacity="0.66" />
         </linearGradient>
+        <filter id="particleGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
         <marker id="arrowMain" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#b7c8a3" fillOpacity="0.9" />
         </marker>
@@ -25,16 +32,32 @@ export default function SettlementPaths() {
 
       {/* Main rail: clean direction from buyer to escrow to seller. */}
       <path d="M155 335 H365 H585" fill="none" stroke="#ede9df" strokeOpacity="0.08" strokeWidth="18" strokeLinecap="round" />
-      <path className="animate-[dashFlow_5s_linear_infinite]" d="M155 335 H350" fill="none" stroke="url(#mainFlow)" strokeWidth="2.8" strokeDasharray="12 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
-      <path className="animate-[dashFlow_5s_linear_infinite]" d="M382 335 H585" fill="none" stroke="url(#mainFlow)" strokeWidth="2.8" strokeDasharray="12 12" strokeLinecap="round" markerEnd="url(#arrowMain)" />
+      <path id="buyerToEscrow" className="animate-[dashFlow_5s_linear_infinite]" d="M155 335 H350" fill="none" stroke="url(#mainFlow)" strokeWidth="2.8" strokeDasharray="12 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
+      <path id="escrowToSeller" className="animate-[dashFlow_5s_linear_infinite]" d="M382 335 H585" fill="none" stroke="url(#mainFlow)" strokeWidth="2.8" strokeDasharray="12 12" strokeLinecap="round" markerEnd="url(#arrowMain)" />
 
       {/* Infrastructure rail from Arc USDC into escrow. */}
       <path d="M365 140 V318" fill="none" stroke="#ede9df" strokeOpacity="0.05" strokeWidth="10" strokeLinecap="round" />
-      <path className="animate-[dashFlow_7s_linear_infinite]" d="M365 140 V318" fill="none" stroke="url(#infraFlow)" strokeWidth="2" strokeDasharray="5 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
+      <path id="arcToEscrow" className="animate-[dashFlow_7s_linear_infinite]" d="M365 140 V318" fill="none" stroke="url(#infraFlow)" strokeWidth="2" strokeDasharray="5 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
 
       {/* Fallback branch leaves escrow only when a dispute is opened. */}
       <path d="M365 352 V575" fill="none" stroke="#ede9df" strokeOpacity="0.045" strokeWidth="10" strokeLinecap="round" />
-      <path className="animate-[dashFlow_8s_linear_infinite]" d="M365 352 V575" fill="none" stroke="url(#disputeFlow)" strokeWidth="2" strokeDasharray="4 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
+      <path id="escrowToArbiter" className="animate-[dashFlow_8s_linear_infinite]" d="M365 352 V575" fill="none" stroke="url(#disputeFlow)" strokeWidth="2" strokeDasharray="4 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
+
+      {/* Flow particles make the direction readable without making the canvas noisy. */}
+      <g filter="url(#particleGlow)" className="motion-safe:opacity-100 motion-reduce:opacity-0">
+        <circle r="4" fill="#d8b15f" fillOpacity="0.9">
+          <animateMotion dur="2.8s" repeatCount="indefinite" path="M155 335 H350" />
+        </circle>
+        <circle r="4" fill="#b7c8a3" fillOpacity="0.88">
+          <animateMotion dur="3s" begin="0.7s" repeatCount="indefinite" path="M382 335 H585" />
+        </circle>
+        <circle r="3" fill="#d8b15f" fillOpacity="0.76">
+          <animateMotion dur="3.6s" begin="0.4s" repeatCount="indefinite" path="M365 140 V318" />
+        </circle>
+        <circle r="3" fill="#c98b4a" fillOpacity="0.62">
+          <animateMotion dur="4.4s" begin="1.3s" repeatCount="indefinite" path="M365 352 V575" />
+        </circle>
+      </g>
 
       <g className="font-mono text-[10px] uppercase tracking-[0.18em]" fill="#ede9df" fillOpacity="0.42">
         <text x="214" y="314">fund usdc</text>
