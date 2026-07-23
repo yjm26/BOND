@@ -126,7 +126,7 @@ export default function App() {
         <Route path="/market" element={<MarketPage wallet={wallet} />} />
         <Route path="/offers" element={<OffersRedirectPage />} />
         <Route path="/profile" element={<ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
-        <Route path="/arbiter" element={<ArbiterPage wallet={wallet} />} />
+        <Route path="/arbiter" element={<ArbiterPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
       </Routes>
       </PageTransition>
       </ErrorBoundary>

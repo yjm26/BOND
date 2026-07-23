@@ -11,9 +11,9 @@ export default function HeaderNavLinks({ isAdmin, tone = 'light', mode = 'landin
       <div className="hidden items-center gap-6 md:flex">
         <Link to="/market" className={navLink}>Market</Link>
         <Link to="/rooms" className={navLink}>My rooms</Link>
+        <Link to="/arbiter" className={navLink}>Disputes</Link>
         <Link to="/profile" className={navLink}>Profile</Link>
         <Link to="/profile" className={navLink}>Settings</Link>
-        {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Arbiter</Link>}
       </div>
     )
   }
@@ -23,7 +23,7 @@ export default function HeaderNavLinks({ isAdmin, tone = 'light', mode = 'landin
       <a href="#how" onClick={onHowClick} className={navLink}>How it works</a>
       <a href="#use-cases" onClick={onUseCasesClick} className={navLink}>Use cases</a>
       <Link to="/docs" className={navLink}>Docs</Link>
-      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Arbiter</Link>}
+      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Disputes</Link>}
     </div>
   )
 }

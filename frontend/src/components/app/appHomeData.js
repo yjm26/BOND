@@ -24,4 +24,10 @@ export const APP_ACTIONS = [
     body: 'Review connected wallet, app preferences, and profile settings.',
     to: '/profile',
   },
+  {
+    label: 'Disputes',
+    title: 'Resolve rooms that need arbiter review.',
+    body: 'Owner and active arbiters review frozen rooms, evidence, and settlement outcomes.',
+    to: '/arbiter',
+  },
 ]
