@@ -10,7 +10,7 @@ const PATH_LABELS = [
 
 export default function FlowTextMap() {
   return (
-    <div className="relative min-h-[680px] overflow-hidden border-l border-[#ede9df]/10 bg-[#20201f]">
+    <div className="relative min-h-[680px] overflow-hidden bg-[#20201f]">
       <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(237,233,223,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(237,233,223,0.12)_1px,transparent_1px)] [background-size:28px_28px]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_44%,rgba(216,177,95,0.12),transparent_22rem),radial-gradient(circle_at_82%_74%,rgba(183,200,163,0.10),transparent_20rem)]" />
 

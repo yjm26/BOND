@@ -119,20 +119,23 @@ Revolutionary web3 marketplace
 
 ## Hero rules
 
-The hero uses two sides:
+The hero should stay simple and editorial unless there is a strong product reason to add a visual canvas.
 
-1. Left editorial panel
+Current preferred hero:
+
+1. Single editorial panel
    - off-white background;
    - large black headline;
    - short concrete paragraph;
    - clear CTA buttons;
    - meaningful role/flow facts only.
 
-2. Right settlement canvas
+Avoid reintroducing a right-side hero canvas unless explicitly requested. If used later, the right side:
+
    - warm almost-black background;
    - subtle grid;
-   - visible directional flow lines;
-   - hoverable nodes with real explanations;
+   - may use an aesthetic ASCII field / terminal-style settlement preview when the full lifecycle is explained in the next section;
+   - avoid repeating the full flow diagram if section two already owns the application flow;
    - no decorative fake controls.
 
 Current approved flow direction:
@@ -222,6 +225,7 @@ For future sections below hero:
 
 - keep the same editorial/system language;
 - do not copy the hero layout everywhere;
+- avoid harsh left/right seams; blend split sections with shared backgrounds or soft gradients;
 - use diagrams only when they explain product behavior;
 - make risk and transaction state visible;
 - prefer concrete escrow lifecycle copy over vague marketing.
