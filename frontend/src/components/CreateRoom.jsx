@@ -43,8 +43,9 @@ export default function CreateRoom({ wallet }) {
   const canSubmit = Boolean(wallet && item.trim() && price.trim())
 
   const validateRoom = () => {
-    if (!wallet || !item.trim() || !price.trim()) return 'Connect wallet and fill item + price first.'
-    if (new TextEncoder().encode(item.trim()).length > MAX_ITEM_BYTES) return `Item description must stay under ${MAX_ITEM_BYTES} bytes`
+    const itemValue = item.trim()
+    if (!wallet || !itemValue || !price.trim()) return 'Connect wallet and fill item + price first.'
+    if (new TextEncoder().encode(itemValue).length > MAX_ITEM_BYTES) return `Item description must stay under ${MAX_ITEM_BYTES} bytes`
     if (deliveryDays < 1 || deliveryDays > 90) return 'Delivery window must be 1–90 days'
     try {
       const priceWei = ethers.parseUnits(price, 6)
@@ -123,7 +124,7 @@ export default function CreateRoom({ wallet }) {
         }
 
         setStep('Creating room…')
-        const tx = await contract.createRoom(item, priceWei, collateralWei, joinCodeHash, creatorIsSeller, deliveryDays, { ...ARC_GAS, nonce: nonce++ })
+        const tx = await contract.createRoom(item.trim(), priceWei, collateralWei, joinCodeHash, creatorIsSeller, deliveryDays, { ...ARC_GAS, nonce: nonce++ })
         setStep('Waiting for confirmation…')
         const receipt = await waitForTx(wallet.provider, tx.hash, 180000)
 
