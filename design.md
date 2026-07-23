@@ -159,7 +159,7 @@ Allowed:
 - scroll reveal for lower sections, subtle translate/fade only;
 - subtle hover transitions;
 - low-opacity animated dashed settlement lines;
-- small moving flow particles on the hero settlement rail when they clarify direction;
+- one small moving flow particle on the hero settlement rail when it clarifies direction;
 - gentle reveal animation;
 - node hover explanation.
 

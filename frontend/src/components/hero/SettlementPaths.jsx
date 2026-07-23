@@ -43,19 +43,10 @@ export default function SettlementPaths() {
       <path d="M365 352 V575" fill="none" stroke="#ede9df" strokeOpacity="0.045" strokeWidth="10" strokeLinecap="round" />
       <path id="escrowToArbiter" className="animate-[dashFlow_8s_linear_infinite]" d="M365 352 V575" fill="none" stroke="url(#disputeFlow)" strokeWidth="2" strokeDasharray="4 12" strokeLinecap="round" markerEnd="url(#arrowSoft)" />
 
-      {/* Flow particles make the direction readable without making the canvas noisy. */}
+      {/* One settlement particle keeps the motion readable: buyer funds escrow, then escrow releases to seller. */}
       <g filter="url(#particleGlow)" className="motion-safe:opacity-100 motion-reduce:opacity-0">
-        <circle r="4" fill="#d8b15f" fillOpacity="0.9">
-          <animateMotion dur="2.8s" repeatCount="indefinite" path="M155 335 H350" />
-        </circle>
-        <circle r="4" fill="#b7c8a3" fillOpacity="0.88">
-          <animateMotion dur="3s" begin="0.7s" repeatCount="indefinite" path="M382 335 H585" />
-        </circle>
-        <circle r="3" fill="#d8b15f" fillOpacity="0.76">
-          <animateMotion dur="3.6s" begin="0.4s" repeatCount="indefinite" path="M365 140 V318" />
-        </circle>
-        <circle r="3" fill="#c98b4a" fillOpacity="0.62">
-          <animateMotion dur="4.4s" begin="1.3s" repeatCount="indefinite" path="M365 352 V575" />
+        <circle r="4.5" fill="#ede9df" fillOpacity="0.94">
+          <animateMotion dur="4.2s" repeatCount="indefinite" path="M155 335 H585" />
         </circle>
       </g>
 
