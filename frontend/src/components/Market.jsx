@@ -182,31 +182,45 @@ export default function Market({ wallet }) {
   }, [listings, search, sort])
 
   return (
-    <section className="pt-24 pb-32 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-[1400px] mx-auto">
+    <section className="min-h-screen bg-[#ede9df] px-4 pb-32 pt-28 text-[#171716] sm:px-6">
+      <div className="mx-auto max-w-[1180px]">
 
         {/* Header */}
-        <div className="flex items-end justify-between gap-4 mb-8 flex-wrap">
+        <div className="mb-10 grid gap-8 border-b border-[#171716]/15 pb-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[3px] text-stripe-body dark:text-gray-500 mb-2">Market</div>
-            <h1 className="text-[28px] font-light text-stripe-navy dark:text-white" style={{ letterSpacing: '-0.56px' }}>
-              Browse deals.
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.28em] text-[#6f6b62]">Market / Deal intake</div>
+            <h1 className="max-w-[520px] text-[clamp(44px,6vw,76px)] font-medium leading-[0.92] tracking-[-0.075em] text-[#171716]">
+              Browse settlement-ready deals.
             </h1>
-            <p className="text-[14px] text-stripe-body dark:text-gray-400 mt-1">
-              Pick a listing and open a trustless escrow room.
+            <p className="mt-5 max-w-[520px] text-[16px] leading-[1.65] tracking-[-0.02em] text-[#4d4942]">
+              Find a buyer or seller, review the terms, then open a private BOND escrow room where USDC only moves through release, refund, or arbitration.
             </p>
           </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              ['Listings', `${sorted.length}`],
+              ['Asset', 'USDC'],
+              ['Path', 'Escrow room'],
+            ].map(([label, value]) => (
+              <div key={label} className="border border-[#171716]/15 bg-[#f4f0e7] p-4">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#6f6b62]">{label}</div>
+                <div className="mt-2 text-[20px] font-medium tracking-[-0.04em] text-[#171716]">{value}</div>
+              </div>
+            ))}
+          </div>
+
           {wallet && (
-            <div className="flex gap-2 shrink-0">
+            <div className="flex shrink-0 gap-2 lg:col-span-2 lg:justify-end">
               <button
                 onClick={() => { setShowOffers(!showOffers); setShowForm(false) }}
-                className={`text-[13px] px-4 py-2 rounded-md border transition ${showOffers ? 'bg-zinc-900 text-zinc-100 border-zinc-700' : 'border-zinc-300 text-zinc-600 hover:border-zinc-500'}`}
+                className={`border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition ${showOffers ? 'border-[#171716] bg-[#171716] text-[#ede9df]' : 'border-[#171716]/20 text-[#171716] hover:border-[#171716]'}`}
               >
                 Offers
               </button>
               <button
                 onClick={() => { setShowForm(!showForm); setShowOffers(false) }}
-                className="btn-primary text-[13px] shrink-0"
+                className="shrink-0 border border-[#171716] bg-[#171716] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#ede9df] transition hover:bg-transparent hover:text-[#171716]"
               >
                 {showForm ? 'Cancel' : '+ Post Listing'}
               </button>
@@ -386,36 +400,39 @@ export default function Market({ wallet }) {
           </div>
         )}
 
-        {/* Search + Sort + Category filter — single row */}
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <div className="w-full sm:w-auto sm:flex-1 sm:max-w-[360px] relative">
+        {/* Search + Sort + Category filter — deal desk controls */}
+        <div className="mb-6 border border-[#171716]/15 bg-[#f4f0e7] p-3">
+          <div className="grid gap-3 lg:grid-cols-[1fr_220px]">
+          <div className="relative">
             <input
-              className="stripe-input w-full pl-9"
+              className="h-12 w-full border border-[#171716]/15 bg-[#ede9df] pl-10 pr-9 text-[14px] text-[#171716] outline-none transition placeholder:text-[#6f6b62]/60 focus:border-[#171716]/40"
               placeholder="Search listings…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-stripe-body dark:text-gray-500" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6f6b62]" width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2"/>
               <path d="M16 16l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stripe-body dark:text-gray-500 hover:text-stripe-navy dark:hover:text-white text-[12px]">
+              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#6f6b62] hover:text-[#171716]">
                 ✕
               </button>
             )}
           </div>
           <select
-            className="stripe-input text-[13px] py-2 pr-8"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            className="h-12 w-full border border-[#171716]/15 bg-[#ede9df] px-3 font-mono text-[12px] uppercase tracking-[0.12em] text-[#171716] outline-none transition focus:border-[#171716]/40"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23171716' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             value={sort}
             onChange={(e) => setSort(e.target.value)}
           >
             {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
           </select>
-          <div className="flex gap-1.5 overflow-x-auto">
+          </div>
+
+          <div className="mt-3 flex gap-2 overflow-x-auto border-t border-[#171716]/10 pt-3">
             {CATEGORIES.map((cat) => (
-              <button key={cat} onClick={() => setFilter(cat)} className={`text-[11px] font-mono px-3 py-1.5 rounded-md whitespace-nowrap border transition ${filter === cat ? 'bg-zinc-900 text-zinc-100 border-zinc-700' : 'text-zinc-500 dark:text-gray-400 border-zinc-200 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20 hover:text-zinc-700 dark:hover:text-white bg-white dark:bg-white/5'}`}>
+              <button key={cat} onClick={() => setFilter(cat)} className={`whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition ${filter === cat ? 'border-[#171716] bg-[#171716] text-[#ede9df]' : 'border-[#171716]/15 bg-[#ede9df] text-[#6f6b62] hover:border-[#171716]/40 hover:text-[#171716]'}`}>
                 {cat !== 'All' && <span className="mr-1 opacity-60">{CATEGORY_ICON[cat]}</span>}{cat}
               </button>
             ))}
@@ -445,13 +462,13 @@ export default function Market({ wallet }) {
 
         {/* Listings */}
         {!loading && sorted.length === 0 && (
-          <div className="card-3d p-8 text-center">
-            <div className="w-14 h-14 mx-auto mb-5 rounded-lg border border-stripe-border dark:border-white/10 flex items-center justify-center text-2xl">🔍</div>
-            <h3 className="text-[16px] font-medium text-stripe-navy dark:text-white mb-2">
+          <div className="grid min-h-[260px] place-items-center border border-[#171716]/15 bg-[#f4f0e7] p-8 text-center">
+            <div className="mb-5 flex h-14 w-14 items-center justify-center border border-[#171716]/15 bg-[#ede9df] font-mono text-[20px] text-[#6f6b62]">⌕</div>
+            <h3 className="mb-2 text-[22px] font-medium tracking-[-0.05em] text-[#171716]">
               {search ? 'No results found' : 'No listings yet'}
             </h3>
-            <p className="text-[14px] text-stripe-body dark:text-gray-400">
-              {search ? `No listings match "${search}"` : wallet ? 'Post the first listing!' : 'Connect your wallet to post a listing.'}
+            <p className="max-w-[420px] text-[14px] leading-[1.65] text-[#6f6b62]">
+              {search ? `No listings match "${search}"` : wallet ? 'Post the first listing and define the escrow terms before value moves.' : 'Connect your wallet to post a listing. Deals should start with clear terms, price, proof, and settlement path.'}
             </p>
           </div>
         )}
