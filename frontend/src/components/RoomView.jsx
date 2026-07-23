@@ -2,25 +2,24 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract, getUsdc, ensureArcChain, ARC_GAS, ARC_GAS_APPROVE, STATE_NAMES, CONTRACT_ADDRESS, waitForTx , parseRoom, fixSignerNonce } from '../utils/contract'
-import { fetchReputation, getReputationBadge, getCollateralBadge } from '../utils/reputation'
+import { fetchReputation } from '../utils/reputation'
 import RoomHistory from './room/RoomHistory'
 import ActionPanel from './room/ActionPanel'
-import Skeleton from './Skeleton'
+import RoomArbiterPanel from './room-detail/RoomArbiterPanel'
+import RoomCountdownPanel from './room-detail/RoomCountdownPanel'
+import RoomDetailSidebar from './room-detail/RoomDetailSidebar'
+import RoomEmptyState from './room-detail/RoomEmptyState'
+import RoomEvidencePanel from './room-detail/RoomEvidencePanel'
+import RoomGuidePanel from './room-detail/RoomGuidePanel'
+import RoomHeader from './room-detail/RoomHeader'
+import RoomJoinCodePanel from './room-detail/RoomJoinCodePanel'
+import RoomLoadingState from './room-detail/RoomLoadingState'
+import RoomPartiesPanel from './room-detail/RoomPartiesPanel'
+import RoomStatusMessage from './room-detail/RoomStatusMessage'
+import RoomTermsPanel from './room-detail/RoomTermsPanel'
 import { useToast } from '../hooks/useToast'
 import { useSmartPolling } from '../hooks/useSmartPolling'
-import { authFetch, API_URL } from '../lib/api'
-
-const STATE_BADGE = {
-  Created: 'text-blue-700 bg-blue-50 border-blue-200',
-  Joined: 'text-purple-700 bg-purple-50 border-purple-200',
-  Funded: 'text-amber-700 bg-amber-50 border-amber-200',
-  Delivered: 'text-green-700 bg-green-50 border-green-200',
-  Released: 'text-emerald-700 bg-emerald-50 border-emerald-200',
-  Disputed: 'text-red-700 bg-red-50 border-red-200',
-  Refunded: 'text-orange-700 bg-orange-50 border-orange-200',
-  Expired: 'text-gray-600 bg-gray-50 border-gray-200',
-  Cancelled: 'text-gray-600 bg-gray-50 border-gray-200',
-}
+import { API_URL } from '../lib/api'
 
 const STATE_GUIDES = {
   Created: {
@@ -106,11 +105,6 @@ const STATE_GUIDES = {
 
 const TREASURY = '0xB8b4e8E7Ad2651d36b8E0D24B5EF1ae06EE2cC4a'
 
-function formatAddress(addr) {
-  if (!addr || addr === '0x0000000000000000000000000000000000000000') return '—'
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`
-}
-
 export default function RoomView({ wallet }) {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -143,16 +137,9 @@ export default function RoomView({ wallet }) {
   const [inviteLink, setInviteLink] = useState('')
 
   useEffect(() => {
-    // Fetch invite link with joinCode from backend (for creator to share)
-    if (!id || !wallet) return
-    authFetch(`/api/room-codes?roomId=${id}`, { method: 'GET' }, wallet)
-      .then(codes => {
-        const code = codes?.[0]?.joinCode
-        if (code) setInviteLink(`${window.location.origin}/room/${id}?code=${code}`)
-        else setInviteLink(window.location.href)
-      })
-      .catch(() => setInviteLink(window.location.href))
-  }, [id, wallet])
+    if (!id) return
+    setInviteLink(window.location.href)
+  }, [id])
 
   async function loadRoom() {
     try {
@@ -236,22 +223,6 @@ export default function RoomView({ wallet }) {
   }
 
   useEffect(() => { loadRoom(); loadEvidence() }, [id, wallet])
-
-  // Auto-fetch joinCode from backend when user is eligible to join but URL has no code
-  useEffect(() => {
-    if (!room || !id || joinCodeInput) return
-    const isCreatorAddr = account === room.creator?.toLowerCase()
-    const isCounterAddr = account === room.counterparty?.toLowerCase()
-    if (isCreatorAddr || isCounterAddr) return // already participant
-    if (room.state !== 'Created') return // can only join in Created state
-    if (!wallet) return
-    authFetch(`/api/room-codes?roomId=${id}`, { method: 'GET' }, wallet)
-      .then(data => {
-        const code = data?.[0]?.joinCode
-        if (code) setJoinCodeInput(code)
-      })
-      .catch(() => {})
-  }, [room, id, account, joinCodeInput, wallet])
 
   const isTerminal = ['Released', 'Refunded', 'Expired', 'Cancelled'].includes(room?.state)
   useSmartPolling(
@@ -538,382 +509,62 @@ export default function RoomView({ wallet }) {
   const isBuyer = role === 'buyer'
   const guide = room && STATE_GUIDES[room.state] ? (STATE_GUIDES[room.state][role || 'both'] || STATE_GUIDES[room.state].both || []) : []
 
-  if (loading) return (
-    <section className="pt-28 pb-32 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <div className="card-3d p-6 md:p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Skeleton className="w-16 h-6" />
-            <Skeleton className="w-32 h-6" />
-            <div className="ml-auto"><Skeleton className="w-20 h-8" /></div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-3 space-y-6">
-              <Skeleton className="w-3/4 h-8" />
-              <Skeleton lines={4} />
-              <div className="grid grid-cols-2 gap-4">
-                <Skeleton className="h-20" />
-                <Skeleton className="h-20" />
-              </div>
-            </div>
-            <div className="lg:col-span-2 space-y-4">
-              <Skeleton className="h-24" />
-              <Skeleton className="h-40" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+  const priceUSDC = room?.price || '0'
+  const taxUSDC = room ? (Number(room.price) * 0.01).toFixed(2) : '0.00'
+  const totalUSDC = room ? (Number(room.price) * 1.01).toFixed(2) : '0.00'
+  const hasCollateral = Number(room?.collateralAmount || 0) > 0
+  const displayRole = role ? role[0].toUpperCase() + role.slice(1) : null
 
-  if (!wallet) return (
-    <section className="pt-28 pb-32 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <div className="card-3d p-8 text-center max-w-[500px] mx-auto">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-stripe-surface dark:bg-white/5 border border-stripe-border dark:border-white/10 flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 15v2m0 0v2m0-2h2m-2 0H9m12-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round"/></svg>
-          </div>
-          <h2 className="text-[18px] font-medium text-stripe-navy dark:text-white mb-2">Connect Your Wallet</h2>
-          <p className="text-[14px] text-stripe-body dark:text-gray-400 mb-6">Use the "Connect Wallet" button in the top navigation to get started.</p>
-          <div className="text-left bg-stripe-surface dark:bg-white/5 rounded-lg p-4 space-y-2 text-[13px] text-stripe-body dark:text-gray-400">
-            <div className="flex items-start gap-2"><span className="text-green-600 mt-0.5">✓</span> Switch to <strong className="text-stripe-navy dark:text-white">Arc Testnet</strong> (chain ID 5042002)</div>
-            <div className="flex items-start gap-2"><span className="text-green-600 mt-0.5">✓</span> You need <strong className="text-stripe-navy dark:text-white">test USDC</strong> to create or join rooms</div>
-            <div className="flex items-start gap-2"><span className="text-green-600 mt-0.5">✓</span> Need test USDC? Ask in Discord or check the docs</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-
-  if (!room) return (
-    <section className="pt-28 pb-32 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <div className="card-3d p-8 text-center">
-          <div className="text-red-600 text-[14px]">Room not found</div>
-        </div>
-      </div>
-    </section>
-  )
-
-  const priceUSDC = room.price
-  const taxUSDC = (Number(room.price) * 0.01).toFixed(2)
-  const totalUSDC = (Number(room.price) * 1.01).toFixed(2)
-  const hasCollateral = Number(room.collateralAmount) > 0
+  if (loading) return <RoomLoadingState />
+  if (!wallet || !room) return <RoomEmptyState wallet={wallet} status={status} />
 
   return (
-    <section className="pt-28 pb-32 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <button onClick={() => navigate(-1)} className="text-[13px] text-stripe-body dark:text-gray-400 hover:text-stripe-navy dark:hover:text-white transition mb-4">← Back</button>
-
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-[22px] sm:text-[26px] font-semibold text-stripe-navy dark:text-white leading-tight">{room.item}</h1>
-              <div className="text-[13px] text-stripe-body dark:text-gray-400 font-mono mt-1">Room #{id}</div>
-            </div>
-            <span className={`px-3 py-1.5 rounded text-[12px] font-semibold tracking-wider border shrink-0 ${STATE_BADGE[room.state] || 'text-gray-600 bg-gray-50 border-gray-200'}`}>
-              {room.state}
-            </span>
-          </div>
-        </div>
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* LEFT COLUMN — Info (3/5) */}
-          <div className="lg:col-span-3 space-y-5">
-            {/* Price */}
-            <div className="card-3d p-5">
-              <div className="text-[10px] font-mono uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-3">Price Breakdown</div>
-              <PriceRow label="Item price" value={`${priceUSDC} USDC`} />
-              <PriceRow label="Tax (1%)" value={`${taxUSDC} USDC`} />
-              <PriceRow label="Total to fund" value={`${totalUSDC} USDC`} bold />
-              {hasCollateral && <PriceRow label="Seller collateral" value={`${room.collateralAmount} USDC`} bold />}
-            </div>
-
-            {/* Escrow & Collateral */}
-            {Number(room.value) > 0 && (
-              <div className="card-3d p-5">
-                <div className="text-[10px] font-mono uppercase tracking-[2px] text-green-600 mb-2">In Escrow</div>
-                <div className="text-[24px] font-semibold text-green-700 font-mono">{room.value} USDC</div>
-                <div className="text-[12px] text-stripe-body dark:text-gray-400 mt-1">Locked on-chain until deal completes</div>
+    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
+      <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
+        <RoomDetailSidebar wallet={wallet} />
+        <main className="overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
+          <div className="p-4 sm:p-5 lg:p-6">
+            <button onClick={() => navigate(-1)} className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#ede9df]/44 transition hover:text-[#ede9df]">← Back</button>
+            <RoomHeader id={id} room={room} role={displayRole} />
+            <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
+              <div className="grid gap-5">
+                <RoomTermsPanel room={room} priceUSDC={priceUSDC} taxUSDC={taxUSDC} totalUSDC={totalUSDC} hasCollateral={hasCollateral} />
+                <RoomPartiesPanel room={room} isCreator={isCreator} isCounter={isCounter} creatorRep={creatorRep} counterpartyRep={counterpartyRep} role={displayRole} />
+                <RoomEvidencePanel room={room} evidence={evidence} />
+                <RoomHistory roomId={id} provider={wallet.provider} />
               </div>
-            )}
-
-            {hasCollateral && (
-              <div className="card-3d p-5">
-                <div className="text-[10px] font-mono uppercase tracking-[2px] text-amber-600 mb-2">Collateral Locked</div>
-                <div className="text-[20px] font-semibold text-amber-700 font-mono">{room.collateralAmount} USDC</div>
-                <div className="text-[12px] text-stripe-body dark:text-gray-400 mt-1">
-                  {isCreator ? 'Your collateral. Refunded on success/cancel/expire.' : 'Seller collateral acts as guarantee. Refunded to seller on success.'}
-                </div>
-              </div>
-            )}
-
-            {/* Parties */}
-            <div className="card-3d p-5">
-              <div className="text-[10px] font-mono uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-4">Parties</div>
-              <div className="space-y-4">
-                <PartyCard
-                  label="Creator"
-                  address={room.creator}
-                  role={room.creatorIsSeller ? 'Seller' : 'Buyer'}
-                  isYou={isCreator}
-                  reputation={creatorRep}
+              <aside className="grid content-start gap-5">
+                <RoomGuidePanel guide={guide} />
+                <RoomCountdownPanel countdown={countdown} room={room} />
+                <RoomJoinCodePanel joinCode={joinCode} room={room} isCreator={isCreator} isParticipant={isParticipant} joinCodeInput={joinCodeInput} setJoinCodeInput={setJoinCodeInput} />
+                <ActionPanel
+                  room={room} id={id} isCreator={isCreator} isSeller={isSeller} isBuyer={isBuyer} isAdmin={isAdmin} isParticipant={isParticipant}
+                  arbiterName={arbiterName} totalUSDC={totalUSDC} joinCode={joinCode} copied={copied}
+                  canExpire={canExpire} canEscalate={canEscalate} canBuyerRefund={canBuyerRefund}
+                  handleJoin={handleJoin} handleFund={handleFund} handleDeliver={handleDeliver} handleRelease={handleRelease}
+                  handleBuyerRefund={handleBuyerRefund} handleCancel={handleCancel} handleLeave={handleLeave} handleExpire={handleExpire}
+                  handleEscalate={handleEscalate} handleArbRelease={handleArbRelease} handleArbRefund={handleArbRefund} handleArbSplit={handleArbSplit}
+                  copyInvite={copyInvite}
+                  showDisputeForm={showDisputeForm} setShowDisputeForm={setShowDisputeForm}
+                  disputeReason={disputeReason} setDisputeReason={setDisputeReason}
+                  handleDispute={handleDispute}
+                  canMutualCancel={canMutualCancel}
+                  mutualCancelStatus={mutualCancelStatus}
+                  hasApprovedMutualCancel={hasApprovedMutualCancel}
+                  counterpartyApprovedMutualCancel={counterpartyApprovedMutualCancel}
+                  mutualCancelReady={mutualCancelReady}
+                  handleRequestMutualCancel={handleRequestMutualCancel}
+                  handleRevokeMutualCancel={handleRevokeMutualCancel}
+                  handleExecuteMutualCancel={handleExecuteMutualCancel}
+                  txPending={txPending}
                 />
-                {room.counterparty !== '0x0000000000000000000000000000000000000000' ? (
-                  <PartyCard
-                    label="Counterparty"
-                    address={room.counterparty}
-                    role={room.creatorIsSeller ? 'Buyer' : 'Seller'}
-                    isYou={isCounter}
-                    reputation={counterpartyRep}
-                  />
-                ) : (
-                  <div className="text-[13px] text-stripe-body dark:text-gray-400 py-3 border border-dashed border-stripe-border dark:border-white/10 rounded px-3">
-                    Waiting for counterparty to join…
-                  </div>
-                )}
-              </div>
-              <div className="mt-4 pt-4 border-t border-stripe-border dark:border-white/10">
-                <div className="text-[13px] text-stripe-body dark:text-gray-400">
-                  You are: <span className="font-medium text-stripe-navy dark:text-white">{isCreator ? (room.creatorIsSeller ? 'Seller' : 'Buyer') : isCounter ? (room.creatorIsSeller ? 'Buyer' : 'Seller') : 'Viewer'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Evidence (if disputed) */}
-            {room.state === 'Disputed' && evidence && evidence.length > 0 && (
-              <div className="card-3d p-5">
-                <div className="text-[10px] font-mono uppercase tracking-[2px] text-red-600 mb-3">Submitted Evidence</div>
-                <div className="space-y-2">
-                  {evidence.map((ev) => (
-                    <div key={ev.id} className="border border-red-100 rounded p-3">
-                      <div className="flex justify-between items-start gap-2">
-                        <span className="text-[11px] font-medium text-red-700 uppercase">{ev.evidenceType}</span>
-                        <span className="text-[10px] text-gray-400 shrink-0">{formatAddress(ev.submitter)}</span>
-                      </div>
-                      {ev.description && <div className="text-[12px] text-gray-600 mt-1">{ev.description}</div>}
-                      <div className="text-[11px] text-blue-600 mt-1 break-all">
-                        {ev.evidenceRef.startsWith('http') ? (
-                          <a href={ev.evidenceRef} target="_blank" rel="noopener noreferrer" className="hover:underline">🔗 {ev.evidenceRef}</a>
-                        ) : (
-                          <span className="font-mono">{ev.evidenceRef}</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Room History */}
-            <RoomHistory roomId={id} provider={wallet.provider} />
-          </div>
-
-          {/* RIGHT COLUMN — Actions (2/5) */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* State Guide */}
-            {guide.length > 0 && (
-              <div className="card-3d p-5">
-                <div className="text-[10px] font-mono uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-3">What to do</div>
-                <ul className="space-y-2">
-                  {guide.map((g, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[13px] text-stripe-body dark:text-gray-300">
-                      <span className="text-blue-500 mt-0.5 shrink-0">•</span>
-                      {g}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Countdown */}
-            {countdown && (
-              <div className={`rounded-lg p-4 border ${
-                countdown === 'Expired'
-                  ? 'bg-red-50 border-red-200'
-                  : room.state === 'Disputed'
-                  ? 'bg-red-50 border-red-200'
-                  : room.state === 'Funded'
-                  ? 'bg-amber-50 border-amber-200'
-                  : 'bg-purple-50 border-purple-200'
-              }`}>
-                <div className={`text-[10px] font-mono uppercase tracking-[2px] mb-1 ${
-                  countdown === 'Expired' ? 'text-red-600' : room.state === 'Disputed' ? 'text-red-600' : room.state === 'Funded' ? 'text-amber-600' : 'text-purple-600'
-                }`}>Deadline</div>
-                <div className={`text-[18px] font-semibold font-mono ${
-                  countdown === 'Expired' ? 'text-red-800' : room.state === 'Disputed' ? 'text-red-800' : room.state === 'Funded' ? 'text-amber-800' : 'text-purple-800'
-                }`}>{countdown}</div>
-                {room.state === 'Funded' && (
-                  <div className="text-[11px] text-amber-600 mt-1">Seller must deliver before deadline</div>
-                )}
-                {room.state === 'Delivered' && (
-                  <div className="text-[11px] text-purple-600 mt-1">No action = funds released to seller</div>
-                )}
-              </div>
-            )}
-
-            {/* Manual join code input — fallback when auto-fetch fails */}
-            {!joinCode && room.state === 'Created' && !isCreator && !isParticipant && (
-              <div className="bg-stripe-surface dark:bg-white/5 border border-stripe-border dark:border-white/10 rounded-lg p-4">
-                <div className="text-[10px] font-mono uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-2">Join Code Required</div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={joinCodeInput}
-                    onChange={(e) => setJoinCodeInput(e.target.value)}
-                    placeholder="Enter 8-character code"
-                    maxLength={8}
-                    className="stripe-input flex-1 font-mono text-[14px] tracking-[2px] uppercase"
-                  />
-                  <button
-                    onClick={() => {
-                      const trimmed = joinCodeInput.trim().toUpperCase()
-                      if (trimmed.length === 8) setJoinCodeInput(trimmed)
-                    }}
-                    disabled={joinCodeInput.trim().length !== 8}
-                    className="btn-primary px-4 text-[13px] disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Apply
-                  </button>
-                </div>
-                <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-2">
-                  Ask the room creator for the invite link or join code.
-                </p>
-              </div>
-            )}
-
-            <ActionPanel
-              room={room} id={id} isCreator={isCreator} isSeller={isSeller} isBuyer={isBuyer} isAdmin={isAdmin} isParticipant={isParticipant}
-              arbiterName={arbiterName} totalUSDC={totalUSDC} joinCode={joinCode} copied={copied}
-              canExpire={canExpire} canEscalate={canEscalate} canBuyerRefund={canBuyerRefund}
-              handleJoin={handleJoin} handleFund={handleFund} handleDeliver={handleDeliver} handleRelease={handleRelease}
-              handleBuyerRefund={handleBuyerRefund} handleCancel={handleCancel} handleLeave={handleLeave} handleExpire={handleExpire}
-              handleEscalate={handleEscalate} handleArbRelease={handleArbRelease} handleArbRefund={handleArbRefund} handleArbSplit={handleArbSplit}
-              copyInvite={copyInvite}
-              showDisputeForm={showDisputeForm} setShowDisputeForm={setShowDisputeForm}
-              disputeReason={disputeReason} setDisputeReason={setDisputeReason}
-              handleDispute={handleDispute}
-              canMutualCancel={canMutualCancel}
-              mutualCancelStatus={mutualCancelStatus}
-              hasApprovedMutualCancel={hasApprovedMutualCancel}
-              counterpartyApprovedMutualCancel={counterpartyApprovedMutualCancel}
-              mutualCancelReady={mutualCancelReady}
-              handleRequestMutualCancel={handleRequestMutualCancel}
-              handleRevokeMutualCancel={handleRevokeMutualCancel}
-              handleExecuteMutualCancel={handleExecuteMutualCancel}
-              txPending={txPending}
-            />
-
-            {/* Status */}
-            {status && (
-              <div className={`px-4 py-3 rounded text-[13px] font-medium border ${
-                status.type === 'ok' ? 'bg-green-50 text-green-700 border-green-100'
-                : status.type === 'err' ? 'bg-red-50 text-red-600 border-red-100'
-                : 'bg-blue-50 text-blue-700 border-blue-100'
-              }`}>
-                {status.msg}
-              </div>
-            )}
-
-            {/* Arbiter Info */}
-            <div className="card-3d p-4">
-              <div className="text-[10px] font-mono uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-2">Arbiter</div>
-              <div className="text-[13px] text-stripe-navy dark:text-white font-medium">{arbiterName}</div>
-              <div className="text-[11px] text-stripe-body dark:text-gray-400 font-mono mt-0.5">{formatAddress(arbiterAddr)}</div>
+                <RoomStatusMessage status={status} />
+                <RoomArbiterPanel arbiterName={arbiterName} arbiterAddr={arbiterAddr} />
+              </aside>
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </section>
-  )
-}
-
-function PriceRow({ label, value, bold }) {
-  return (
-    <div className={`flex justify-between text-[13px] py-2 ${bold ? 'font-medium' : ''} border-b border-stripe-border dark:border-white/10 last:border-b-0`}>
-      <span className="text-stripe-body dark:text-gray-400">{label}</span>
-      <span className="text-stripe-navy dark:text-white font-mono" style={{ fontFeatureSettings: '"tnum"' }}>{value}</span>
-    </div>
-  )
-}
-
-function PartyCard({ label, address, role, isYou, reputation }) {
-  const badge = reputation ? getReputationBadge(reputation) : null
-  const collBadge = reputation ? getCollateralBadge(reputation.multiplier) : null
-  return (
-    <div className="border border-stripe-border dark:border-white/10 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-stripe-body dark:text-gray-400">{label}</span>
-          {isYou && <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 border border-purple-200 font-medium">YOU</span>}
-        </div>
-        <span className="text-[12px] text-stripe-body dark:text-gray-400 shrink-0">{role}</span>
-      </div>
-
-      <div className="text-[14px] font-mono text-stripe-navy dark:text-white mb-3">{formatAddress(address)}</div>
-
-      {reputation && reputation.totalDeals > 0 ? (
-        <div className="space-y-2">
-          {/* Reputation Badge */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {badge && (
-              <span className={`text-[11px] px-2 py-1 rounded border ${badge.color} font-medium`}>
-                {badge.label}
-              </span>
-            )}
-            {collBadge && (
-              <span className={`text-[11px] px-2 py-1 rounded border ${collBadge.color} font-medium`}>
-                Collateral {collBadge.label}
-              </span>
-            )}
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-4 gap-2 mt-2">
-            <div className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded">
-              <div className="text-[14px] font-semibold text-stripe-navy dark:text-white">{reputation.totalDeals}</div>
-              <div className="text-[10px] text-stripe-body dark:text-gray-400">Deals</div>
-            </div>
-            <div className="text-center p-2 bg-green-50 rounded">
-              <div className="text-[14px] font-semibold text-green-700">{reputation.success}</div>
-              <div className="text-[10px] text-green-600">Success</div>
-            </div>
-            <div className="text-center p-2 bg-red-50 rounded">
-              <div className="text-[14px] font-semibold text-red-700">{reputation.dispute}</div>
-              <div className="text-[10px] text-red-600">Dispute</div>
-            </div>
-            <div className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded">
-              <div className="text-[14px] font-semibold text-stripe-navy dark:text-white">{reputation.successRate}%</div>
-              <div className="text-[10px] text-stripe-body dark:text-gray-400">Rate</div>
-            </div>
-          </div>
-
-          {/* Success Rate Bar */}
-          <div className="mt-2">
-            <div className="flex justify-between text-[10px] text-stripe-body dark:text-gray-400 mb-1">
-              <span>Success rate</span>
-              <span>{reputation.successRate}%</span>
-            </div>
-            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${reputation.successRate}%`,
-                  backgroundColor: reputation.successRate >= 90 ? '#10b981' : reputation.successRate >= 70 ? '#f59e0b' : '#ef4444',
-                }}
-              />
-            </div>
-          </div>
-
-          {collBadge && (
-            <div className="text-[11px] text-stripe-body dark:text-gray-400 mt-1">{collBadge.desc}</div>
-          )}
-        </div>
-      ) : (
-        <div className="text-[12px] text-stripe-body dark:text-gray-400">No reputation history yet</div>
-      )}
-    </div>
   )
 }
