@@ -21,6 +21,8 @@ import { useToast } from '../hooks/useToast'
 import { useSmartPolling } from '../hooks/useSmartPolling'
 import { API_URL } from '../lib/api'
 
+const MAX_REASON_BYTES = 500
+
 const STATE_GUIDES = {
   Created: {
     seller: [
@@ -417,6 +419,7 @@ export default function RoomView({ wallet }) {
 
   const handleDispute = async () => {
     if (!disputeReason.trim()) { setStatus({ type: 'err', msg: 'Reason required' }); return }
+    if (new TextEncoder().encode(disputeReason.trim()).length > MAX_REASON_BYTES) { setStatus({ type: 'err', msg: `Reason must stay under ${MAX_REASON_BYTES} bytes` }); return }
     const ok = await doAction(
       (c, gas) => c.openDispute(id, disputeReason.trim(), 'text', '', '', gas),
       'Opening dispute\u2026',

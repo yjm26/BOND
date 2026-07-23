@@ -15,7 +15,7 @@ export default function CreateRoomForm({ state, setters, fromMarket, canSubmit, 
         <RoleSelector creatorIsSeller={creatorIsSeller} fromMarket={fromMarket} onSeller={() => !fromMarket && setCreatorIsSeller(true)} onBuyer={() => { if (!fromMarket) { setCreatorIsSeller(false); setNoCollateral(true); setCollateral('') } }} />
         <CreateRoomFlow creatorIsSeller={creatorIsSeller} />
         <CreateRoomField label="Item / service" disabled={fromMarket}>
-          <input className={inputClass} placeholder="What is being delivered?" value={item} onChange={(event) => !fromMarket && setItem(event.target.value)} readOnly={fromMarket} disabled={fromMarket} maxLength={500} />
+          <input className={inputClass} placeholder="What is being delivered?" value={item} onChange={(event) => !fromMarket && setItem(event.target.value)} readOnly={fromMarket} disabled={fromMarket} maxLength={160} />
         </CreateRoomField>
         <CreateRoomField label="Price" suffix="USDC" disabled={fromMarket}>
           <input className={`${inputClass} pr-16`} type="number" placeholder="0.00" min="0.01" step="0.01" value={price} onChange={(event) => !fromMarket && setPrice(event.target.value)} readOnly={fromMarket} disabled={fromMarket} />

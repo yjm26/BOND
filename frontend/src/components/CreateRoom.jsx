@@ -10,6 +10,8 @@ import CreateRoomSidebar from './create-room/CreateRoomSidebar'
 import CreateRoomSuccess from './create-room/CreateRoomSuccess'
 import CreateRoomSummary from './create-room/CreateRoomSummary'
 
+const MAX_ITEM_BYTES = 160
+
 export default function CreateRoom({ wallet }) {
   const [searchParams] = useSearchParams()
   const [item, setItem] = useState(searchParams.get('item') || '')
@@ -42,6 +44,7 @@ export default function CreateRoom({ wallet }) {
 
   const validateRoom = () => {
     if (!wallet || !item.trim() || !price.trim()) return 'Connect wallet and fill item + price first.'
+    if (new TextEncoder().encode(item.trim()).length > MAX_ITEM_BYTES) return `Item description must stay under ${MAX_ITEM_BYTES} bytes`
     if (deliveryDays < 1 || deliveryDays > 90) return 'Delivery window must be 1–90 days'
     try {
       const priceWei = ethers.parseUnits(price, 6)

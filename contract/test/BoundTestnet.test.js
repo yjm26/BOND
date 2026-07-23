@@ -159,4 +159,59 @@ describe('BoundTestnet', function () {
     await expect(bond.connect(secondArbiter).arbiterResolve(secondRoomId, seller.address))
       .to.be.revertedWith('Not authorized')
   })
+
+  it('bounds user-controlled strings that are stored on-chain', async function () {
+    const { bond, owner, seller, buyer } = await deployFixture()
+    const price = parseUsdc(10)
+    const longItem = 'x'.repeat(161)
+    const longReason = 'x'.repeat(501)
+    const longEvidenceRef = 'x'.repeat(301)
+
+    await expect(bond.connect(seller).createRoom(longItem, price, 0, joinHash, true, 5))
+      .to.be.revertedWith('Item too long')
+
+    await expect(bond.connect(owner).addArbiter(buyer.address, 'x'.repeat(65)))
+      .to.be.revertedWith('Arbiter name too long')
+
+    const fresh = await deployFixture()
+    const freshRoom = await createJoinFundDeliver(fresh)
+    await expect(fresh.bond.connect(fresh.buyer).openDispute(freshRoom.roomId, longReason, 'text', '', ''))
+      .to.be.revertedWith('Reason too long')
+
+    await fresh.bond.connect(fresh.buyer).openDispute(freshRoom.roomId, 'Missing delivery', 'text', '', '')
+    await expect(fresh.bond.connect(fresh.buyer).submitEvidence(freshRoom.roomId, 'text', 'ok', longEvidenceRef))
+      .to.be.revertedWith('Evidence ref too long')
+  })
+
+  it('reverts cleanly when USDC returns false instead of silently continuing', async function () {
+    const { bond, usdc, seller, buyer } = await deployFixture()
+    const price = parseUsdc(25)
+    const fee = await bond.fundingFee(price)
+
+    await bond.connect(seller).createRoom('Safe transfer test', price, 0, joinHash, true, 5)
+    await bond.connect(buyer).joinRoom(1, ethers.toUtf8Bytes('JOINCODE'))
+    await usdc.mint(buyer.address, price + fee)
+    await usdc.connect(buyer).approve(await bond.getAddress(), price + fee)
+    await usdc.setFailTransfers(true)
+
+    await expect(bond.connect(buyer).fundRoom(1))
+      .to.be.revertedWith('USDC transferFrom failed')
+  })
+
+  it('emits admin change events and rejects no-op ownership transfers', async function () {
+    const { bond, owner, treasury, buyer } = await deployFixture()
+
+    await expect(bond.connect(owner).transferOwnership(owner.address))
+      .to.be.revertedWith('Owner unchanged')
+
+    await expect(bond.connect(owner).setTreasury(buyer.address))
+      .to.emit(bond, 'TreasuryUpdated')
+      .withArgs(treasury.address, buyer.address)
+
+    await expect(bond.connect(owner).transferOwnership(buyer.address))
+      .to.emit(bond, 'OwnershipTransferred')
+      .withArgs(owner.address, buyer.address)
+
+    expect(await bond.owner()).to.equal(buyer.address)
+  })
 })

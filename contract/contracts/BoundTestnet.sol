@@ -16,6 +16,7 @@ contract BoundTestnet {
     string public arbiterName;
     mapping(address => bool) public isArbiter;
     mapping(address => string) public arbiterDisplayName;
+    bool private locked;
 
     uint256 public roomCount;
     mapping(uint256 => Room) public rooms;
@@ -48,6 +49,12 @@ contract BoundTestnet {
     uint256 public constant FUND_DL = 30 minutes;
     uint256 public constant MIN_DELIVERY_DAYS = 1;
     uint256 public constant MAX_DELIVERY_DAYS = 90;
+    uint256 public constant MAX_ITEM_BYTES = 160;
+    uint256 public constant MAX_ARBITER_NAME_BYTES = 64;
+    uint256 public constant MAX_REASON_BYTES = 500;
+    uint256 public constant MAX_EVIDENCE_TYPE_BYTES = 48;
+    uint256 public constant MAX_EVIDENCE_DESC_BYTES = 500;
+    uint256 public constant MAX_EVIDENCE_REF_BYTES = 300;
 
     // Buyer can settle or dispute immediately after delivery.
     // Seller can escalate to arbiter only after this short response buffer.
@@ -119,6 +126,8 @@ contract BoundTestnet {
         string evidenceRef
     );
     event EscalatedNoResponse(uint256 indexed id, uint32 confirmDeadline);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event TreasuryUpdated(address indexed previousTreasury, address indexed newTreasury);
 
     // ─── Modifiers ───
     modifier onlyOwner() {
@@ -131,6 +140,13 @@ contract BoundTestnet {
         _;
     }
 
+    modifier nonReentrant() {
+        require(!locked, "Reentrant call");
+        locked = true;
+        _;
+        locked = false;
+    }
+
     // ─── Constructor ───
     constructor(
         address _usdc,
@@ -141,6 +157,7 @@ contract BoundTestnet {
         require(_usdc != address(0), "Bad USDC");
         require(_treasury != address(0), "Bad treasury");
         require(_arbiter != address(0), "Bad arbiter");
+        require(bytes(_arbiterName).length <= MAX_ARBITER_NAME_BYTES, "Arbiter name too long");
         owner = msg.sender;
         usdc = IERC20(_usdc);
         treasury = _treasury;
@@ -154,11 +171,14 @@ contract BoundTestnet {
     // ─── Admin ───
     function setTreasury(address _t) external onlyOwner {
         require(_t != address(0), "Bad treasury");
+        address previous = treasury;
         treasury = _t;
+        emit TreasuryUpdated(previous, _t);
     }
 
     function setArbiter(address _a, string memory _name) external onlyOwner {
         require(_a != address(0), "Bad arbiter");
+        require(bytes(_name).length <= MAX_ARBITER_NAME_BYTES, "Arbiter name too long");
         arbiter = _a;
         arbiterName = _name;
         isArbiter[_a] = true;
@@ -168,6 +188,7 @@ contract BoundTestnet {
 
     function addArbiter(address _account, string memory _name) external onlyOwner {
         require(_account != address(0), "Bad arbiter");
+        require(bytes(_name).length <= MAX_ARBITER_NAME_BYTES, "Arbiter name too long");
         isArbiter[_account] = true;
         arbiterDisplayName[_account] = _name;
         emit ArbiterAdded(_account, _name);
@@ -182,7 +203,10 @@ contract BoundTestnet {
 
     function transferOwnership(address _new) external onlyOwner {
         require(_new != address(0), "Bad owner");
+        require(_new != owner, "Owner unchanged");
+        address previous = owner;
         owner = _new;
+        emit OwnershipTransferred(previous, _new);
     }
 
     // ─── Helpers ───
@@ -209,6 +233,14 @@ contract BoundTestnet {
         return (_price * FUND_TAX_BPS) / BPS_DENOM;
     }
 
+    function _safeTransfer(address to, uint256 amount) internal {
+        require(usdc.transfer(to, amount), "USDC transfer failed");
+    }
+
+    function _safeTransferFrom(address from, address to, uint256 amount) internal {
+        require(usdc.transferFrom(from, to, amount), "USDC transferFrom failed");
+    }
+
     // ─── Reputation ───
     function collateralMultiplier(address sellerAccount) external view returns (uint256) {
         if (refundedCount[sellerAccount] > 0) return 150;
@@ -225,8 +257,9 @@ contract BoundTestnet {
         bytes32 _joinCodeHash,
         bool _creatorIsSeller,
         uint32 _deliveryDays
-    ) external {
+    ) external nonReentrant {
         require(bytes(_item).length > 0, "Empty item");
+        require(bytes(_item).length <= MAX_ITEM_BYTES, "Item too long");
         require(_price > 0, "Zero price");
         require(_deliveryDays >= MIN_DELIVERY_DAYS && _deliveryDays <= MAX_DELIVERY_DAYS, "Bad deliveryDays");
         require(activeRooms[msg.sender] < MAX_ACTIVE, "Max active rooms reached");
@@ -257,10 +290,7 @@ contract BoundTestnet {
         activeRooms[msg.sender]++;
 
         if (_creatorIsSeller && _collateral > 0) {
-            require(
-                usdc.transferFrom(msg.sender, address(this), _collateral),
-                "Collateral lock failed"
-            );
+            _safeTransferFrom(msg.sender, address(this), _collateral);
         }
 
         emit RoomCreated(
@@ -275,7 +305,7 @@ contract BoundTestnet {
     }
 
     // ─── Join Room ───
-    function joinRoom(uint256 _roomId, bytes calldata _joinCode) external {
+    function joinRoom(uint256 _roomId, bytes calldata _joinCode) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.creator != address(0), "Room not found");
         require(r.state == State.Created, "Not open for join");
@@ -291,17 +321,14 @@ contract BoundTestnet {
         activeRooms[msg.sender]++;
 
         if (!r.creatorIsSeller && r.collateralAmount > 0) {
-            require(
-                usdc.transferFrom(msg.sender, address(this), r.collateralAmount),
-                "Collateral lock failed"
-            );
+            _safeTransferFrom(msg.sender, address(this), r.collateralAmount);
         }
 
         emit RoomJoined(_roomId, msg.sender);
     }
 
     // ─── Fund Room ───
-    function fundRoom(uint256 _roomId) external {
+    function fundRoom(uint256 _roomId) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Joined, "Not joinable");
         require(block.timestamp <= r.joinedAt + FUND_DL, "Fund window expired");
@@ -312,7 +339,7 @@ contract BoundTestnet {
         uint256 fee = fundingFee(r.priceUSD);
         uint256 totalPaid = r.priceUSD + fee;
 
-        require(usdc.transferFrom(msg.sender, address(this), totalPaid), "Fund transfer failed");
+        _safeTransferFrom(msg.sender, address(this), totalPaid);
 
         r.fundedAmount = r.priceUSD;
         r.platformFee = fee;
@@ -337,7 +364,7 @@ contract BoundTestnet {
     }
 
     // ─── Release Funds (buyer confirms) ───
-    function releaseFunds(uint256 _roomId) external {
+    function releaseFunds(uint256 _roomId) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Delivered, "Not delivered");
         require(msg.sender == _buyer(r), "Only buyer can release");
@@ -350,11 +377,11 @@ contract BoundTestnet {
         uint256 payout = r.fundedAmount + r.collateralAmount;
 
         if (r.platformFee > 0) {
-            usdc.transfer(treasury, r.platformFee);
+            _safeTransfer(treasury, r.platformFee);
         }
 
         if (payout > 0) {
-            usdc.transfer(seller, payout);
+            _safeTransfer(seller, payout);
         }
 
         _closeRoom(_roomId, r);
@@ -393,6 +420,7 @@ contract BoundTestnet {
         require(r.state == State.Delivered, "Not delivered");
         require(msg.sender == _buyer(r), "Only buyer can dispute");
         require(bytes(_reason).length > 0, "Reason required");
+        require(bytes(_reason).length <= MAX_REASON_BYTES, "Reason too long");
 
         r.state = State.Disputed;
         r.disputedAt = uint32(block.timestamp);
@@ -426,6 +454,10 @@ contract BoundTestnet {
         string calldata _description,
         string calldata _evidenceRef
     ) internal {
+        require(bytes(_evidenceType).length <= MAX_EVIDENCE_TYPE_BYTES, "Evidence type too long");
+        require(bytes(_description).length <= MAX_EVIDENCE_DESC_BYTES, "Evidence desc too long");
+        require(bytes(_evidenceRef).length <= MAX_EVIDENCE_REF_BYTES, "Evidence ref too long");
+
         roomEvidence[_roomId].push(Evidence({
             submitter: msg.sender,
             evidenceType: _evidenceType,
@@ -452,7 +484,7 @@ contract BoundTestnet {
     }
 
     // ─── Buyer Refund (seller failed to deliver) ───
-    function buyerRefund(uint256 _roomId) external {
+    function buyerRefund(uint256 _roomId) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Funded, "Not funded");
         require(block.timestamp > r.deliveryDeadline, "Deadline not passed");
@@ -463,11 +495,11 @@ contract BoundTestnet {
         uint256 totalRefund = r.fundedAmount + r.collateralAmount;
 
         if (r.platformFee > 0) {
-            usdc.transfer(treasury, r.platformFee);
+            _safeTransfer(treasury, r.platformFee);
         }
 
         if (totalRefund > 0) {
-            usdc.transfer(buyer, totalRefund);
+            _safeTransfer(buyer, totalRefund);
         }
 
         _closeRoom(_roomId, r);
@@ -478,7 +510,7 @@ contract BoundTestnet {
     }
 
     // ─── Arbiter Resolve ───
-    function arbiterResolve(uint256 _roomId, address _winner) external onlyOwnerOrArbiter {
+    function arbiterResolve(uint256 _roomId, address _winner) external onlyOwnerOrArbiter nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Disputed, "Not disputed");
         require(_winner == _buyer(r) || _winner == _seller(r), "Invalid winner");
@@ -487,10 +519,10 @@ contract BoundTestnet {
         uint256 arbiterFee = (total * ARBITER_FEE_BPS) / BPS_DENOM;
         uint256 net = total - arbiterFee;
 
-        if (r.platformFee > 0) usdc.transfer(treasury, r.platformFee);
-        if (arbiterFee > 0) usdc.transfer(treasury, arbiterFee);
+        if (r.platformFee > 0) _safeTransfer(treasury, r.platformFee);
+        if (arbiterFee > 0) _safeTransfer(treasury, arbiterFee);
 
-        if (net > 0) usdc.transfer(_winner, net);
+        if (net > 0) _safeTransfer(_winner, net);
 
         if (_winner == _seller(r)) {
             successCount[_seller(r)]++;
@@ -505,7 +537,7 @@ contract BoundTestnet {
     }
 
     // ─── Arbiter Split ───
-    function arbiterSplit(uint256 _roomId) external onlyOwnerOrArbiter {
+    function arbiterSplit(uint256 _roomId) external onlyOwnerOrArbiter nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Disputed, "Not disputed");
 
@@ -514,12 +546,12 @@ contract BoundTestnet {
         uint256 net = total - arbiterFee;
         uint256 half = net / 2;
 
-        if (r.platformFee > 0) usdc.transfer(treasury, r.platformFee);
-        if (arbiterFee > 0) usdc.transfer(treasury, arbiterFee);
+        if (r.platformFee > 0) _safeTransfer(treasury, r.platformFee);
+        if (arbiterFee > 0) _safeTransfer(treasury, arbiterFee);
 
         if (half > 0) {
-            usdc.transfer(_buyer(r), half);
-            usdc.transfer(_seller(r), net - half);
+            _safeTransfer(_buyer(r), half);
+            _safeTransfer(_seller(r), net - half);
         }
 
         _closeRoom(_roomId, r);
@@ -529,13 +561,13 @@ contract BoundTestnet {
     }
 
     // ─── Cancel Room (creator, before join) ───
-    function cancelRoom(uint256 _roomId) external {
+    function cancelRoom(uint256 _roomId) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.creator == msg.sender, "Only creator");
         require(r.state == State.Created, "Not cancellable");
 
         if (r.creatorIsSeller && r.collateralAmount > 0) {
-            usdc.transfer(r.creator, r.collateralAmount);
+            _safeTransfer(r.creator, r.collateralAmount);
         }
 
         _clearMutualCancelApprovals(_roomId, r.creator, r.counterparty);
@@ -546,7 +578,7 @@ contract BoundTestnet {
     }
 
     // ─── Expire Room (anyone, after deadline) ───
-    function expireRoom(uint256 _roomId) external {
+    function expireRoom(uint256 _roomId) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(
             r.state == State.Created || r.state == State.Joined,
@@ -560,9 +592,9 @@ contract BoundTestnet {
         }
 
         if (r.creatorIsSeller && r.collateralAmount > 0) {
-            usdc.transfer(r.creator, r.collateralAmount);
+            _safeTransfer(r.creator, r.collateralAmount);
         } else if (!r.creatorIsSeller && r.collateralAmount > 0) {
-            usdc.transfer(r.counterparty, r.collateralAmount);
+            _safeTransfer(r.counterparty, r.collateralAmount);
         }
 
         _clearMutualCancelApprovals(_roomId, r.creator, r.counterparty);
@@ -597,7 +629,7 @@ contract BoundTestnet {
     }
 
     // ─── Mutual Cancel Execute ───
-    function executeMutualCancel(uint256 _roomId) external {
+    function executeMutualCancel(uint256 _roomId) external nonReentrant {
         Room storage r = rooms[_roomId];
         require(
             r.state == State.Joined || r.state == State.Funded || r.state == State.Delivered,
@@ -612,10 +644,10 @@ contract BoundTestnet {
         address seller = _seller(r);
 
         if (r.fundedAmount + r.platformFee > 0) {
-            usdc.transfer(buyer, r.fundedAmount + r.platformFee);
+            _safeTransfer(buyer, r.fundedAmount + r.platformFee);
         }
         if (r.collateralAmount > 0) {
-            usdc.transfer(seller, r.collateralAmount);
+            _safeTransfer(seller, r.collateralAmount);
         }
 
         _clearMutualCancelApprovals(_roomId, r.creator, r.counterparty);

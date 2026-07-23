@@ -6,6 +6,7 @@ import { formatAddress } from '../../../utils/constants'
 const inputClass = 'h-11 w-full border border-[#ede9df]/12 bg-[#111110] px-3 text-[13px] text-[#ede9df] outline-none placeholder:text-[#ede9df]/24 focus:border-[#d8b15f]/60 disabled:opacity-50'
 const primaryButton = 'h-11 border border-[#ede9df] bg-[#ede9df] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition hover:bg-transparent hover:text-[#ede9df] disabled:cursor-not-allowed disabled:opacity-40'
 const ghostButton = 'h-11 border border-[#ede9df]/14 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#ede9df]/64 transition hover:border-[#ede9df]/34 hover:text-[#ede9df] disabled:cursor-not-allowed disabled:opacity-40'
+const MAX_ARBITER_NAME_BYTES = 64
 
 export default function ArbiterManagePanel({ wallet }) {
   const [owner, setOwner] = useState('')
@@ -75,6 +76,10 @@ export default function ArbiterManagePanel({ wallet }) {
       setStatus({ type: 'err', msg: 'Invalid arbiter address.' })
       return
     }
+    if (new TextEncoder().encode(arbiterName.trim()).length > MAX_ARBITER_NAME_BYTES) {
+      setStatus({ type: 'err', msg: `Arbiter name must stay under ${MAX_ARBITER_NAME_BYTES} bytes.` })
+      return
+    }
     runArbiterTx('Adding arbiter…', (contract) => contract.addArbiter(arbiterAddress, arbiterName.trim() || 'BOND Arbiter', ARC_GAS))
   }
 
@@ -125,7 +130,7 @@ export default function ArbiterManagePanel({ wallet }) {
       {isOwner ? (
         <div className="mt-5 grid gap-3">
           <input className={inputClass} value={arbiterAddress} onChange={(event) => setArbiterAddress(event.target.value)} placeholder="Arbiter wallet address" />
-          <input className={inputClass} value={arbiterName} onChange={(event) => setArbiterName(event.target.value)} placeholder="Display name, e.g. BOND Arbiter" />
+          <input className={inputClass} value={arbiterName} onChange={(event) => setArbiterName(event.target.value)} placeholder="Display name, e.g. BOND Arbiter" maxLength={64} />
           <div className="grid gap-2 sm:grid-cols-2">
             <button className={primaryButton} disabled={loading} onClick={addArbiter}>Add arbiter</button>
             <button className={ghostButton} disabled={loading} onClick={removeArbiter}>Remove arbiter</button>
