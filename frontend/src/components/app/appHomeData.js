@@ -12,7 +12,7 @@ export const APP_ACTIONS = [
     to: '/rooms',
   },
   {
-    label: 'Create',
+    label: 'Create room',
     title: 'Start a new escrow room.',
     body: 'Define buyer, seller, amount, deadline, and fallback path before value moves.',
     to: '/create',

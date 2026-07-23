@@ -1,8 +1,14 @@
-import { useState } from 'react'
-import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract, getUsdc, waitForTx, ARC_GAS, ARC_GAS_APPROVE, generateJoinCode, hashJoinCode, createInviteLink, CONTRACT_ADDRESS, ensureArcChain, fixSignerNonce } from '../utils/contract'
-import { authFetch, API_URL } from '../lib/api'
+import { authFetch } from '../lib/api'
+import CreateRoomConfirm from './create-room/CreateRoomConfirm'
+import CreateRoomForm from './create-room/CreateRoomForm'
+import CreateRoomHeader from './create-room/CreateRoomHeader'
+import CreateRoomSidebar from './create-room/CreateRoomSidebar'
+import CreateRoomSuccess from './create-room/CreateRoomSuccess'
+import CreateRoomSummary from './create-room/CreateRoomSummary'
 
 export default function CreateRoom({ wallet }) {
   const [searchParams] = useSearchParams()
@@ -11,21 +17,18 @@ export default function CreateRoom({ wallet }) {
   const [collateral, setCollateral] = useState(searchParams.get('collateral') || '')
   const [noCollateral, setNoCollateral] = useState(searchParams.get('collateral') === '0')
   const [deliveryDays, setDeliveryDays] = useState(Number(searchParams.get('deliveryDays')) || 5)
-  const [dealType, setDealType] = useState(Number(searchParams.get('dealType')) || 0) // 0=Instant, 1=EventBased, 2=Service
+  const [dealType, setDealType] = useState(Number(searchParams.get('dealType')) || 0)
   const counterparty = searchParams.get('counterparty') || ''
-  const fromMarket = !!searchParams.get('listingId') || !!searchParams.get('item')
+  const fromMarket = Boolean(searchParams.get('listingId') || searchParams.get('item'))
   const [creatorIsSeller, setCreatorIsSeller] = useState(searchParams.get('creatorIsSeller') !== 'false')
-  const socialsRaw = searchParams.get('socials')
-  const socials = socialsRaw ? (() => { try { return JSON.parse(decodeURIComponent(socialsRaw)) } catch { return null } })() : null
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState('')
   const [result, setResult] = useState(() => {
-    // Persist success screen across refresh (e.g. user refreshes before clicking Go to Room)
     try {
       const saved = sessionStorage.getItem('bond_last_created')
       if (saved) {
         const data = JSON.parse(saved)
-        if (Date.now() - data.ts < 600000) return data // 10 min ttl
+        if (Date.now() - data.ts < 600000) return data
         sessionStorage.removeItem('bond_last_created')
       }
     } catch {}
@@ -33,40 +36,59 @@ export default function CreateRoom({ wallet }) {
   })
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
-  const navigate = useNavigate()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const roomState = useMemo(() => ({ item, price, collateral, noCollateral, deliveryDays, dealType, creatorIsSeller }), [item, price, collateral, noCollateral, deliveryDays, dealType, creatorIsSeller])
+  const canSubmit = Boolean(wallet && item.trim() && price.trim())
+
+  const validateRoom = () => {
+    if (!wallet || !item.trim() || !price.trim()) return 'Connect wallet and fill item + price first.'
+    if (deliveryDays < 1 || deliveryDays > 90) return 'Delivery window must be 1–90 days'
+    try {
+      const priceWei = ethers.parseUnits(price, 6)
+      if (priceWei === 0n) return 'Price too small — minimum 0.000001 USDC'
+    } catch {
+      return 'Invalid price format'
+    }
+    if (!noCollateral && collateral) {
+      try { ethers.parseUnits(collateral, 6) } catch { return 'Invalid collateral format' }
+    }
+    return ''
+  }
+
+  const requestCreate = () => {
+    const validationError = validateRoom()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+    setError('')
+    setConfirmOpen(true)
+  }
 
   const handleCreate = async () => {
-    if (!wallet || !item || !price) return
-    if (Number(price) <= 0) { setError('Price must be greater than 0'); return }
-    if (deliveryDays < 1 || deliveryDays > 90) { setError('Delivery window must be 1–90 days'); return }
-    // Validate price is at least 0.000001 USDC (1 unit = 1e-6), otherwise parseUnits rounds to 0
-    try {
-      const testWei = ethers.parseUnits(price, 6)
-      if (testWei === 0n) { setError('Price too small — minimum 0.000001 USDC'); return }
-    } catch {
-      setError('Invalid price format'); return
+    const validationError = validateRoom()
+    if (validationError) {
+      setError(validationError)
+      return
     }
-    // Validate collateral format
-    if (!noCollateral && collateral) {
-      try {
-        ethers.parseUnits(collateral, 6)
-      } catch {
-        setError('Invalid collateral format'); return
-      }
-    }
+
+    setConfirmOpen(false)
     setLoading(true)
     setError('')
-    setStep('Checking limits\u2026')
+    setStep('Checking limits…')
+    let createdSuccessfully = false
+
     try {
       const signer = await wallet.provider.getSigner()
       await ensureArcChain(signer)
       const contract = getContract(signer)
       const restore = await fixSignerNonce(signer)
+
       try {
-        // Check active room limit before spending gas
         let active, maxActive
         try {
-          [active, maxActive] = await Promise.all([
+          ;[active, maxActive] = await Promise.all([
             contract.activeRooms(wallet.address),
             contract.MAX_ACTIVE(),
           ])
@@ -74,6 +96,7 @@ export default function CreateRoom({ wallet }) {
           console.error('Read error:', readErr)
           throw new Error('Cannot read contract. Make sure your wallet is on Arc Testnet (chain 5042002) and the contract is deployed.')
         }
+
         if (active >= maxActive) {
           throw new Error(`You have ${active} active room(s) (max ${maxActive}). Complete, release, or cancel one first.`)
         }
@@ -84,14 +107,11 @@ export default function CreateRoom({ wallet }) {
         const collateralWei = collateralValue ? ethers.parseUnits(collateralValue, 6) : 0n
         const joinCode = generateJoinCode()
         const joinCodeHash = hashJoinCode(joinCode)
-
-        // Query nonce from PUBLIC RPC to bypass wallet stale cache
         const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
         let nonce = await rpcProvider.getTransactionCount(await signer.getAddress(), 'latest')
 
-        // Step 1: Approve USDC for collateral (only if creator is seller and collateral > 0)
         if (creatorIsSeller && collateralWei > 0n) {
-          setStep('Approving USDC\u2026')
+          setStep('Approving USDC…')
           try {
             const approveTx = await usdc.approve(CONTRACT_ADDRESS, collateralWei, { ...ARC_GAS_APPROVE, nonce: nonce++ })
             await waitForTx(wallet.provider, approveTx.hash, 180000)
@@ -101,34 +121,32 @@ export default function CreateRoom({ wallet }) {
           }
         }
 
-        // Step 2: Create room (contract pulls collateral via transferFrom)
-        setStep('Creating room\u2026')
+        setStep('Creating room…')
         const tx = await contract.createRoom(item, priceWei, collateralWei, joinCodeHash, creatorIsSeller, deliveryDays, dealType, { ...ARC_GAS, nonce: nonce++ })
-        setStep('Waiting for confirmation\u2026')
+        setStep('Waiting for confirmation…')
         const receipt = await waitForTx(wallet.provider, tx.hash, 180000)
 
-        const event = receipt.logs.find(log => {
+        const event = receipt.logs.find((log) => {
           try { return contract.interface.parseLog(log)?.name === 'RoomCreated' } catch { return false }
         })
         if (!event) throw new Error('RoomCreated event not found in transaction receipt')
         const parsed = contract.interface.parseLog(event)
         if (!parsed?.args?.id) throw new Error('Could not parse room ID from event')
+
         const roomId = parsed.args.id.toString()
         const inviteLink = createInviteLink(roomId, joinCode)
+        const nextResult = { roomId, inviteLink, joinCode, ts: Date.now() }
+        setResult(nextResult)
+        sessionStorage.setItem('bond_last_created', JSON.stringify(nextResult))
+        createdSuccessfully = true
 
-        setResult({ roomId, inviteLink, joinCode, ts: Date.now() })
-        sessionStorage.setItem('bond_last_created', JSON.stringify({ roomId, inviteLink, joinCode, ts: Date.now() }))
-        setStep('')
-        setLoading(false)
-
-        // === Notify backend (blocking with timeout, critical for seller discovery) ===
         const listingId = searchParams.get('listingId')
         let backendErr = null
         try {
           const ctrl = new AbortController()
           const t = setTimeout(() => ctrl.abort(), 15000)
 
-        if (listingId) {
+          if (listingId) {
             await authFetch(`/api/listings/${listingId}/taken`, {
               method: 'PUT',
               signal: ctrl.signal,
@@ -157,18 +175,16 @@ export default function CreateRoom({ wallet }) {
                 counterparty,
                 item,
                 price,
-                listingId: searchParams.get('listingId'),
+                listingId,
               }),
             }, wallet)
           }
           clearTimeout(t)
         } catch (e) {
           console.error('Backend sync failed:', e)
-          backendErr = 'Seller notification failed \u2014 please share the invite link manually.'
+          backendErr = 'Seller notification failed — please share the invite link manually.'
         }
-        if (backendErr) {
-          setError(backendErr)
-        }
+        if (backendErr) setError(backendErr)
       } finally {
         restore()
       }
@@ -177,8 +193,11 @@ export default function CreateRoom({ wallet }) {
       setError(err.reason || err.message || 'Transaction failed')
       setStep('')
     } finally {
-      // loading already cleared above on success; catch/finally handles error path
-      if (!result) setLoading(false)
+      if (!createdSuccessfully) setLoading(false)
+      if (createdSuccessfully) {
+        setStep('')
+        setLoading(false)
+      }
     }
   }
 
@@ -189,333 +208,33 @@ export default function CreateRoom({ wallet }) {
   }
 
   if (result) {
-    return (
-      <section className="pt-28 pb-32 px-4 sm:px-6 min-h-screen">
-        <div className="max-w-full sm:max-w-[560px] mx-auto">
-          <div className="card-3d p-8">
-            <div className="text-center mb-6">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-green-50 dark:bg-green-500/10 border border-green-100 dark:border-green-500/20 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-              <h2 className="text-[22px] font-semibold text-stripe-navy dark:text-white mb-1">Room Created!</h2>
-              <p className="text-[14px] text-stripe-body dark:text-gray-400">Share this invite link with your counterparty</p>
-              {fromMarket && !creatorIsSeller && (
-                <div className="mt-3 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                  <p className="text-[12px] text-amber-700 dark:text-amber-400">
-                    The seller has been notified. They need to join and lock collateral before you can fund this room.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-1">Room ID</div>
-                <div className="text-stripe-navy dark:text-white font-mono text-[16px] font-semibold">#{result.roomId}</div>
-              </div>
-
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-1.5">Join Code</div>
-                <div className="bg-stripe-surface dark:bg-white/5 border border-stripe-border dark:border-white/10 rounded-lg px-4 py-3">
-                  <code className="text-green-600 font-mono text-[20px] tracking-[4px] font-bold">{result.joinCode}</code>
-                </div>
-              </div>
-
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-400 mb-1.5">Invite Link</div>
-                <div className="flex gap-2">
-                  <input readOnly value={result.inviteLink} className="stripe-input flex-1 font-mono text-[12px]" />
-                  <button onClick={copyLink} className="btn-primary px-4 text-[13px]">
-                    {copied ? '✓ Copied' : 'Copy'}
-                  </button>
-                </div>
-                <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-1.5">⚠️ Only share with your counterparty</p>
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <Link to={`/room/${result.roomId}?code=${result.joinCode}`} className="btn-primary flex-1 text-center py-3">
-                Go to Room →
-              </Link>
-              <Link to="/rooms" className="btn-secondary px-4 py-3">
-                My Rooms
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    )
+    return <CreateRoomSuccess result={result} copied={copied} fromMarket={fromMarket} creatorIsSeller={creatorIsSeller} onCopy={copyLink} />
   }
 
   return (
-    <section className="pt-28 pb-32 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-full sm:max-w-[560px] mx-auto">
-        <div className="font-mono text-[11px] uppercase tracking-[3px] text-stripe-body dark:text-gray-400 mb-4">Create Room</div>
-        <h2 className="text-[32px] font-light text-stripe-navy dark:text-white mb-1" style={{ letterSpacing: '-0.64px' }}>
-          {fromMarket ? 'Confirm the deal' : 'Set up a trustless deal'}
-        </h2>
-        <p className="text-[15px] font-light text-stripe-body dark:text-gray-400 mb-8">
-          {fromMarket ? 'Deal terms are locked from the market listing.' : 'Free to create. 1% fee only when funded.'}
-        </p>
-
-        <div className="card-3d p-6">
-          {/* Role toggle */}
-          <div className="mb-5">
-            <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500 block mb-2">I am</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => !fromMarket && setCreatorIsSeller(true)}
-                disabled={fromMarket}
-                className={`flex-1 py-2.5 rounded-md text-[13px] font-mono border transition ${
-                  creatorIsSeller
-                    ? 'bg-zinc-900 dark:bg-white text-zinc-100 dark:text-[#0c0f1a] border-zinc-700 dark:border-white'
-                    : 'bg-white dark:bg-white/5 text-zinc-500 dark:text-gray-400 border-zinc-200 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20'
-                } ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-              >
-                ◆ SELLER — I deliver the item
-              </button>
-              <button
-                type="button"
-                onClick={() => { if (!fromMarket) { setCreatorIsSeller(false); setNoCollateral(true); setCollateral('') } }}
-                disabled={fromMarket}
-                className={`flex-1 py-2.5 rounded-md text-[13px] font-mono border transition ${
-                  !creatorIsSeller
-                    ? 'bg-zinc-900 dark:bg-white text-zinc-100 dark:text-[#0c0f1a] border-zinc-700 dark:border-white'
-                    : 'bg-white dark:bg-white/5 text-zinc-500 dark:text-gray-400 border-zinc-200 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20'
-                } ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-              >
-                ◈ BUYER — I fund the escrow
-              </button>
+    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
+      <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
+        <CreateRoomSidebar wallet={wallet} />
+        <main className="overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
+          <div className="p-4 sm:p-5 lg:p-6">
+            <CreateRoomHeader fromMarket={fromMarket} creatorIsSeller={creatorIsSeller} />
+            <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+              <CreateRoomForm
+                state={roomState}
+                setters={{ setItem, setPrice, setCollateral, setNoCollateral, setDeliveryDays, setDealType, setCreatorIsSeller }}
+                fromMarket={fromMarket}
+                canSubmit={canSubmit}
+                loading={loading}
+                step={step}
+                error={error}
+                onRequestCreate={requestCreate}
+              />
+              <CreateRoomSummary state={roomState} fromMarket={fromMarket} />
             </div>
           </div>
-
-          {/* Role indicator + flow */}
-          <div className="mb-5 p-4 rounded-lg bg-stripe-surface dark:bg-white/5 border border-stripe-border dark:border-white/10">
-            <div className="text-[11px] text-stripe-body dark:text-gray-400 font-mono mb-3">
-              {creatorIsSeller
-                ? '◆ You are the SELLER — you deliver the item'
-                : '◈ You are the BUYER — you fund the escrow'}
-            </div>
-            <div className="flex items-start gap-3 text-[11px]">
-              {creatorIsSeller ? (
-                <>
-                  <div className="flex-1 text-center">
-                    <div className="w-6 h-6 mx-auto rounded-full bg-stripe-navy dark:bg-white text-white dark:text-[#0c0f1a] flex items-center justify-center text-[10px] font-bold mb-1">1</div>
-                    <div className="text-stripe-navy dark:text-white font-medium">You create</div>
-                    <div className="text-stripe-body dark:text-gray-500 mt-0.5">+ collateral locked now</div>
-                  </div>
-                  <div className="text-stripe-border dark:text-white/10 mt-2">→</div>
-                  <div className="flex-1 text-center">
-                    <div className="w-6 h-6 mx-auto rounded-full border border-stripe-border dark:border-white/20 text-stripe-body dark:text-gray-500 flex items-center justify-center text-[10px] font-bold mb-1">2</div>
-                    <div className="text-stripe-navy dark:text-white font-medium">Buyer joins</div>
-                    <div className="text-stripe-body dark:text-gray-500 mt-0.5">no cost</div>
-                  </div>
-                  <div className="text-stripe-border dark:text-white/10 mt-2">→</div>
-                  <div className="flex-1 text-center">
-                    <div className="w-6 h-6 mx-auto rounded-full border border-stripe-border dark:border-white/20 text-stripe-body dark:text-gray-500 flex items-center justify-center text-[10px] font-bold mb-1">3</div>
-                    <div className="text-stripe-navy dark:text-white font-medium">Buyer funds</div>
-                    <div className="text-stripe-body dark:text-gray-500 mt-0.5">price + 1% fee</div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex-1 text-center">
-                    <div className="w-6 h-6 mx-auto rounded-full bg-stripe-navy dark:bg-white text-white dark:text-[#0c0f1a] flex items-center justify-center text-[10px] font-bold mb-1">1</div>
-                    <div className="text-stripe-navy dark:text-white font-medium">You create</div>
-                    <div className="text-stripe-body dark:text-gray-500 mt-0.5">no cost</div>
-                  </div>
-                  <div className="text-stripe-border dark:text-white/10 mt-2">→</div>
-                  <div className="flex-1 text-center">
-                    <div className="w-6 h-6 mx-auto rounded-full border border-stripe-border dark:border-white/20 text-stripe-body dark:text-gray-500 flex items-center justify-center text-[10px] font-bold mb-1">2</div>
-                    <div className="text-stripe-navy dark:text-white font-medium">Seller joins</div>
-                    <div className="text-stripe-body dark:text-gray-500 mt-0.5">+ collateral locked</div>
-                  </div>
-                  <div className="text-stripe-border dark:text-white/10 mt-2">→</div>
-                  <div className="flex-1 text-center">
-                    <div className="w-6 h-6 mx-auto rounded-full border border-stripe-border dark:border-white/20 text-stripe-body dark:text-gray-500 flex items-center justify-center text-[10px] font-bold mb-1">3</div>
-                    <div className="text-stripe-navy dark:text-white font-medium">You fund</div>
-                    <div className="text-stripe-body dark:text-gray-500 mt-0.5">price + 1% fee</div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          <input
-            className={`stripe-input mb-3 ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-            placeholder="What are you selling?"
-            value={item}
-            onChange={(e) => !fromMarket && setItem(e.target.value)}
-            readOnly={fromMarket}
-            disabled={fromMarket}
-            maxLength={500}
-          />
-
-          <div className="relative mb-3">
-            <input
-              className={`stripe-input ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-              type="number"
-              placeholder="0.00"
-              min="0.01"
-              step="0.01"
-              value={price}
-              onChange={(e) => !fromMarket && setPrice(e.target.value)}
-              readOnly={fromMarket}
-              disabled={fromMarket}
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-stripe-body dark:text-gray-400 font-medium">USDC</span>
-          </div>
-
-          {/* Collateral section */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-400">
-                {creatorIsSeller ? 'Collateral' : 'Required Seller Collateral'}
-              </label>
-              <label className={`flex items-center gap-2 cursor-pointer ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={noCollateral}
-                  onChange={(e) => {
-                    if (fromMarket) return
-                    setNoCollateral(e.target.checked)
-                    if (e.target.checked) setCollateral('')
-                  }}
-                  disabled={fromMarket}
-                  className="w-3.5 h-3.5 rounded border-stripe-border dark:border-white/20 accent-stripe-navy"
-                />
-                <span className="text-[11px] text-stripe-body dark:text-gray-400">No collateral</span>
-              </label>
-            </div>
-            {!noCollateral && (
-              <>
-                <div className="relative">
-                  <input
-                    className={`stripe-input ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    type="number"
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                    value={collateral}
-                    onChange={(e) => !fromMarket && setCollateral(e.target.value)}
-                    readOnly={fromMarket}
-                    disabled={fromMarket}
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-stripe-body dark:text-gray-400 font-medium">USDC</span>
-                </div>
-                <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-1">
-                  {creatorIsSeller
-                    ? "Your \"skin in the game.\" Lost if you scam."
-                    : "Seller must lock this when joining. Lost if they don't deliver."}
-                </p>
-              </>
-            )}
-            {noCollateral && (
-              <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-1">
-                No collateral — {creatorIsSeller ? 'buyer trusts you based on reputation only.' : 'seller joins without locking funds.'}
-              </p>
-            )}
-          </div>
-
-          {/* Delivery days — hidden for Instant deals */}
-          {dealType !== 0 && (
-            <div className="mb-4">
-              <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-400 block mb-1.5">
-                Delivery Window
-              </label>
-              <div className="flex items-center gap-3">
-                  <input
-                    className={`stripe-input flex-1 ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    type="number"
-                    min={1}
-                    max={90}
-                    step={1}
-                    value={deliveryDays}
-                    onChange={(e) => !fromMarket && setDeliveryDays(Math.max(1, Math.min(90, Number(e.target.value) || 1)))}
-                    readOnly={fromMarket}
-                    disabled={fromMarket}
-                  />
-                <span className="text-[13px] text-stripe-body dark:text-gray-400 font-medium">days</span>
-              </div>
-              <p className="text-[11px] text-stripe-body dark:text-gray-400 mt-1">
-                Seller must deliver within this window or buyer can refund + claim collateral.
-              </p>
-            </div>
-          )}
-
-
-
-          {/* Deal type */}
-          <div className="mb-4">
-            <label className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-400 block mb-1.5">
-              Deal Type
-            </label>
-            <div className="flex flex-col gap-2">
-              {[
-                { key: 0, label: 'Instant', desc: 'Digital goods — 24h confirm window' },
-                { key: 1, label: 'Event Based', desc: 'WL, mint, launch — 30d confirm window' },
-                { key: 2, label: 'Service', desc: 'Freelance, custom work — 7d confirm window' },
-              ].map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  onClick={() => !fromMarket && setDealType(t.key)}
-                  disabled={fromMarket}
-                  className={`text-left p-3 rounded-lg border transition ${
-                    dealType === t.key
-                      ? 'bg-stripe-navy dark:bg-white text-white dark:text-[#0c0f1a] border-stripe-navy dark:border-white'
-                      : 'bg-white dark:bg-white/5 text-stripe-body dark:text-gray-400 border-stripe-border dark:border-white/10 hover:border-stripe-navy dark:hover:border-white/40'
-                  } ${fromMarket ? 'opacity-60 cursor-not-allowed' : ''}`}
-                >
-                  <div className="text-[13px] font-semibold">{t.label}</div>
-                  <div className="text-[11px] opacity-80 mt-0.5">{t.desc}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Contact info from market listing */}
-          {fromMarket && socials && (
-            <div className="mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
-              <div className="font-mono text-[10px] uppercase tracking-[2px] text-blue-600 dark:text-blue-400 mb-1.5">
-                Seller Contact
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(socials).map(([key, val]) => {
-                  const link = key === 'telegram' ? `https://t.me/${val.replace(/^@/, '')}` :
-                                 key === 'twitter' ? `https://x.com/${val.replace(/^@/, '')}` :
-                                 key === 'discord' ? null :
-                                 key === 'whatsapp' ? `https://wa.me/${val.replace(/^\+/, '')}` :
-                                 val.startsWith('http') ? val : null
-                  return link ? (
-                    <a key={key} href={link} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-500/20 text-[12px] text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-500/10 transition">
-                      {key === 'telegram' && '✈️'} {key === 'twitter' && '𝕏'} {key === 'whatsapp' && '📱'} {key === 'other' && '🔗'} {val}
-                    </a>
-                  ) : (
-                    <span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-500/20 text-[12px] text-blue-600 dark:text-blue-300">
-                      {val}
-                    </span>
-                  )
-                })}
-              </div>
-              <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1.5">
-                Contact seller directly for delivery details. The contract only secures the funds.
-              </p>
-            </div>
-          )}
-
-          <button onClick={handleCreate} disabled={loading || !item || !price} className="btn-primary w-full py-3.5 text-[15px]">
-            {loading ? step || 'Processing…' : fromMarket ? `Confirm Deal →` : `Create Room (FREE${!noCollateral && collateral && creatorIsSeller ? ' + collateral' : ''})`}
-          </button>
-
-          {error && (
-            <div className="mt-3 px-4 py-2.5 rounded text-[13px] font-medium border bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20">
-              {error}
-            </div>
-          )}
-        </div>
+        </main>
       </div>
+      <CreateRoomConfirm open={confirmOpen} loading={loading} state={roomState} onCancel={() => setConfirmOpen(false)} onConfirm={handleCreate} />
     </section>
   )
 }
