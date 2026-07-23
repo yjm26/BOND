@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import ErrorBoundary from './components/ErrorBoundary'
 import Hero from './components/Hero'
 import HowItWorks from './components/HowItWorks'
+import RoomClaritySection from './components/room-clarity/RoomClaritySection'
 import RoomsPage from './components/RoomsPage'
 import RoomView from './components/RoomView'
 import CreateRoom from './components/CreateRoom'
@@ -109,7 +110,7 @@ export default function App() {
       <ErrorBoundary>
       <PageTransition>
       <Routes>
-        <Route path="/" element={<><Hero wallet={wallet} onConnect={handleConnect} /><HowItWorks /></>} />
+        <Route path="/" element={<><Hero wallet={wallet} onConnect={handleConnect} /><HowItWorks /><RoomClaritySection /></>} />
         <Route path="/create" element={<CreateRoom wallet={wallet} />} />
         <Route path="/rooms" element={<RoomsPage wallet={wallet} />} />
         <Route path="/room/:id" element={<RoomView wallet={wallet} />} />
