@@ -131,6 +131,58 @@ describe('BoundTestnet', function () {
     expect(await bond.isArbiter(secondArbiter.address)).to.equal(false)
   })
 
+  it('revokes stale primary arbiter authority when rotating setArbiter', async function () {
+    const ctx = await deployFixture()
+    const { bond, owner, arbiter, secondArbiter, seller } = ctx
+
+    await expect(bond.connect(owner).setArbiter(secondArbiter.address, 'Rotated Arbiter'))
+      .to.emit(bond, 'ArbiterRemoved')
+      .withArgs(arbiter.address)
+      .and.to.emit(bond, 'ArbiterAdded')
+      .withArgs(secondArbiter.address, 'Rotated Arbiter')
+
+    expect(await bond.isArbiter(arbiter.address)).to.equal(false)
+    expect(await bond.isArbiter(secondArbiter.address)).to.equal(true)
+    expect(await bond.arbiter()).to.equal(secondArbiter.address)
+
+    const { roomId } = await createJoinFundDeliver(ctx)
+    await ethers.provider.send('evm_increaseTime', [12 * HOUR + 1])
+    await ethers.provider.send('evm_mine')
+    await bond.connect(seller).escalateNoResponse(roomId)
+
+    await expect(bond.connect(arbiter).arbiterResolve(roomId, seller.address))
+      .to.be.revertedWith('Not authorized')
+    await expect(bond.connect(secondArbiter).arbiterResolve(roomId, seller.address))
+      .to.emit(bond, 'DisputeResolved')
+  })
+
+  it('lets the joined counterparty leave before funding and restores the room to created', async function () {
+    const { bond, usdc, seller, buyer } = await deployFixture()
+    const collateral = parseUsdc(12)
+
+    await bond.connect(buyer).createRoom('Seller can leave before funding', parseUsdc(80), collateral, joinHash, false, 5)
+    await usdc.mint(seller.address, collateral)
+    await usdc.connect(seller).approve(await bond.getAddress(), collateral)
+    await bond.connect(seller).joinRoom(1, ethers.toUtf8Bytes('JOINCODE'))
+
+    expect(await usdc.balanceOf(await bond.getAddress())).to.equal(collateral)
+    expect(await bond.activeRooms(seller.address)).to.equal(1n)
+
+    await expect(bond.connect(seller).leaveRoom(1))
+      .to.emit(bond, 'RoomLeft')
+      .withArgs(1, seller.address)
+
+    const room = await bond.rooms(1)
+    expect(room.counterparty).to.equal(ethers.ZeroAddress)
+    expect(room.joinedAt).to.equal(0n)
+    expect(room.state).to.equal(0n)
+    expect(await bond.activeRooms(seller.address)).to.equal(0n)
+    expect(await usdc.balanceOf(seller.address)).to.equal(collateral)
+
+    await expect(bond.connect(buyer).leaveRoom(1))
+      .to.be.revertedWith('Not joined')
+  })
+
   it('allows an active arbiter to resolve a disputed room and rejects removed arbiters', async function () {
     const ctx = await deployFixture()
     const { bond, owner, secondArbiter, seller } = ctx
@@ -163,22 +215,40 @@ describe('BoundTestnet', function () {
   it('bounds user-controlled strings that are stored on-chain', async function () {
     const { bond, owner, seller, buyer } = await deployFixture()
     const price = parseUsdc(10)
+    const maxItem = 'x'.repeat(160)
     const longItem = 'x'.repeat(161)
+    const multibyteItem = '🟡'.repeat(41) // 164 UTF-8 bytes
     const longReason = 'x'.repeat(501)
     const longEvidenceRef = 'x'.repeat(301)
 
+    await expect(bond.connect(seller).createRoom(maxItem, price, 0, joinHash, true, 5))
+      .to.emit(bond, 'RoomCreated')
+
     await expect(bond.connect(seller).createRoom(longItem, price, 0, joinHash, true, 5))
       .to.be.revertedWith('Item too long')
+
+    await expect(bond.connect(seller).createRoom(multibyteItem, price, 0, joinHash, true, 5))
+      .to.be.revertedWith('Item too long')
+
+    await expect(bond.connect(owner).addArbiter(buyer.address, 'x'.repeat(64)))
+      .to.emit(bond, 'ArbiterAdded')
 
     await expect(bond.connect(owner).addArbiter(buyer.address, 'x'.repeat(65)))
       .to.be.revertedWith('Arbiter name too long')
 
     const fresh = await deployFixture()
     const freshRoom = await createJoinFundDeliver(fresh)
-    await expect(fresh.bond.connect(fresh.buyer).openDispute(freshRoom.roomId, longReason, 'text', '', ''))
+    await expect(fresh.bond.connect(fresh.buyer).openDispute(freshRoom.roomId, 'x'.repeat(500), 'text', '', ''))
+      .to.emit(fresh.bond, 'RoomDisputed')
+
+    const freshLongReason = await deployFixture()
+    const freshLongReasonRoom = await createJoinFundDeliver(freshLongReason)
+    await expect(freshLongReason.bond.connect(freshLongReason.buyer).openDispute(freshLongReasonRoom.roomId, longReason, 'text', '', ''))
       .to.be.revertedWith('Reason too long')
 
-    await fresh.bond.connect(fresh.buyer).openDispute(freshRoom.roomId, 'Missing delivery', 'text', '', '')
+    await expect(fresh.bond.connect(fresh.buyer).submitEvidence(freshRoom.roomId, 'text', 'ok', 'x'.repeat(300)))
+      .to.emit(fresh.bond, 'EvidenceSubmitted')
+
     await expect(fresh.bond.connect(fresh.buyer).submitEvidence(freshRoom.roomId, 'text', 'ok', longEvidenceRef))
       .to.be.revertedWith('Evidence ref too long')
   })
@@ -196,6 +266,47 @@ describe('BoundTestnet', function () {
 
     await expect(bond.connect(buyer).fundRoom(1))
       .to.be.revertedWith('USDC transferFrom failed')
+  })
+
+  it('reverts cleanly when payout transfers return false', async function () {
+    const releaseCtx = await deployFixture()
+    const releaseRoom = await createJoinFundDeliver(releaseCtx)
+    await releaseCtx.usdc.setFailTransfers(true)
+    await expect(releaseCtx.bond.connect(releaseCtx.buyer).releaseFunds(releaseRoom.roomId))
+      .to.be.revertedWith('USDC transfer failed')
+
+    const refundCtx = await deployFixture()
+    const refundPrice = parseUsdc(40)
+    const refundFee = await refundCtx.bond.fundingFee(refundPrice)
+    await refundCtx.bond.connect(refundCtx.seller).createRoom('Refund transfer failure', refundPrice, 0, joinHash, true, 5)
+    const refundRoomId = await refundCtx.bond.roomCount()
+    await refundCtx.bond.connect(refundCtx.buyer).joinRoom(refundRoomId, ethers.toUtf8Bytes('JOINCODE'))
+    await refundCtx.usdc.mint(refundCtx.buyer.address, refundPrice + refundFee)
+    await refundCtx.usdc.connect(refundCtx.buyer).approve(await refundCtx.bond.getAddress(), refundPrice + refundFee)
+    await refundCtx.bond.connect(refundCtx.buyer).fundRoom(refundRoomId)
+    await ethers.provider.send('evm_increaseTime', [6 * 24 * HOUR])
+    await ethers.provider.send('evm_mine')
+    await refundCtx.usdc.setFailTransfers(true)
+    await expect(refundCtx.bond.connect(refundCtx.buyer).buyerRefund(refundRoomId))
+      .to.be.revertedWith('USDC transfer failed')
+
+    const resolveCtx = await deployFixture()
+    const resolveRoom = await createJoinFundDeliver(resolveCtx)
+    await ethers.provider.send('evm_increaseTime', [12 * HOUR + 1])
+    await ethers.provider.send('evm_mine')
+    await resolveCtx.bond.connect(resolveCtx.seller).escalateNoResponse(resolveRoom.roomId)
+    await resolveCtx.usdc.setFailTransfers(true)
+    await expect(resolveCtx.bond.connect(resolveCtx.arbiter).arbiterResolve(resolveRoom.roomId, resolveCtx.seller.address))
+      .to.be.revertedWith('USDC transfer failed')
+
+    const splitCtx = await deployFixture()
+    const splitRoom = await createJoinFundDeliver(splitCtx)
+    await ethers.provider.send('evm_increaseTime', [12 * HOUR + 1])
+    await ethers.provider.send('evm_mine')
+    await splitCtx.bond.connect(splitCtx.seller).escalateNoResponse(splitRoom.roomId)
+    await splitCtx.usdc.setFailTransfers(true)
+    await expect(splitCtx.bond.connect(splitCtx.arbiter).arbiterSplit(splitRoom.roomId))
+      .to.be.revertedWith('USDC transfer failed')
   })
 
   it('emits admin change events and rejects no-op ownership transfers', async function () {

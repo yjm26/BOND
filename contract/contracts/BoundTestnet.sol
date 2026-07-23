@@ -105,6 +105,7 @@ contract BoundTestnet {
         uint32 deliveryDeadline
     );
     event RoomJoined(uint256 indexed id, address indexed who);
+    event RoomLeft(uint256 indexed id, address indexed who);
     event RoomFunded(uint256 indexed id, uint256 amount, uint256 fee, uint256 totalPaid);
     event RoomDelivered(uint256 indexed id, bytes32 proof);
     event RoomReleased(uint256 indexed id, uint256 amount, uint256 collateral);
@@ -179,6 +180,12 @@ contract BoundTestnet {
     function setArbiter(address _a, string memory _name) external onlyOwner {
         require(_a != address(0), "Bad arbiter");
         require(bytes(_name).length <= MAX_ARBITER_NAME_BYTES, "Arbiter name too long");
+        address previous = arbiter;
+        if (previous != address(0) && previous != _a) {
+            isArbiter[previous] = false;
+            arbiterDisplayName[previous] = "";
+            emit ArbiterRemoved(previous);
+        }
         arbiter = _a;
         arbiterName = _name;
         isArbiter[_a] = true;
@@ -325,6 +332,30 @@ contract BoundTestnet {
         }
 
         emit RoomJoined(_roomId, msg.sender);
+    }
+
+    // ─── Leave Room (counterparty, before funding) ───
+    function leaveRoom(uint256 _roomId) external nonReentrant {
+        Room storage r = rooms[_roomId];
+        require(r.creator != address(0), "Room not found");
+        require(r.state == State.Joined, "Not joined");
+        require(msg.sender == r.counterparty, "Only counterparty");
+
+        uint256 collateralRefund = (!r.creatorIsSeller && r.collateralAmount > 0) ? r.collateralAmount : 0;
+        address leaving = r.counterparty;
+
+        r.counterparty = address(0);
+        r.joinedAt = 0;
+        r.state = State.Created;
+
+        if (activeRooms[leaving] > 0) activeRooms[leaving]--;
+        _clearMutualCancelApprovals(_roomId, r.creator, leaving);
+
+        if (collateralRefund > 0) {
+            _safeTransfer(leaving, collateralRefund);
+        }
+
+        emit RoomLeft(_roomId, leaving);
     }
 
     // ─── Fund Room ───
@@ -626,6 +657,13 @@ contract BoundTestnet {
 
         mutualCancelApproved[_roomId][msg.sender] = false;
         emit MutualCancelRevoked(_roomId, msg.sender);
+    }
+
+    function getMutualCancelStatus(uint256 _roomId) external view returns (bool creatorApproved, bool counterpartyApproved) {
+        Room storage r = rooms[_roomId];
+        require(r.creator != address(0), "Room not found");
+        creatorApproved = mutualCancelApproved[_roomId][r.creator];
+        counterpartyApproved = r.counterparty != address(0) && mutualCancelApproved[_roomId][r.counterparty];
     }
 
     // ─── Mutual Cancel Execute ───

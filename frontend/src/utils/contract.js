@@ -94,6 +94,7 @@ export const CONTRACT_ABI = [
   // Room
   "function createRoom(string _item, uint256 _price, uint256 _collateral, bytes32 _joinCodeHash, bool _creatorIsSeller, uint32 _deliveryDays) external",
   "function joinRoom(uint256 _roomId, bytes _joinCode) external",
+  "function leaveRoom(uint256 _roomId) external",
   "function fundRoom(uint256 _roomId) external",
   "function markDelivered(uint256 _roomId, bytes32 _proofHash) external",
   "function releaseFunds(uint256 _roomId) external",
@@ -125,6 +126,7 @@ export const CONTRACT_ABI = [
   "function arbiterName() external view returns (string)",
   "function isArbiter(address) external view returns (bool)",
   "function arbiterDisplayName(address) external view returns (string)",
+  "function setArbiter(address _account, string _name) external",
   "function addArbiter(address _account, string _name) external",
   "function removeArbiter(address _account) external",
   "function activeRooms(address) external view returns (uint256)",
@@ -145,6 +147,7 @@ export const CONTRACT_ABI = [
   // Events
   "event RoomCreated(uint256 indexed id, address indexed creator, string item, uint256 price, uint256 collateral, bool creatorIsSeller, uint32 deliveryDeadline)",
   "event RoomJoined(uint256 indexed id, address indexed who)",
+  "event RoomLeft(uint256 indexed id, address indexed who)",
   "event RoomFunded(uint256 indexed id, uint256 amount, uint256 fee, uint256 totalPaid)",
   "event RoomDelivered(uint256 indexed id, bytes32 proof)",
   "event RoomReleased(uint256 indexed id, uint256 amount, uint256 collateral)",
