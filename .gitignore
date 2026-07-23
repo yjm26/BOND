@@ -8,3 +8,7 @@ __pycache__/
 *.pyc
 apply-refactor.py
 frontend/full_test.mjs
+
+# Local Hermes workspace notes and generated screenshots
+.hermes/
+screenshots/
