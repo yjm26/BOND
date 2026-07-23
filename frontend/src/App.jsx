@@ -120,25 +120,25 @@ export default function App() {
       </Routes>
       </PageTransition>
       </ErrorBoundary>
-      <div className="max-w-[600px] mx-auto px-6 mb-16">
-        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg px-5 py-3 text-center text-[13px] text-amber-800 dark:text-amber-400 font-medium">
-          Arc Testnet — for testing only, not real money
+      <div className="mx-auto mb-16 max-w-[620px] px-6">
+        <div className="rounded-xl border border-amber-300/20 bg-amber-300/[0.08] px-5 py-3 text-center text-[13px] font-medium text-amber-200">
+          Arc Testnet — testing environment only, not production funds.
         </div>
       </div>
-      <footer className="py-16 text-center border-t border-stripe-border dark:border-white/10">
-        <div className="flex items-center justify-center gap-2.5 mb-3">
-          <div className="w-5 h-5 bg-stripe-navy dark:bg-white rounded flex items-center justify-center">
-            <span className="text-white dark:text-[#0c0f1a] text-[8px] font-bold font-mono">B</span>
+      <footer className="border-t border-white/[0.08] py-16 text-center">
+        <div className="mb-3 flex items-center justify-center gap-2.5">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white/[0.045]">
+            <span className="font-mono text-[9px] font-bold text-bond-text">B</span>
           </div>
-          <span className="text-[13px] font-medium text-stripe-navy dark:text-white">BOND</span>
+          <span className="text-[13px] font-medium text-bond-text">BOND</span>
         </div>
-        <div className="text-[12px] font-light text-stripe-body dark:text-gray-500">on Arc Testnet</div>
-        <div className="flex items-center justify-center gap-4 mt-3">
-          <a href="https://testnet.arcscan.app/address/0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5" target="_blank" rel="noopener" className="text-[11px] text-stripe-body dark:text-gray-500 hover:text-stripe-navy dark:hover:text-white transition">Contract</a>
-          <span className="text-stripe-border dark:text-white/10">·</span>
-          <a href="https://github.com/yjm26/arc-escrow-agent" target="_blank" rel="noopener" className="text-[11px] text-stripe-body dark:text-gray-500 hover:text-stripe-navy dark:hover:text-white transition">GitHub</a>
+        <div className="text-[12px] text-bond-faint">Safe USDC deals on Arc Testnet</div>
+        <div className="mt-3 flex items-center justify-center gap-4">
+          <a href="https://testnet.arcscan.app/address/0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5" target="_blank" rel="noopener" className="text-[11px] text-bond-faint transition hover:text-bond-text">Contract</a>
+          <span className="text-white/10">·</span>
+          <a href="https://github.com/yjm26/arc-escrow-agent" target="_blank" rel="noopener" className="text-[11px] text-bond-faint transition hover:text-bond-text">GitHub</a>
         </div>
-        <div className="font-mono text-[10px] text-gray-400 dark:text-gray-600 mt-2">0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5</div>
+        <div className="mt-2 font-mono text-[10px] text-bond-faint">0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5</div>
       </footer>
       <ToastContainer />
     </BrowserRouter>
