@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { authFetch, API_URL } from '../lib/api'
 import OfferModal from './OfferModal'
 import OffersPanel from './OffersPanel'
@@ -13,7 +12,6 @@ import { EMPTY_FORM, SOCIAL_OPTIONS } from './market/marketConstants'
 import { sortListings } from './market/marketUtils'
 
 export default function Market({ wallet }) {
-  const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
@@ -112,6 +110,7 @@ export default function Market({ wallet }) {
                 setForm={setForm}
                 setTouched={setTouched}
                 touched={touched}
+                onClose={() => setShowForm(false)}
                 onSubmit={handleSubmit}
               />
             )}
@@ -155,7 +154,6 @@ export default function Market({ wallet }) {
                 onClose={() => setExpandedListing(null)}
                 onOpenDeal={() => { setExpandedListing(null); setOfferTarget(expandedListing) }}
                 onDelete={() => { setExpandedListing(null); handleDelete(expandedListing.id) }}
-                navigate={navigate}
               />
             )}
           </div>
