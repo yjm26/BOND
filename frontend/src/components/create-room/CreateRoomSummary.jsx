@@ -1,13 +1,12 @@
-import { REVIEW_TIMEOUT_LABELS } from './createRoomData'
-
 export default function CreateRoomSummary({ state, fromMarket }) {
-  const { item, price, collateral, noCollateral, deliveryDays, dealType, creatorIsSeller } = state
+  const { item, price, collateral, noCollateral, deliveryDays, creatorIsSeller } = state
   const rows = [
     ['Role', creatorIsSeller ? 'Seller' : 'Buyer'],
     ['Amount', price ? `${price} USDC` : 'Not set'],
     ['Collateral', noCollateral ? 'None' : collateral ? `${collateral} USDC` : 'Not set'],
     ['Seller deadline', `${deliveryDays} days`],
-    ['Review timeout', REVIEW_TIMEOUT_LABELS[dealType] || '24 hours'],
+    ['Buyer settle', 'Anytime after delivery'],
+    ['Arbiter fallback', 'After 12h response buffer'],
     ['Source', fromMarket ? 'Market listing' : 'Manual room'],
   ]
   return (

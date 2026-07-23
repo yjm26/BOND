@@ -160,7 +160,6 @@ export default function RoomView({ wallet }) {
         disputedAt: Number(data.disputedAt),
         deliveryDeadline: Number(data.deliveryDeadline),
         confirmDeadline: Number(data.confirmDeadline),
-        dealType: Number(data.dealType),
         state: STATE_NAMES[Number(data.state)],
         value: ethers.formatUnits(data.fundedAmount, 6),
         collateralLocked: data.collateralAmount,

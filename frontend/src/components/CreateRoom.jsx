@@ -17,7 +17,6 @@ export default function CreateRoom({ wallet }) {
   const [collateral, setCollateral] = useState(searchParams.get('collateral') || '')
   const [noCollateral, setNoCollateral] = useState(searchParams.get('collateral') === '0')
   const [deliveryDays, setDeliveryDays] = useState(Number(searchParams.get('deliveryDays')) || 5)
-  const [dealType, setDealType] = useState(Number(searchParams.get('dealType')) || 0)
   const counterparty = searchParams.get('counterparty') || ''
   const fromMarket = Boolean(searchParams.get('listingId') || searchParams.get('item'))
   const [creatorIsSeller, setCreatorIsSeller] = useState(searchParams.get('creatorIsSeller') !== 'false')
@@ -38,7 +37,7 @@ export default function CreateRoom({ wallet }) {
   const [copied, setCopied] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
-  const roomState = useMemo(() => ({ item, price, collateral, noCollateral, deliveryDays, dealType, creatorIsSeller }), [item, price, collateral, noCollateral, deliveryDays, dealType, creatorIsSeller])
+  const roomState = useMemo(() => ({ item, price, collateral, noCollateral, deliveryDays, creatorIsSeller }), [item, price, collateral, noCollateral, deliveryDays, creatorIsSeller])
   const canSubmit = Boolean(wallet && item.trim() && price.trim())
 
   const validateRoom = () => {
@@ -122,7 +121,7 @@ export default function CreateRoom({ wallet }) {
         }
 
         setStep('Creating room…')
-        const tx = await contract.createRoom(item, priceWei, collateralWei, joinCodeHash, creatorIsSeller, deliveryDays, dealType, { ...ARC_GAS, nonce: nonce++ })
+        const tx = await contract.createRoom(item, priceWei, collateralWei, joinCodeHash, creatorIsSeller, deliveryDays, { ...ARC_GAS, nonce: nonce++ })
         setStep('Waiting for confirmation…')
         const receipt = await waitForTx(wallet.provider, tx.hash, 180000)
 
@@ -221,7 +220,7 @@ export default function CreateRoom({ wallet }) {
             <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
               <CreateRoomForm
                 state={roomState}
-                setters={{ setItem, setPrice, setCollateral, setNoCollateral, setDeliveryDays, setDealType, setCreatorIsSeller }}
+                setters={{ setItem, setPrice, setCollateral, setNoCollateral, setDeliveryDays, setCreatorIsSeller }}
                 fromMarket={fromMarket}
                 canSubmit={canSubmit}
                 loading={loading}

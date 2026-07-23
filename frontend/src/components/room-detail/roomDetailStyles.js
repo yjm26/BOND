@@ -10,8 +10,3 @@ export const ROOM_STATE_TONE = {
   Cancelled: 'border-[#ede9df]/16 text-[#ede9df]/48',
 }
 
-export const REVIEW_TIMEOUT_LABELS = {
-  0: '24h review timeout',
-  1: '30d review timeout',
-  2: '7d review timeout',
-}

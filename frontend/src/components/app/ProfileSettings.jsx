@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import AppGate from './AppGate'
+import ArbiterManagePanel from './profile/ArbiterManagePanel'
 import ProfileEditForm from './profile/ProfileEditForm'
 import ProfileHeader from './profile/ProfileHeader'
 import ProfileIdentityCard from './profile/ProfileIdentityCard'
@@ -68,7 +69,10 @@ export default function ProfileSettings({ wallet, connecting, connectError, onCo
                 <ProfileIdentityCard wallet={wallet} profile={profile} />
                 <ProfileTrustNotes />
               </div>
-              <ProfileEditForm form={form} saving={saving} canSave={canSave} onChange={updateField} onSubmit={submit} />
+              <div className="grid gap-5">
+                <ProfileEditForm form={form} saving={saving} canSave={canSave} onChange={updateField} onSubmit={submit} />
+                <ArbiterManagePanel wallet={wallet} />
+              </div>
             </div>
           </div>
         </main>

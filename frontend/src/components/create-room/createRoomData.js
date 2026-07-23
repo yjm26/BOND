@@ -1,15 +1,3 @@
-export const REVIEW_TIMEOUTS = [
-  { key: 0, label: '24 hours', desc: 'Fast review for simple handoffs.' },
-  { key: 2, label: '7 days', desc: 'Standard review for services or custom work.' },
-  { key: 1, label: '30 days', desc: 'Long review for NFT, account, or event-based deals.' },
-]
-
-export const REVIEW_TIMEOUT_LABELS = {
-  0: '24 hours',
-  1: '30 days',
-  2: '7 days',
-}
-
 export const CREATE_FLOW = {
   seller: [
     ['1', 'You create', 'Collateral can lock now'],

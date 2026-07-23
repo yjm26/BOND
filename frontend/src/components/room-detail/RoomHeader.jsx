@@ -1,4 +1,4 @@
-import { ROOM_STATE_TONE, REVIEW_TIMEOUT_LABELS } from './roomDetailStyles'
+import { ROOM_STATE_TONE } from './roomDetailStyles'
 
 export default function RoomHeader({ id, room, role }) {
   return (
@@ -11,7 +11,7 @@ export default function RoomHeader({ id, room, role }) {
         </div>
         <div className="flex flex-wrap gap-2">
           <span className={`border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] ${ROOM_STATE_TONE[room.state] || 'border-[#ede9df]/16 text-[#ede9df]/48'}`}>{room.state}</span>
-          <span className="border border-[#ede9df]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#ede9df]/42">{REVIEW_TIMEOUT_LABELS[room.dealType] || 'Review timeout'}</span>
+          <span className="border border-[#ede9df]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#ede9df]/42">12h arbiter buffer</span>
         </div>
       </div>
     </div>
