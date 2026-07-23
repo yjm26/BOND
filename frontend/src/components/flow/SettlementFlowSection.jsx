@@ -5,7 +5,7 @@ import { FLOW_STEPS } from './flowData'
 export default function SettlementFlowSection() {
   return (
     <section id="how" className="relative overflow-hidden bg-[#20201f] text-[#ede9df]">
-      <div className="pointer-events-none absolute inset-y-0 left-[38%] z-10 hidden w-[22%] bg-gradient-to-r from-[#20201f] via-[#20201f]/72 to-transparent lg:block" />
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 hidden w-[18%] bg-gradient-to-r from-[#20201f] via-[#20201f]/72 to-transparent lg:block" />
       <div className="grid min-h-screen lg:grid-cols-[44%_56%]">
         <div className="relative z-20 px-6 py-20 sm:px-10 lg:px-14 lg:py-24">
           <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">How BOND works</div>
