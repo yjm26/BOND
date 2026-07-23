@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ethers } from 'ethers'
 import AppGate from './app/AppGate'
 import ArbiterGate from './arbiter/ArbiterGate'
 import ArbiterHeader from './arbiter/ArbiterHeader'
@@ -8,6 +9,12 @@ import DisputeDetailPanel from './arbiter/DisputeDetailPanel'
 import DisputeQueue from './arbiter/DisputeQueue'
 import { ARC_GAS, ensureArcChain, getContract, parseRoom, waitForTx } from '../utils/contract'
 import { DISPUTED_STATE, normalizeEvidence, shapeRoom } from './arbiter/arbiterUtils'
+
+const arcReadProvider = new ethers.JsonRpcProvider(
+  'https://rpc.testnet.arc.network',
+  { chainId: 5042002, name: 'arcTestnet' },
+  { staticNetwork: true }
+)
 
 function getRole(wallet, owner, isArbiter) {
   if (!wallet?.address) return 'User'
@@ -52,11 +59,10 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
   }, [wallet?.address, wallet?.provider])
 
   const loadDisputes = useCallback(async () => {
-    if (!wallet?.provider) return
     setQueueLoading(true)
     setQueueError('')
     try {
-      const contract = getContract(wallet.provider)
+      const contract = getContract(arcReadProvider)
       const total = Number(await contract.roomCount())
       const roomIds = Array.from({ length: total }, (_, index) => index + 1)
       const loaded = []
@@ -80,7 +86,7 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
     } finally {
       setQueueLoading(false)
     }
-  }, [wallet?.provider])
+  }, [])
 
   useEffect(() => {
     if (!wallet) return

@@ -3,7 +3,7 @@ import { APP_ACTIONS } from '../app/appHomeData'
 import { formatAddress } from '../../utils/constants'
 
 export default function ArbiterSidebar({ wallet, role }) {
-  const actions = [...APP_ACTIONS, { label: 'Disputes', to: '/arbiter' }]
+  const actions = APP_ACTIONS
   return (
     <aside className="hidden border border-[#ede9df]/10 bg-[#20201f] p-4 lg:block">
       <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">BOND App</div>
