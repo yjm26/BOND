@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ethers } from 'ethers'
-import { getContract, getUsdc, waitForTx, ARC_GAS, ARC_GAS_APPROVE, generateJoinCode, hashJoinCode, createInviteLink, CONTRACT_ADDRESS, ensureArcChain, fixSignerNonce } from '../utils/contract'
+import { ARC_READ_PROVIDER, getContract, getUsdc, waitForTx, ARC_GAS, ARC_GAS_APPROVE, generateJoinCode, hashJoinCode, createInviteLink, CONTRACT_ADDRESS, ensureArcChain, fixSignerNonce } from '../utils/contract'
 import { authFetch } from '../lib/api'
 import CreateRoomConfirm from './create-room/CreateRoomConfirm'
 import CreateRoomForm from './create-room/CreateRoomForm'
@@ -88,8 +88,8 @@ export default function CreateRoom({ wallet }) {
         let active, maxActive
         try {
           ;[active, maxActive] = await Promise.all([
-            contract.activeRooms(wallet.address),
-            contract.MAX_ACTIVE(),
+            getContract(ARC_READ_PROVIDER).activeRooms(wallet.address),
+            getContract(ARC_READ_PROVIDER).MAX_ACTIVE(),
           ])
         } catch (readErr) {
           console.error('Read error:', readErr)
@@ -106,8 +106,7 @@ export default function CreateRoom({ wallet }) {
         const collateralWei = collateralValue ? ethers.parseUnits(collateralValue, 6) : 0n
         const joinCode = generateJoinCode()
         const joinCodeHash = hashJoinCode(joinCode)
-        const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
-        let nonce = await rpcProvider.getTransactionCount(await signer.getAddress(), 'latest')
+        let nonce = await ARC_READ_PROVIDER.getTransactionCount(await signer.getAddress(), 'latest')
 
         if (creatorIsSeller && collateralWei > 0n) {
           setStep('Approving USDC…')

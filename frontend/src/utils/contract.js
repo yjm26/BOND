@@ -2,9 +2,12 @@ import { ethers } from 'ethers';
 
 export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x2029043537BDbD4Ab443ac51E3E0a5262FC9eb17'; // BoundTestnet on Arc Testnet
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'; // Arc USDC precompile
+export const ARC_RPC_URL = 'https://rpc.testnet.arc.network'
+export const ARC_NETWORK = { chainId: 5042002, name: 'arcTestnet' }
+export const ARC_READ_PROVIDER = new ethers.JsonRpcProvider(ARC_RPC_URL, ARC_NETWORK, { staticNetwork: true })
 
 /// Arc minimum gas params — transactions below 20 Gwei maxFeePerGas stay pending forever
-/// See https://docs.arc.network/arc/references/gas-and-fees
+/// See https://docs.arc.io/arc/references/gas-and-fees
 export const ARC_GAS = {
   maxFeePerGas: 100000000000n,       // 100 Gwei — well above testnet base-fee spikes
   maxPriorityFeePerGas: 2000000000n, // 2 Gwei tip
@@ -20,7 +23,7 @@ export const ARC_GAS_APPROVE = {
 /// Arc blocks finalize quickly; we poll immediately with short intervals.
 /// Uses provider.waitForTransaction when available (event-based, faster than polling).
 export async function waitForTx(walletProvider, txHash, timeoutMs = 60000) {
-  const rpcProvider = new ethers.JsonRpcProvider("https://rpc.testnet.arc.network", 5042002)
+  const rpcProvider = ARC_READ_PROVIDER
   const start = Date.now()
 
   // Try wallet provider's native waitForTransaction first (event-based, instant)
@@ -213,7 +216,7 @@ export function createInviteLink(roomId, joinCode) {
 export async function fixSignerNonce(signer) {
   const addr = await signer.getAddress()
   // Use PUBLIC RPC — wallet provider may have stale nonce cache
-  const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
+  const rpcProvider = ARC_READ_PROVIDER
   let nextNonce = await rpcProvider.getTransactionCount(addr, 'latest')
   const originalPopulate = signer.populateTransaction.bind(signer)
   signer.populateTransaction = async (tx) => {
