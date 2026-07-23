@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getContract } from '../utils/contract'
 import HeaderBrand from './navbar/HeaderBrand'
 import HeaderNavLinks from './navbar/HeaderNavLinks'
@@ -8,8 +8,10 @@ import MobileNavMenu from './navbar/MobileNavMenu'
 
 export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [isAdmin, setIsAdmin] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const isDarkHeader = pathname === '/app' || pathname === '/profile'
 
   useEffect(() => {
     if (!wallet) { setIsAdmin(false); return }
@@ -47,23 +49,32 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
   const scrollToUseCases = (event) => scrollToSection(event, 'use-cases')
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#0d0d0b]/10 bg-[#ede9df]/88 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-10">
+    <nav className={`fixed inset-x-0 top-0 z-50 px-4 py-3 sm:px-6 lg:px-10 ${
+      isDarkHeader
+        ? 'border-b border-[#ede9df]/12 bg-[#20201f]'
+        : 'border-b border-[#0d0d0b]/10 bg-[#ede9df]'
+    }`}>
       <div className="flex items-center justify-between">
-        <HeaderBrand />
+        <HeaderBrand tone={isDarkHeader ? 'dark' : 'light'} />
 
         <div className="hidden items-center gap-8 md:flex">
-          <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} onHowClick={scrollToHow} onUseCasesClick={scrollToUseCases} />
+          <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} tone={isDarkHeader ? 'dark' : 'light'} onHowClick={scrollToHow} onUseCasesClick={scrollToUseCases} />
           <HeaderWalletActions
             wallet={wallet}
             isAdmin={isAdmin}
             connecting={connecting}
             onConnect={onConnect}
             onDisconnect={onDisconnect}
+            tone={isDarkHeader ? 'dark' : 'light'}
           />
         </div>
 
         <button
-          className="flex h-9 w-9 items-center justify-center border border-[#0d0d0b]/14 bg-[#ede9df]/70 text-[#0d0d0b] md:hidden"
+          className={`flex h-9 w-9 items-center justify-center border md:hidden ${
+            isDarkHeader
+              ? 'border-[#ede9df]/16 bg-[#ede9df]/8 text-[#ede9df]'
+              : 'border-[#0d0d0b]/14 bg-[#ede9df]/70 text-[#0d0d0b]'
+          }`}
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Open navigation"
           aria-expanded={mobileOpen}
@@ -83,6 +94,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
           onHowClick={scrollToHow}
           onUseCasesClick={scrollToUseCases}
           onClose={() => setMobileOpen(false)}
+          tone={isDarkHeader ? 'dark' : 'light'}
         />
       )}
     </nav>

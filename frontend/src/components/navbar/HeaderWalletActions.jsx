@@ -3,22 +3,29 @@ import { Link } from 'react-router-dom'
 import NotificationBell from '../NotificationBell'
 import NetworkBadge from './NetworkBadge'
 
-export default function HeaderWalletActions({ wallet, isAdmin, connecting, onConnect, onDisconnect }) {
+export default function HeaderWalletActions({ wallet, isAdmin, tone = 'light', onDisconnect }) {
   const [showWalletMenu, setShowWalletMenu] = useState(false)
+  const dark = tone === 'dark'
+  const secondaryButton = dark
+    ? 'border-[#ede9df]/14 bg-[#ede9df]/8 text-[#ede9df]/72 hover:border-[#ede9df]/28 hover:text-[#ede9df]'
+    : 'border-[#0d0d0b]/12 bg-[#ede9df]/70 text-[#0d0d0b]/70 hover:border-[#0d0d0b]/25 hover:text-[#0d0d0b]'
+  const primaryButton = dark
+    ? 'border-[#ede9df] bg-[#ede9df] text-[#20201f] hover:bg-transparent hover:text-[#ede9df]'
+    : 'border-[#0d0d0b] bg-[#0d0d0b] text-[#ede9df] hover:bg-transparent hover:text-[#0d0d0b]'
 
   return (
     <div className="hidden items-center gap-3 md:flex">
-      <NetworkBadge />
+      <NetworkBadge tone={tone} />
       {wallet ? (
         <>
           <NotificationBell wallet={wallet} />
           <div className="relative">
             <button
               onClick={() => setShowWalletMenu(!showWalletMenu)}
-              className="flex h-9 items-center gap-2 border border-[#0d0d0b]/12 bg-[#ede9df]/70 px-3 font-mono text-[12px] text-[#0d0d0b]/70 transition hover:border-[#0d0d0b]/25 hover:text-[#0d0d0b]"
+              className={`flex h-9 items-center gap-2 border px-3 font-mono text-[12px] transition ${secondaryButton}`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-[#b7c8a3]" />
-              {isAdmin && <span className="bg-[#d8b15f]/22 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-[#6f5628]">ADMIN</span>}
+              {isAdmin && <span className="bg-[#d8b15f]/22 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-[#d8b15f]">ADMIN</span>}
               <span>{wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}</span>
             </button>
             {showWalletMenu && (
@@ -39,12 +46,12 @@ export default function HeaderWalletActions({ wallet, isAdmin, connecting, onCon
               </>
             )}
           </div>
-          <Link to="/create" className="inline-flex h-9 items-center border border-[#0d0d0b] bg-[#0d0d0b] px-4 text-[13px] font-medium text-[#ede9df] transition hover:bg-transparent hover:text-[#0d0d0b]">
+          <Link to="/create" className={`inline-flex h-9 items-center border px-4 text-[13px] font-medium transition ${primaryButton}`}>
             Create room
           </Link>
         </>
       ) : (
-        <Link to="/market" className="inline-flex h-9 items-center justify-center border border-[#0d0d0b] bg-[#0d0d0b] px-4 text-[13px] font-medium text-[#ede9df] transition hover:bg-transparent hover:text-[#0d0d0b]">
+        <Link to="/app" className={`inline-flex h-9 items-center justify-center border px-4 text-[13px] font-medium transition ${primaryButton}`}>
           Go to app
         </Link>
       )}

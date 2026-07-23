@@ -10,6 +10,8 @@ import Hero from './components/Hero'
 import HowItWorks from './components/HowItWorks'
 import RoomClaritySection from './components/room-clarity/RoomClaritySection'
 import UseCasesSection from './components/use-cases/UseCasesSection'
+import AppWorkspace from './components/app/AppWorkspace'
+import ProfileSettings from './components/app/ProfileSettings'
 import RoomsPage from './components/RoomsPage'
 import RoomView from './components/RoomView'
 import CreateRoom from './components/CreateRoom'
@@ -39,6 +41,12 @@ function PageTransition({ children }) {
       {children}
     </main>
   )
+}
+
+function RouteFooter() {
+  const { pathname } = useLocation()
+  const showFooter = pathname === '/' || pathname.startsWith('/docs')
+  return showFooter ? <Footer /> : null
 }
 
 createAppKit({
@@ -113,17 +121,19 @@ export default function App() {
       <PageTransition>
       <Routes>
         <Route path="/" element={<><Hero wallet={wallet} onConnect={handleConnect} /><HowItWorks /><RoomClaritySection /><UseCasesSection /></>} />
+        <Route path="/app" element={<AppWorkspace wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
         <Route path="/create" element={<CreateRoom wallet={wallet} />} />
         <Route path="/rooms" element={<RoomsPage wallet={wallet} />} />
         <Route path="/room/:id" element={<RoomView wallet={wallet} />} />
         <Route path="/docs/:section?" element={<Docs />} />
         <Route path="/market" element={<Market wallet={wallet} />} />
         <Route path="/offers" element={<Offers wallet={wallet} />} />
+        <Route path="/profile" element={<ProfileSettings wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
         <Route path="/arbiter" element={<ArbiterDashboard wallet={wallet} />} />
       </Routes>
       </PageTransition>
       </ErrorBoundary>
-      <Footer />
+      <RouteFooter />
       <ToastContainer />
     </BrowserRouter>
     </ToastProvider>

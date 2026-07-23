@@ -1,16 +1,16 @@
 import { FLOW_WORDS } from './flowData'
 
 const PATH_LABELS = [
-  { text: 'CREATE ROOM', left: '18%', top: '17%' },
-  { text: 'FUND USDC', left: '35%', top: '33%' },
-  { text: 'LOCK ESCROW', left: '48%', top: '49%' },
-  { text: 'PROOF ATTACHED', left: '56%', top: '63%' },
-  { text: 'RELEASE / REFUND / DISPUTE', left: '48%', top: '78%' },
+  { text: 'CREATE ROOM', left: '54%', top: '16%' },
+  { text: 'FUND USDC', left: '62%', top: '32%' },
+  { text: 'LOCK ESCROW', left: '70%', top: '48%' },
+  { text: 'PROOF ATTACHED', left: '73%', top: '62%' },
+  { text: 'RELEASE / REFUND / DISPUTE', left: '68%', top: '78%' },
 ]
 
 export default function FlowTextMap() {
   return (
-    <div className="relative min-h-[680px] overflow-hidden bg-[#20201f]">
+    <div className="relative min-h-[680px] overflow-hidden bg-transparent">
       <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(237,233,223,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(237,233,223,0.12)_1px,transparent_1px)] [background-size:28px_28px]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_44%,rgba(216,177,95,0.12),transparent_22rem),radial-gradient(circle_at_82%_74%,rgba(183,200,163,0.10),transparent_20rem)]" />
 
@@ -35,10 +35,10 @@ export default function FlowTextMap() {
             </feMerge>
           </filter>
         </defs>
-        <path d="M130 120 C240 160 270 245 350 295 C455 360 475 485 610 604" fill="none" stroke="#ede9df" strokeOpacity="0.08" strokeWidth="20" strokeLinecap="round" />
-        <path className="animate-[dashFlow_9s_linear_infinite]" d="M130 120 C240 160 270 245 350 295 C455 360 475 485 610 604" fill="none" stroke="url(#flowSectionRail)" strokeWidth="2.3" strokeDasharray="10 14" strokeLinecap="round" />
+        <path d="M420 112 C510 170 530 245 575 305 C650 405 625 500 698 616" fill="none" stroke="#ede9df" strokeOpacity="0.08" strokeWidth="20" strokeLinecap="round" />
+        <path className="animate-[dashFlow_9s_linear_infinite]" d="M420 112 C510 170 530 245 575 305 C650 405 625 500 698 616" fill="none" stroke="url(#flowSectionRail)" strokeWidth="2.3" strokeDasharray="10 14" strokeLinecap="round" />
         <circle r="5" fill="#ede9df" filter="url(#flowSectionGlow)">
-          <animateMotion dur="7.5s" repeatCount="indefinite" path="M130 120 C240 160 270 245 350 295 C455 360 475 485 610 604" />
+          <animateMotion dur="7.5s" repeatCount="indefinite" path="M420 112 C510 170 530 245 575 305 C650 405 625 500 698 616" />
         </circle>
       </svg>
 

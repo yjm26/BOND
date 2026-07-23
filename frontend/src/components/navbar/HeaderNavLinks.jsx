@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 
-export default function HeaderNavLinks({ wallet, isAdmin, onHowClick, onUseCasesClick }) {
-  const navLink = 'text-[13px] font-medium tracking-[-0.01em] !text-[#0d0d0b]/70 transition hover:!text-[#0d0d0b]'
+export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', onHowClick, onUseCasesClick }) {
+  const dark = tone === 'dark'
+  const navLink = dark
+    ? 'text-[13px] font-medium tracking-[-0.01em] !text-[#ede9df]/70 transition hover:!text-[#ede9df]'
+    : 'text-[13px] font-medium tracking-[-0.01em] !text-[#0d0d0b]/70 transition hover:!text-[#0d0d0b]'
 
   return (
     <div className="hidden items-center gap-6 md:flex">
@@ -14,7 +17,7 @@ export default function HeaderNavLinks({ wallet, isAdmin, onHowClick, onUseCases
           <Link to="/offers" className={navLink}>Offers</Link>
         </>
       )}
-      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#8d2f2f] transition hover:text-[#5f1f1f]">Arbiter</Link>}
+      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Arbiter</Link>}
     </div>
   )
 }
