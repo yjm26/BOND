@@ -87,8 +87,8 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
                 <NotificationBell wallet={wallet} />
                 <div className="relative">
                   <button onClick={() => setShowWalletMenu(!showWalletMenu)} className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.035] px-3 py-2 font-mono text-[12px] text-bond-muted transition hover:border-white/[0.16] hover:text-bond-text">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
-                    {isAdmin && <span className="rounded bg-[#5e6ad2]/20 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-[#aeb7ff]">ADMIN</span>}
+                    <span className="h-2 w-2 rounded-full bg-[#b7c8a3] shadow-[0_0_14px_rgba(183,200,163,0.28)]" />
+                    {isAdmin && <span className="rounded bg-[#d8b15f]/20 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-[#6f5628]">ADMIN</span>}
                     <span>{wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}</span>
                     <svg className="ml-1 h-3 w-3 text-bond-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                   </button>

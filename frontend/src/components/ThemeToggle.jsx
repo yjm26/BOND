@@ -5,7 +5,7 @@ export default function ThemeToggle() {
       aria-label="Arc interface"
       title="BOND Arc-native interface"
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-[#5e6ad2]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-[#d8b15f]" />
       Arc UI
     </div>
   )

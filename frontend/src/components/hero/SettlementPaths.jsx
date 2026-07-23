@@ -4,22 +4,22 @@ export default function SettlementPaths() {
       <defs>
         <linearGradient id="mainFlow" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stopColor="#ede9df" stopOpacity="0.48" />
-          <stop offset="50%" stopColor="#7c8cff" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#34d399" stopOpacity="0.68" />
+          <stop offset="46%" stopColor="#d8b15f" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#b7c8a3" stopOpacity="0.72" />
         </linearGradient>
         <linearGradient id="infraFlow" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#7c8cff" stopOpacity="0.78" />
+          <stop offset="0%" stopColor="#d8b15f" stopOpacity="0.76" />
           <stop offset="100%" stopColor="#ede9df" stopOpacity="0.24" />
         </linearGradient>
         <linearGradient id="disputeFlow" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#ede9df" stopOpacity="0.24" />
-          <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.62" />
+          <stop offset="0%" stopColor="#ede9df" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#c98b4a" stopOpacity="0.66" />
         </linearGradient>
         <marker id="arrowMain" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399" fillOpacity="0.9" />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#b7c8a3" fillOpacity="0.9" />
         </marker>
         <marker id="arrowSoft" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#ede9df" fillOpacity="0.55" />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#d8b15f" fillOpacity="0.68" />
         </marker>
       </defs>
 

@@ -5,9 +5,9 @@ import { SETTLEMENT_NODES } from './heroData'
 
 export default function SettlementCanvas() {
   return (
-    <div className="relative min-h-[620px] overflow-hidden bg-[#050505] text-[#ede9df] lg:min-h-auto">
-      <div className="absolute inset-0 opacity-[0.26] [background-image:linear-gradient(rgba(237,233,223,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(237,233,223,0.18)_1px,transparent_1px)] [background-size:54px_54px]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_32%,rgba(237,233,223,0.12),transparent_24rem),radial-gradient(circle_at_72%_64%,rgba(94,106,210,0.32),transparent_24rem)]" />
+    <div className="relative min-h-[620px] overflow-hidden bg-[#20201f] text-[#ede9df] lg:min-h-auto">
+      <div className="absolute inset-0 opacity-[0.24] [background-image:linear-gradient(rgba(237,233,223,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(237,233,223,0.16)_1px,transparent_1px)] [background-size:54px_54px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_32%,rgba(237,233,223,0.12),transparent_24rem),radial-gradient(circle_at_74%_64%,rgba(216,177,95,0.16),transparent_24rem)]" />
       <SettlementPaths />
 
       <div className="relative z-10 flex h-full min-h-[620px] flex-col justify-between p-6 sm:p-8 lg:p-10">
