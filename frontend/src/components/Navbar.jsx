@@ -11,7 +11,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
   const { pathname } = useLocation()
   const [isAdmin, setIsAdmin] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const isAppRoute = ['/app', '/market', '/rooms', '/room', '/offers', '/create', '/profile', '/arbiter'].some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  const isAppRoute = ['/app', '/market', '/rooms', '/room', '/offers', '/create', '/profile', '/settings', '/arbiter'].some((route) => pathname === route || pathname.startsWith(`${route}/`))
   const isDarkHeader = isAppRoute
 
   useEffect(() => {

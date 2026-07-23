@@ -57,7 +57,10 @@ export default function AppHome({ wallet, profile }) {
               <div className="border border-[#ede9df]/10 bg-[#20201f] p-5">
                 <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/42">Profile</div>
                 <div className="mt-8 text-[28px] font-medium tracking-[-0.05em]">{name}</div>
-                <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#ede9df]/46">Default role: {profile?.defaultRole || 'buyer'}</div>
+                <div className="mt-3 space-y-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[#ede9df]/46">
+                  <div>X: {profile?.xProfile || 'Not added'}</div>
+                  <div>Discord: {profile?.discord || 'Not added'}</div>
+                </div>
               </div>
               <div className="border border-[#d8b15f]/20 bg-[#d8b15f]/[0.08] p-5">
                 <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">Arc Testnet</div>

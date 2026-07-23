@@ -37,8 +37,6 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
             <Link to="/docs" className={linkClass} onClick={onClose}>Docs</Link>
           </>
         )}
-        {wallet && mode === 'landing' && <Link to="/rooms" className={linkClass} onClick={onClose}>Rooms</Link>}
-        {wallet && mode === 'landing' && <Link to="/offers" className={linkClass} onClick={onClose}>Offers</Link>}
         {isAdmin && <Link to="/arbiter" className={linkClass} onClick={onClose}>Arbiter</Link>}
         <div className={`mt-5 border px-4 py-3 font-mono text-[10px] uppercase tracking-[0.16em] ${
           dark
