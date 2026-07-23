@@ -95,6 +95,14 @@ curl http://localhost:4100/api/health
 
 Then open `http://localhost:4100`.
 
+If Render shows `Frontend build not found. Run npm run render-build first.`, the backend started but `frontend/dist` was not created during the build step. Check that the Render service uses the repo root and this build command:
+
+```text
+npm install && npm run render-build
+```
+
+`npm run build` is also aliased to the same command for Render setups that expect a standard build script.
+
 ### Backend placement
 
 For the current MVP, the cleanest deployment is **one Render Web Service** from the repo root. Keep `server.js` as the production backend and let it serve both API and frontend. This avoids CORS and `VITE_API_URL` setup.
