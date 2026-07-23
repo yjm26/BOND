@@ -1,12 +1,14 @@
 import { useState } from 'react'
+import ConfirmModal from '../ConfirmModal'
 
 export default function ProfileSetup({ wallet, onComplete }) {
   const [displayName, setDisplayName] = useState('')
   const [defaultRole, setDefaultRole] = useState('buyer')
+  const [pendingProfile, setPendingProfile] = useState(null)
 
   const submit = (event) => {
     event.preventDefault()
-    onComplete({
+    setPendingProfile({
       displayName: displayName.trim() || 'BOND member',
       defaultRole,
       createdAt: new Date().toISOString(),
@@ -66,6 +68,19 @@ export default function ProfileSetup({ wallet, onComplete }) {
           </button>
         </form>
       </div>
+      <ConfirmModal
+        open={Boolean(pendingProfile)}
+        tone="dark"
+        eyebrow="Profile setup"
+        title="Save this workspace profile?"
+        description="BOND will use these local preferences to prepare your app workspace. You can adjust real profile settings later when profile storage is implemented."
+        confirmLabel="Save profile"
+        cancelLabel="Review"
+        onCancel={() => setPendingProfile(null)}
+        onConfirm={() => {
+          if (pendingProfile) onComplete(pendingProfile)
+        }}
+      />
     </section>
   )
 }

@@ -11,7 +11,8 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
   const { pathname } = useLocation()
   const [isAdmin, setIsAdmin] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const isDarkHeader = pathname === '/app' || pathname === '/profile'
+  const isAppRoute = ['/app', '/market', '/rooms', '/room', '/offers', '/create', '/profile', '/arbiter'].some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  const isDarkHeader = isAppRoute
 
   useEffect(() => {
     if (!wallet) { setIsAdmin(false); return }
@@ -55,10 +56,10 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
         : 'border-b border-[#0d0d0b]/10 bg-[#ede9df]'
     }`}>
       <div className="flex items-center justify-between">
-        <HeaderBrand tone={isDarkHeader ? 'dark' : 'light'} />
+        <HeaderBrand tone={isDarkHeader ? 'dark' : 'light'} to={isAppRoute ? '/app' : '/'} />
 
         <div className="hidden items-center gap-8 md:flex">
-          <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} tone={isDarkHeader ? 'dark' : 'light'} onHowClick={scrollToHow} onUseCasesClick={scrollToUseCases} />
+          <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} tone={isDarkHeader ? 'dark' : 'light'} mode={isAppRoute ? 'app' : 'landing'} onHowClick={scrollToHow} onUseCasesClick={scrollToUseCases} />
           <HeaderWalletActions
             wallet={wallet}
             isAdmin={isAdmin}
@@ -66,6 +67,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
             onConnect={onConnect}
             onDisconnect={onDisconnect}
             tone={isDarkHeader ? 'dark' : 'light'}
+            mode={isAppRoute ? 'app' : 'landing'}
           />
         </div>
 
@@ -95,6 +97,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
           onUseCasesClick={scrollToUseCases}
           onClose={() => setMobileOpen(false)}
           tone={isDarkHeader ? 'dark' : 'light'}
+          mode={isAppRoute ? 'app' : 'landing'}
         />
       )}
     </nav>
