@@ -15,20 +15,21 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
   const isDarkHeader = isAppRoute
 
   useEffect(() => {
-    if (!wallet) { setIsAdmin(false); return }
-    const provider = wallet.provider
-    const contract = getContract(provider)
+    if (!wallet?.address || !wallet?.provider) { setIsAdmin(false); return }
+    const contract = getContract(wallet.provider)
     let stale = false
     Promise.all([
       contract.owner().catch(() => ''),
-      contract.arbiter().catch(() => ''),
-    ]).then(([owner, arbiter]) => {
+      contract.isArbiter(wallet.address).catch(() => false),
+    ]).then(([owner, activeArbiter]) => {
       if (stale) return
       const addr = wallet.address.toLowerCase()
-      setIsAdmin(addr === owner.toLowerCase() || addr === arbiter.toLowerCase())
+      setIsAdmin(addr === owner.toLowerCase() || activeArbiter)
+    }).catch(() => {
+      if (!stale) setIsAdmin(false)
     })
     return () => { stale = true }
-  }, [wallet])
+  }, [wallet?.address, wallet?.provider])
 
   const scrollToSection = (event, sectionId) => {
     event.preventDefault()

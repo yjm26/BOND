@@ -406,7 +406,7 @@ function Overview() {
       <div className="flex flex-col gap-2 mb-4">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500">Address</span>
-          <Code>0x1d18E4f77086f8FCB43ab81b810257C63e0352C7</Code>
+          <Code>0x1A3ea0d24ff15a90417508F38ABD8E173921082A</Code>
         </div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-[2px] text-stripe-body dark:text-gray-500">Network</span>

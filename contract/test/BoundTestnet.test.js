@@ -251,6 +251,16 @@ describe('BoundTestnet', function () {
 
     await expect(fresh.bond.connect(fresh.buyer).submitEvidence(freshRoom.roomId, 'text', 'ok', longEvidenceRef))
       .to.be.revertedWith('Evidence ref too long')
+
+    const capped = await deployFixture()
+    const cappedRoom = await createJoinFundDeliver(capped)
+    await capped.bond.connect(capped.buyer).openDispute(cappedRoom.roomId, 'bad delivery', 'text', '', '')
+    for (let i = 1; i < 20; i++) {
+      await capped.bond.connect(capped.buyer).submitEvidence(cappedRoom.roomId, 'text', `note ${i}`, `ref-${i}`)
+    }
+    expect(await capped.bond.getEvidenceCount(cappedRoom.roomId)).to.equal(20n)
+    await expect(capped.bond.connect(capped.buyer).submitEvidence(cappedRoom.roomId, 'text', 'overflow', 'ref-overflow'))
+      .to.be.revertedWith('Evidence limit reached')
   })
 
   it('reverts cleanly when USDC returns false instead of silently continuing', async function () {

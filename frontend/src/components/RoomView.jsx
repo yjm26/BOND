@@ -105,8 +105,6 @@ const STATE_GUIDES = {
   },
 }
 
-const TREASURY = '0xB8b4e8E7Ad2651d36b8E0D24B5EF1ae06EE2cC4a'
-
 export default function RoomView({ wallet }) {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -119,8 +117,9 @@ export default function RoomView({ wallet }) {
   const [status, setStatus] = useState(null)
   const [countdown, setCountdown] = useState('')
   const [confirmCountdown, setConfirmCountdown] = useState(null)
-  const [arbiterName, setArbiterName] = useState('Bond Escrow')
-  const [arbiterAddr, setArbiterAddr] = useState(TREASURY)
+  const [arbiterName, setArbiterName] = useState('BOND Arbiter')
+  const [arbiterAddr, setArbiterAddr] = useState('')
+  const [isActiveArbiter, setIsActiveArbiter] = useState(false)
   const [copied, setCopied] = useState(false)
   const [ownerAddr, setOwnerAddr] = useState('')
 
@@ -170,6 +169,7 @@ export default function RoomView({ wallet }) {
       try { setArbiterName(await contract.arbiterName()) } catch {}
       try { setArbiterAddr(await contract.arbiter()) } catch {}
       try { setOwnerAddr(await contract.owner()) } catch {}
+      try { setIsActiveArbiter(wallet?.address ? await contract.isArbiter(wallet.address) : false) } catch { setIsActiveArbiter(false) }
       try {
         const mc = await contract.getMutualCancelStatus(id)
         setMutualCancelStatus({ creatorApproved: mc[0], counterpartyApproved: mc[1] })
@@ -263,7 +263,7 @@ export default function RoomView({ wallet }) {
   const isCreator = account === room?.creator?.toLowerCase()
   const isCounter = account === room?.counterparty?.toLowerCase()
   const isParticipant = isCreator || isCounter
-  const isAdmin = account === ownerAddr?.toLowerCase() || account === arbiterAddr?.toLowerCase()
+  const isAdmin = account === ownerAddr?.toLowerCase() || isActiveArbiter
 
   async function doAction(fn, label, successMsg) {
     setTxPending(true)

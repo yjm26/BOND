@@ -10,7 +10,7 @@ interface IERC20 {
 contract BoundTestnet {
     // ─── State ───
     address public owner;
-    IERC20 public usdc;
+    IERC20 public immutable usdc;
     address public treasury;
     address public arbiter;
     string public arbiterName;
@@ -55,6 +55,7 @@ contract BoundTestnet {
     uint256 public constant MAX_EVIDENCE_TYPE_BYTES = 48;
     uint256 public constant MAX_EVIDENCE_DESC_BYTES = 500;
     uint256 public constant MAX_EVIDENCE_REF_BYTES = 300;
+    uint256 public constant MAX_EVIDENCE_PER_ROOM = 20;
 
     // Buyer can settle or dispute immediately after delivery.
     // Seller can escalate to arbiter only after this short response buffer.
@@ -406,6 +407,12 @@ contract BoundTestnet {
         address seller = _seller(r);
 
         uint256 payout = r.fundedAmount + r.collateralAmount;
+        uint256 releasedAmount = r.fundedAmount;
+        uint256 releasedCollateral = r.collateralAmount;
+
+        _closeRoom(_roomId, r);
+        r.state = State.Released;
+        successCount[seller]++;
 
         if (r.platformFee > 0) {
             _safeTransfer(treasury, r.platformFee);
@@ -415,11 +422,7 @@ contract BoundTestnet {
             _safeTransfer(seller, payout);
         }
 
-        _closeRoom(_roomId, r);
-        r.state = State.Released;
-        successCount[seller]++;
-
-        emit RoomReleased(_roomId, r.fundedAmount, r.collateralAmount);
+        emit RoomReleased(_roomId, releasedAmount, releasedCollateral);
     }
 
     // ─── Escalate No Response (seller calls when buyer ghosts) ───
@@ -488,6 +491,7 @@ contract BoundTestnet {
         require(bytes(_evidenceType).length <= MAX_EVIDENCE_TYPE_BYTES, "Evidence type too long");
         require(bytes(_description).length <= MAX_EVIDENCE_DESC_BYTES, "Evidence desc too long");
         require(bytes(_evidenceRef).length <= MAX_EVIDENCE_REF_BYTES, "Evidence ref too long");
+        require(roomEvidence[_roomId].length < MAX_EVIDENCE_PER_ROOM, "Evidence limit reached");
 
         roomEvidence[_roomId].push(Evidence({
             submitter: msg.sender,
@@ -524,6 +528,12 @@ contract BoundTestnet {
         address buyer = _buyer(r);
         address seller = _seller(r);
         uint256 totalRefund = r.fundedAmount + r.collateralAmount;
+        uint256 refundedAmount = r.fundedAmount;
+        uint256 refundedCollateral = r.collateralAmount;
+
+        _closeRoom(_roomId, r);
+        r.state = State.Refunded;
+        refundedCount[seller]++;
 
         if (r.platformFee > 0) {
             _safeTransfer(treasury, r.platformFee);
@@ -533,11 +543,7 @@ contract BoundTestnet {
             _safeTransfer(buyer, totalRefund);
         }
 
-        _closeRoom(_roomId, r);
-        r.state = State.Refunded;
-        refundedCount[seller]++;
-
-        emit RoomRefunded(_roomId, r.fundedAmount, r.collateralAmount);
+        emit RoomRefunded(_roomId, refundedAmount, refundedCollateral);
     }
 
     // ─── Arbiter Resolve ───
@@ -549,20 +555,21 @@ contract BoundTestnet {
         uint256 total = r.fundedAmount + r.collateralAmount;
         uint256 arbiterFee = (total * ARBITER_FEE_BPS) / BPS_DENOM;
         uint256 net = total - arbiterFee;
+        address seller = _seller(r);
+
+        if (_winner == seller) {
+            successCount[seller]++;
+        } else {
+            refundedCount[seller]++;
+        }
+
+        _closeRoom(_roomId, r);
+        r.state = State.Released;
 
         if (r.platformFee > 0) _safeTransfer(treasury, r.platformFee);
         if (arbiterFee > 0) _safeTransfer(treasury, arbiterFee);
 
         if (net > 0) _safeTransfer(_winner, net);
-
-        if (_winner == _seller(r)) {
-            successCount[_seller(r)]++;
-        } else {
-            refundedCount[_seller(r)]++;
-        }
-
-        _closeRoom(_roomId, r);
-        r.state = State.Released;
 
         emit DisputeResolved(_roomId, _winner, net);
     }
@@ -576,17 +583,19 @@ contract BoundTestnet {
         uint256 arbiterFee = (total * ARBITER_FEE_BPS) / BPS_DENOM;
         uint256 net = total - arbiterFee;
         uint256 half = net / 2;
+        address buyer = _buyer(r);
+        address seller = _seller(r);
+
+        _closeRoom(_roomId, r);
+        r.state = State.Released;
 
         if (r.platformFee > 0) _safeTransfer(treasury, r.platformFee);
         if (arbiterFee > 0) _safeTransfer(treasury, arbiterFee);
 
         if (half > 0) {
-            _safeTransfer(_buyer(r), half);
-            _safeTransfer(_seller(r), net - half);
+            _safeTransfer(buyer, half);
+            _safeTransfer(seller, net - half);
         }
-
-        _closeRoom(_roomId, r);
-        r.state = State.Released;
 
         emit DisputeResolved(_roomId, address(0), net);
     }
@@ -597,13 +606,16 @@ contract BoundTestnet {
         require(r.creator == msg.sender, "Only creator");
         require(r.state == State.Created, "Not cancellable");
 
-        if (r.creatorIsSeller && r.collateralAmount > 0) {
-            _safeTransfer(r.creator, r.collateralAmount);
-        }
+        address creator = r.creator;
+        uint256 collateralRefund = r.creatorIsSeller ? r.collateralAmount : 0;
 
         _clearMutualCancelApprovals(_roomId, r.creator, r.counterparty);
         _closeRoom(_roomId, r);
         r.state = State.Cancelled;
+
+        if (collateralRefund > 0) {
+            _safeTransfer(creator, collateralRefund);
+        }
 
         emit RoomCancelled(_roomId, msg.sender);
     }
@@ -622,15 +634,16 @@ contract BoundTestnet {
             require(block.timestamp > r.joinedAt + FUND_DL, "Not expired");
         }
 
-        if (r.creatorIsSeller && r.collateralAmount > 0) {
-            _safeTransfer(r.creator, r.collateralAmount);
-        } else if (!r.creatorIsSeller && r.collateralAmount > 0) {
-            _safeTransfer(r.counterparty, r.collateralAmount);
-        }
+        address refundTo = r.creatorIsSeller ? r.creator : r.counterparty;
+        uint256 collateralRefund = r.collateralAmount;
 
         _clearMutualCancelApprovals(_roomId, r.creator, r.counterparty);
         _closeRoom(_roomId, r);
         r.state = State.Expired;
+
+        if (collateralRefund > 0) {
+            _safeTransfer(refundTo, collateralRefund);
+        }
 
         emit RoomExpired(_roomId);
     }
@@ -680,17 +693,19 @@ contract BoundTestnet {
 
         address buyer = _buyer(r);
         address seller = _seller(r);
-
-        if (r.fundedAmount + r.platformFee > 0) {
-            _safeTransfer(buyer, r.fundedAmount + r.platformFee);
-        }
-        if (r.collateralAmount > 0) {
-            _safeTransfer(seller, r.collateralAmount);
-        }
+        uint256 refundToBuyer = r.fundedAmount + r.platformFee;
+        uint256 refundToSeller = r.collateralAmount;
 
         _clearMutualCancelApprovals(_roomId, r.creator, r.counterparty);
         _closeRoom(_roomId, r);
         r.state = State.Cancelled;
+
+        if (refundToBuyer > 0) {
+            _safeTransfer(buyer, refundToBuyer);
+        }
+        if (refundToSeller > 0) {
+            _safeTransfer(seller, refundToSeller);
+        }
 
         emit MutualCancelExecuted(_roomId);
     }
