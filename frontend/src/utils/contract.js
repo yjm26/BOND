@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x2029043537BDbD4Ab443ac51E3E0a5262FC9eb17'; // BoundTestnet on Arc Testnet
+export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x1d18E4f77086f8FCB43ab81b810257C63e0352C7'; // BoundTestnet on Arc Testnet
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'; // Arc USDC precompile
 export const ARC_RPC_URL = 'https://rpc.testnet.arc.network'
 export const ARC_NETWORK = { chainId: 5042002, name: 'arcTestnet' }
