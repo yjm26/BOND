@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ethers } from 'ethers'
-import { ARC_READ_PROVIDER, getContract, getUsdc, waitForTx, ARC_GAS, ARC_GAS_APPROVE, generateJoinCode, hashJoinCode, createInviteLink, CONTRACT_ADDRESS, ensureArcChain, fixSignerNonce } from '../utils/contract'
+import { getContract, getUsdc, waitForTx, ARC_GAS, ARC_GAS_APPROVE, generateJoinCode, hashJoinCode, createInviteLink, CONTRACT_ADDRESS, ensureArcChain, fixSignerNonce, readMany, getLatestNonce } from '../utils/contract'
 import { authFetch } from '../lib/api'
 import CreateRoomConfirm from './create-room/CreateRoomConfirm'
 import CreateRoomForm from './create-room/CreateRoomForm'
@@ -91,13 +91,13 @@ export default function CreateRoom({ wallet }) {
       try {
         let active, maxActive
         try {
-          ;[active, maxActive] = await Promise.all([
-            getContract(ARC_READ_PROVIDER).activeRooms(wallet.address),
-            getContract(ARC_READ_PROVIDER).MAX_ACTIVE(),
-          ])
+          ;[active, maxActive] = await readMany([
+            { method: 'activeRooms', args: [wallet.address] },
+            { method: 'MAX_ACTIVE' },
+          ], wallet.provider)
         } catch (readErr) {
           console.error('Read error:', readErr)
-          throw new Error('Cannot read contract. Make sure your wallet is on Arc Testnet (chain 5042002) and the contract is deployed.')
+          throw new Error('Cannot read BOND contract right now. Arc RPC may be busy; your wallet can be on the correct Arc Testnet and still hit this. Please retry in a few seconds.')
         }
 
         if (active >= maxActive) {
@@ -110,7 +110,7 @@ export default function CreateRoom({ wallet }) {
         const collateralWei = collateralValue ? ethers.parseUnits(collateralValue, 6) : 0n
         const joinCode = generateJoinCode()
         const joinCodeHash = hashJoinCode(joinCode)
-        let nonce = await ARC_READ_PROVIDER.getTransactionCount(await signer.getAddress(), 'latest')
+        let nonce = await getLatestNonce(await signer.getAddress(), wallet.provider)
 
         if (creatorIsSeller && collateralWei > 0n) {
           setStep('Approving USDC…')

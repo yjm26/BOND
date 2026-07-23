@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { createAppKit } from '@reown/appkit/react'
 import { useAppKit, useAppKitAccount, useAppKitProvider, useDisconnect } from '@reown/appkit/react'
 import { EthersAdapter } from '@reown/appkit-adapter-ethers'
@@ -46,6 +46,27 @@ function RouteFooter() {
   return showFooter ? <Footer /> : null
 }
 
+function DisconnectRedirect({ tick }) {
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (tick > 0) navigate('/app', { replace: true })
+  }, [tick, navigate])
+  return null
+}
+
+function DisconnectOverlay({ active }) {
+  if (!active) return null
+  return (
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-[#050505]/88 px-6 text-[#ede9df] backdrop-blur-md animate-page-enter">
+      <div className="w-full max-w-[420px] border border-[#ede9df]/12 bg-[#20201f] p-6 text-center shadow-2xl">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border border-[#ede9df]/14 border-t-[#d8b15f]" />
+        <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.24em] text-[#d8b15f]">Closing wallet session</div>
+        <p className="mt-3 text-[15px] leading-[1.55] text-[#ede9df]/72">Clearing the workspace and returning to the app gate.</p>
+      </div>
+    </div>
+  )
+}
+
 createAppKit({
   projectId: 'af815ce51d40ec33de9699ee550f21a8',
   adapters: [new EthersAdapter()],
@@ -67,6 +88,8 @@ export default function App() {
 
   const [wallet, setWallet] = useState(null)
   const [connecting, setConnecting] = useState(false)
+  const [disconnecting, setDisconnecting] = useState(false)
+  const [disconnectRedirectTick, setDisconnectRedirectTick] = useState(0)
   const [connectError, setConnectError] = useState(null)
   const manualDisconnect = useRef(false)
 
@@ -104,15 +127,21 @@ export default function App() {
 
   const handleDisconnect = useCallback(async () => {
     manualDisconnect.current = true
-    setWallet(null)
+    setDisconnecting(true)
     localStorage.removeItem('bond_wallet_connected')
     resetAuthCache()
     try { await disconnect() } catch (e) { console.error('Disconnect failed:', e) }
+    window.setTimeout(() => {
+      setWallet(null)
+      setDisconnectRedirectTick((tick) => tick + 1)
+      window.setTimeout(() => setDisconnecting(false), 450)
+    }, 450)
   }, [disconnect])
 
   return (
     <ToastProvider>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <DisconnectRedirect tick={disconnectRedirectTick} />
       <Navbar onConnect={handleConnect} onDisconnect={handleDisconnect} wallet={wallet} connecting={connecting} />
       <ErrorBoundary>
       <PageTransition>
@@ -132,6 +161,7 @@ export default function App() {
       </ErrorBoundary>
       <RouteFooter />
       <ToastContainer />
+      <DisconnectOverlay active={disconnecting} />
     </BrowserRouter>
     </ToastProvider>
   )

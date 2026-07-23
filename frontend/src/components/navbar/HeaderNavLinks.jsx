@@ -1,12 +1,20 @@
 import { Link } from 'react-router-dom'
 
-export default function HeaderNavLinks({ isAdmin, tone = 'light', mode = 'landing', onHowClick, onUseCasesClick }) {
+export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode = 'landing', onHowClick, onUseCasesClick }) {
   const dark = tone === 'dark'
   const navLink = dark
     ? 'text-[13px] font-medium tracking-[-0.01em] !text-[#ede9df]/70 transition hover:!text-[#ede9df]'
     : 'text-[13px] font-medium tracking-[-0.01em] !text-[#0d0d0b]/70 transition hover:!text-[#0d0d0b]'
 
   if (mode === 'app') {
+    if (!wallet) {
+      return (
+        <div className="hidden items-center gap-6 md:flex">
+          <Link to="/" className={navLink}>Back to home</Link>
+        </div>
+      )
+    }
+
     return (
       <div className="hidden items-center gap-6 md:flex">
         <Link to="/market" className={navLink}>Market</Link>

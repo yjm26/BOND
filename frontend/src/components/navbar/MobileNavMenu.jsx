@@ -23,13 +23,17 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
           : 'border-[#0d0d0b]/10 bg-[#ede9df]'
       }`}>
         {mode === 'app' ? (
-          <>
-            <Link to="/market" className={linkClass} onClick={onClose}>Market</Link>
-            <Link to="/rooms" className={linkClass} onClick={onClose}>My rooms</Link>
-            <Link to="/arbiter" className={linkClass} onClick={onClose}>Disputes</Link>
-            <Link to="/profile" className={linkClass} onClick={onClose}>Profile</Link>
-            <Link to="/profile" className={linkClass} onClick={onClose}>Settings</Link>
-          </>
+          wallet ? (
+            <>
+              <Link to="/market" className={linkClass} onClick={onClose}>Market</Link>
+              <Link to="/rooms" className={linkClass} onClick={onClose}>My rooms</Link>
+              <Link to="/arbiter" className={linkClass} onClick={onClose}>Disputes</Link>
+              <Link to="/profile" className={linkClass} onClick={onClose}>Profile</Link>
+              <Link to="/profile" className={linkClass} onClick={onClose}>Settings</Link>
+            </>
+          ) : (
+            <Link to="/" className={linkClass} onClick={onClose}>Back to home</Link>
+          )
         ) : (
           <>
             <a href="#how" onClick={(e) => { onHowClick(e); onClose() }} className={linkClass}>How it works</a>

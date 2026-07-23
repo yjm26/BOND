@@ -3,8 +3,15 @@ import { ethers } from 'ethers';
 export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x1A3ea0d24ff15a90417508F38ABD8E173921082A'; // BoundTestnet on Arc Testnet
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'; // Arc USDC precompile
 export const ARC_RPC_URL = 'https://rpc.testnet.arc.network'
+export const ARC_RPC_URLS = [
+  ARC_RPC_URL,
+  'https://rpc.blockdaemon.testnet.arc.network',
+  'https://rpc.drpc.testnet.arc.network',
+  'https://rpc.quicknode.testnet.arc.network',
+]
 export const ARC_NETWORK = { chainId: 5042002, name: 'arcTestnet' }
 export const ARC_READ_PROVIDER = new ethers.JsonRpcProvider(ARC_RPC_URL, ARC_NETWORK, { staticNetwork: true })
+export const ARC_READ_PROVIDERS = ARC_RPC_URLS.map((url) => new ethers.JsonRpcProvider(url, ARC_NETWORK, { staticNetwork: true }))
 
 /// Arc minimum gas params — transactions below 20 Gwei maxFeePerGas stay pending forever
 /// See https://docs.arc.io/arc/references/gas-and-fees
@@ -168,6 +175,56 @@ export function getContract(signerOrProvider) {
   return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signerOrProvider);
 }
 
+export async function readContract(method, args = [], fallbackProvider) {
+  const providers = [...ARC_READ_PROVIDERS]
+  if (fallbackProvider) providers.push(fallbackProvider)
+  let lastError
+
+  for (const provider of providers) {
+    try {
+      const contract = getContract(provider)
+      return await contract[method](...args)
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  throw lastError || new Error(`Cannot read contract method ${method}`)
+}
+
+export async function readMany(calls, fallbackProvider) {
+  const providers = [...ARC_READ_PROVIDERS]
+  if (fallbackProvider) providers.push(fallbackProvider)
+  let lastError
+
+  for (const provider of providers) {
+    try {
+      const contract = getContract(provider)
+      return await Promise.all(calls.map(({ method, args = [] }) => contract[method](...args)))
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  throw lastError || new Error('Cannot read contract')
+}
+
+export async function getLatestNonce(address, fallbackProvider) {
+  const providers = [...ARC_READ_PROVIDERS]
+  if (fallbackProvider) providers.push(fallbackProvider)
+  let lastError
+
+  for (const provider of providers) {
+    try {
+      return await provider.getTransactionCount(address, 'latest')
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  throw lastError || new Error('Cannot read wallet nonce')
+}
+
 export function getUsdc(signerOrProvider) {
   return new ethers.Contract(USDC_ADDRESS, USDC_ABI, signerOrProvider);
 }
@@ -218,9 +275,8 @@ export function createInviteLink(roomId, joinCode) {
 /// This patches signer.populateTransaction to use RPC's latest nonce + auto-increment.
 export async function fixSignerNonce(signer) {
   const addr = await signer.getAddress()
-  // Use PUBLIC RPC — wallet provider may have stale nonce cache
-  const rpcProvider = ARC_READ_PROVIDER
-  let nextNonce = await rpcProvider.getTransactionCount(addr, 'latest')
+  // Use Arc RPC fallback set — wallet provider may have stale nonce cache
+  let nextNonce = await getLatestNonce(addr, signer.provider)
   const originalPopulate = signer.populateTransaction.bind(signer)
   signer.populateTransaction = async (tx) => {
     const populated = await originalPopulate(tx)
