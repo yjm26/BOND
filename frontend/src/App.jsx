@@ -6,20 +6,17 @@ import { EthersAdapter } from '@reown/appkit-adapter-ethers'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
-import Hero from './components/Hero'
-import HowItWorks from './components/HowItWorks'
-import RoomClaritySection from './components/room-clarity/RoomClaritySection'
-import UseCasesSection from './components/use-cases/UseCasesSection'
-import AppWorkspace from './components/app/AppWorkspace'
-import ProfileSettings from './components/app/ProfileSettings'
-import RoomsPage from './components/RoomsPage'
-import RoomView from './components/RoomView'
-import CreateRoom from './components/CreateRoom'
-import Market from './components/Market'
-import Offers from './components/Offers'
-import Docs from './components/Docs'
-import ArbiterDashboard from './components/ArbiterDashboard'
 import ToastContainer from './components/ToastContainer'
+import AppPage from './pages/AppPage'
+import ArbiterPage from './pages/ArbiterPage'
+import CreateRoomPage from './pages/CreateRoomPage'
+import DocsPage from './pages/DocsPage'
+import LandingPage from './pages/LandingPage'
+import MarketPage from './pages/MarketPage'
+import OffersPage from './pages/OffersPage'
+import ProfilePage from './pages/ProfilePage'
+import RoomDetailPage from './pages/RoomDetailPage'
+import RoomsIndexPage from './pages/RoomsIndexPage'
 import { ToastProvider } from './contexts/ToastContext'
 import { reconnectWallet } from './lib/wallet'
 import { resetAuthCache } from './lib/api'
@@ -120,16 +117,16 @@ export default function App() {
       <ErrorBoundary>
       <PageTransition>
       <Routes>
-        <Route path="/" element={<><Hero wallet={wallet} onConnect={handleConnect} /><HowItWorks /><RoomClaritySection /><UseCasesSection /></>} />
-        <Route path="/app" element={<AppWorkspace wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
-        <Route path="/create" element={<CreateRoom wallet={wallet} />} />
-        <Route path="/rooms" element={<RoomsPage wallet={wallet} />} />
-        <Route path="/room/:id" element={<RoomView wallet={wallet} />} />
-        <Route path="/docs/:section?" element={<Docs />} />
-        <Route path="/market" element={<Market wallet={wallet} />} />
-        <Route path="/offers" element={<Offers wallet={wallet} />} />
-        <Route path="/profile" element={<ProfileSettings wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
-        <Route path="/arbiter" element={<ArbiterDashboard wallet={wallet} />} />
+        <Route path="/" element={<LandingPage wallet={wallet} onConnect={handleConnect} />} />
+        <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
+        <Route path="/create" element={<CreateRoomPage wallet={wallet} />} />
+        <Route path="/rooms" element={<RoomsIndexPage wallet={wallet} />} />
+        <Route path="/room/:id" element={<RoomDetailPage wallet={wallet} />} />
+        <Route path="/docs/:section?" element={<DocsPage />} />
+        <Route path="/market" element={<MarketPage wallet={wallet} />} />
+        <Route path="/offers" element={<OffersPage wallet={wallet} />} />
+        <Route path="/profile" element={<ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
+        <Route path="/arbiter" element={<ArbiterPage wallet={wallet} />} />
       </Routes>
       </PageTransition>
       </ErrorBoundary>
