@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 
-export default function HeaderBrand({ tone = 'light', to = '/' }) {
+export default function HeaderBrand({ tone = 'light', to = '/', hideSubtitle = false }) {
   const dark = tone === 'dark'
+  const subtitle = dark ? 'Deal rooms' : 'Escrow rooms on Arc'
 
   return (
     <Link to={to} className="group inline-flex items-center gap-3">
@@ -14,7 +15,7 @@ export default function HeaderBrand({ tone = 'light', to = '/' }) {
       </span>
       <span>
         <span className={`block text-[15px] font-semibold tracking-[-0.03em] ${dark ? 'text-[#ede9df]' : 'text-[#0d0d0b]'}`}>BOND</span>
-        <span className={`hidden font-mono text-[9px] uppercase tracking-[0.22em] sm:block ${dark ? 'text-[#ede9df]/56' : 'text-[#0d0d0b]/55'}`}>{dark ? 'App workspace' : 'Escrow rooms on Arc'}</span>
+        {!hideSubtitle && <span className={`hidden font-mono text-[9px] uppercase tracking-[0.22em] sm:block ${dark ? 'text-[#ede9df]/56' : 'text-[#0d0d0b]/55'}`}>{subtitle}</span>}
       </span>
     </Link>
   )
