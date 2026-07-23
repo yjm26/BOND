@@ -27,21 +27,24 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
     return () => { stale = true }
   }, [wallet])
 
-  const scrollToHow = (event) => {
+  const scrollToSection = (event, sectionId) => {
     event.preventDefault()
     const isHome = window.location.pathname === '/' || window.location.pathname === ''
     if (!isHome) {
       navigate('/')
       setTimeout(() => {
-        const el = document.getElementById('how')
+        const el = document.getElementById(sectionId)
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 350)
       return
     }
 
-    const el = document.getElementById('how')
+    const el = document.getElementById(sectionId)
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+
+  const scrollToHow = (event) => scrollToSection(event, 'how')
+  const scrollToUseCases = (event) => scrollToSection(event, 'use-cases')
 
   return (
     <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#0d0d0b]/10 bg-[#ede9df]/88 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-10">
@@ -49,7 +52,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
         <HeaderBrand />
 
         <div className="hidden items-center gap-8 md:flex">
-          <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} onHowClick={scrollToHow} />
+          <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} onHowClick={scrollToHow} onUseCasesClick={scrollToUseCases} />
           <HeaderWalletActions
             wallet={wallet}
             isAdmin={isAdmin}
@@ -78,6 +81,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
           connecting={connecting}
           onConnect={onConnect}
           onHowClick={scrollToHow}
+          onUseCasesClick={scrollToUseCases}
           onClose={() => setMobileOpen(false)}
         />
       )}

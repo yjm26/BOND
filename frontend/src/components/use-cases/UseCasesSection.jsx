@@ -3,7 +3,7 @@ import { USE_CASES } from './useCaseData'
 
 export default function UseCasesSection() {
   return (
-    <section className="bg-[#ede9df] px-6 pb-16 text-[#171716] sm:px-10 sm:pb-28 lg:px-14">
+    <section id="use-cases" className="bg-[#ede9df] px-6 pb-16 text-[#171716] sm:px-10 sm:pb-28 lg:px-14">
       <div className="border-y border-[#171716]/15 py-8 sm:py-10">
         <div className="grid gap-8 lg:grid-cols-[34%_1fr] lg:items-end">
           <div>

@@ -44,9 +44,9 @@ export default function HeaderWalletActions({ wallet, isAdmin, connecting, onCon
           </Link>
         </>
       ) : (
-        <button onClick={onConnect} disabled={connecting} className="inline-flex h-9 items-center justify-center border border-[#0d0d0b] bg-[#0d0d0b] px-4 text-[13px] font-medium text-[#ede9df] transition hover:bg-transparent hover:text-[#0d0d0b] disabled:opacity-40">
-          {connecting ? 'Connecting…' : 'Connect wallet'}
-        </button>
+        <Link to="/market" className="inline-flex h-9 items-center justify-center border border-[#0d0d0b] bg-[#0d0d0b] px-4 text-[13px] font-medium text-[#ede9df] transition hover:bg-transparent hover:text-[#0d0d0b]">
+          Go to app
+        </Link>
       )}
     </div>
   )
