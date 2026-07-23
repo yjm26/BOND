@@ -13,8 +13,8 @@ const RESOURCE_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#20201f] px-6 py-14 text-[#ede9df] sm:px-10 lg:px-14">
-      <div className="grid gap-12 border-t border-[#ede9df]/14 pt-10 lg:grid-cols-[1fr_360px]">
+    <footer className="bg-[#20201f] px-6 py-10 text-[#ede9df] sm:px-10 sm:py-14 lg:px-14">
+      <div className="grid gap-9 border-t border-[#ede9df]/14 pt-8 sm:gap-12 sm:pt-10 lg:grid-cols-[1fr_360px]">
         <div>
           <Link to="/" className="inline-flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center border border-[#ede9df]/18 bg-[#ede9df] font-mono text-[13px] font-semibold text-[#20201f]">
@@ -26,11 +26,11 @@ export default function Footer() {
             </span>
           </Link>
 
-          <p className="mt-8 max-w-[520px] text-[15px] leading-[1.7] tracking-[-0.01em] text-[#b9b2a5]">
+          <p className="mt-6 max-w-[520px] text-[14px] leading-[1.65] tracking-[-0.01em] text-[#b9b2a5] sm:mt-8 sm:text-[15px] sm:leading-[1.7]">
             Private escrow rooms for risky digital work and marketplace deals. Lock USDC on Arc, attach proof, and settle with release, refund, or arbitration.
           </p>
 
-          <div className="mt-8 max-w-[560px] border border-[#d8b15f]/22 bg-[#d8b15f]/[0.07] px-4 py-3 font-mono text-[10px] uppercase leading-[1.7] tracking-[0.16em] text-[#d8b15f]/82">
+          <div className="mt-6 max-w-[560px] border border-[#d8b15f]/22 bg-[#d8b15f]/[0.07] px-4 py-3 font-mono text-[9px] uppercase leading-[1.65] tracking-[0.14em] text-[#d8b15f]/82 sm:mt-8 sm:text-[10px] sm:tracking-[0.16em]">
             Arc Testnet — testing environment only. Do not use production funds.
           </div>
         </div>
@@ -60,9 +60,9 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="mt-12 flex flex-col gap-3 border-t border-[#ede9df]/10 pt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#ede9df]/34 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-9 flex flex-col gap-3 border-t border-[#ede9df]/10 pt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#ede9df]/34 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">
         <span>© BOND / Arc Testnet</span>
-        <span>0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5</span>
+        <span className="max-w-full truncate">0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5</span>
       </div>
     </footer>
   )
