@@ -8,7 +8,7 @@ const PRODUCT_LINKS = [
 
 const RESOURCE_LINKS = [
   { label: 'GitHub', href: 'https://github.com/yjm26/arc-escrow-agent' },
-  { label: 'Contract', href: 'https://testnet.arcscan.app/address/0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5' },
+  { label: 'Contract', href: 'https://testnet.arcscan.app/address/0x2029043537BDbD4Ab443ac51E3E0a5262FC9eb17' },
 ]
 
 export default function Footer() {
@@ -62,7 +62,7 @@ export default function Footer() {
 
       <div className="mt-9 flex flex-col gap-3 border-t border-[#ede9df]/10 pt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#ede9df]/34 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">
         <span>© BOND / Arc Testnet</span>
-        <span className="max-w-full truncate">0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5</span>
+        <span className="max-w-full truncate">0x2029043537BDbD4Ab443ac51E3E0a5262FC9eb17</span>
       </div>
     </footer>
   )

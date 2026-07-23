@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0xADf4c67c0D8b2900fA045B1BDbA5d54c803688E5'; // BoundTestnet after deploy
+export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x2029043537BDbD4Ab443ac51E3E0a5262FC9eb17'; // BoundTestnet on Arc Testnet
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'; // Arc USDC precompile
 
 /// Arc minimum gas params — transactions below 20 Gwei maxFeePerGas stay pending forever

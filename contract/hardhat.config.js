@@ -19,4 +19,22 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
+  etherscan: {
+    apiKey: {
+      arcTestnet: 'arcscan',
+    },
+    customChains: [
+      {
+        network: 'arcTestnet',
+        chainId: 5042002,
+        urls: {
+          apiURL: 'https://testnet.arcscan.app/api/',
+          browserURL: 'https://testnet.arcscan.app',
+        },
+      },
+    ],
+  },
+  sourcify: {
+    enabled: false,
+  },
 };
