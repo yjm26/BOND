@@ -1,39 +1,79 @@
+import { useEffect, useMemo, useState } from 'react'
 import AppGate from './AppGate'
+import ProfileEditForm from './profile/ProfileEditForm'
+import ProfileHeader from './profile/ProfileHeader'
+import ProfileIdentityCard from './profile/ProfileIdentityCard'
+import ProfileSaveConfirm from './profile/ProfileSaveConfirm'
+import ProfileSidebar from './profile/ProfileSidebar'
+import ProfileTrustNotes from './profile/ProfileTrustNotes'
+import { emptyProfile, loadProfile, saveProfile } from './profile/profileStorage'
 
 export default function ProfileSettings({ wallet, connecting, connectError, onConnect }) {
+  const [profile, setProfile] = useState(emptyProfile())
+  const [form, setForm] = useState(emptyProfile())
+  const [pendingProfile, setPendingProfile] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (!wallet?.address) return
+    const stored = loadProfile(wallet.address) || emptyProfile()
+    setProfile(stored)
+    setForm(stored)
+  }, [wallet?.address])
+
+  const canSave = useMemo(() => form.displayName.trim().length > 0, [form.displayName])
+
+  const updateField = (key, value) => {
+    setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  const submit = (event) => {
+    event.preventDefault()
+    if (!canSave) return
+    setPendingProfile({
+      ...profile,
+      displayName: form.displayName.trim(),
+      xProfile: form.xProfile.trim(),
+      discord: form.discord.trim(),
+      updatedAt: new Date().toISOString(),
+      createdAt: profile.createdAt || new Date().toISOString(),
+    })
+  }
+
+  const confirmSave = () => {
+    if (!wallet?.address || !pendingProfile) return
+    setSaving(true)
+    saveProfile(wallet.address, pendingProfile)
+    window.setTimeout(() => {
+      setProfile(pendingProfile)
+      setForm(pendingProfile)
+      setPendingProfile(null)
+      setSaving(false)
+    }, 500)
+  }
+
   if (!wallet) {
     return <AppGate connecting={connecting} connectError={connectError} onConnect={onConnect} />
   }
 
   return (
-    <section className="min-h-screen bg-[#ede9df] px-6 pt-[112px] text-[#171716] sm:px-10 lg:px-14">
-      <div className="grid gap-12 lg:grid-cols-[36%_1fr]">
-        <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#6f6b62]">Profile / Settings</div>
-          <h1 className="mt-5 max-w-[520px] text-[clamp(44px,6vw,82px)] font-medium leading-[0.92] tracking-[-0.08em]">
-            Workspace identity, without fake reputation.
-          </h1>
-          <p className="mt-6 max-w-[440px] text-[15px] leading-[1.72] tracking-[-0.01em] text-[#5f5a50]">
-            This page starts with honest local workspace settings. Reputation, saved profile data, and notifications should only become editable once they are backed by real app data.
-          </p>
-        </div>
-
-        <div className="grid gap-3">
-          <div className="border border-[#171716]/14 bg-[#f4f0e7] p-5 sm:p-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#6f6b62]">Connected wallet</div>
-            <div className="mt-5 break-all font-mono text-[13px] text-[#171716]">{wallet.address}</div>
-          </div>
-          {['Display name', 'Notification preference', 'Default room role'].map((label) => (
-            <div key={label} className="flex items-center justify-between border border-[#171716]/14 bg-[#f4f0e7] p-5 sm:p-6">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#6f6b62]">{label}</div>
-                <div className="mt-2 text-[14px] text-[#5f5a50]">Coming after profile storage is implemented.</div>
+    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
+      <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
+        <ProfileSidebar wallet={wallet} />
+        <main className="overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
+          <div className="p-4 sm:p-5 lg:p-6">
+            <ProfileHeader profile={profile} />
+            <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+              <div className="grid gap-5">
+                <ProfileIdentityCard wallet={wallet} profile={profile} />
+                <ProfileTrustNotes />
               </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#171716]/35">Soon</span>
+              <ProfileEditForm form={form} saving={saving} canSave={canSave} onChange={updateField} onSubmit={submit} />
             </div>
-          ))}
-        </div>
+          </div>
+        </main>
       </div>
+      <ProfileSaveConfirm pendingProfile={pendingProfile} onCancel={() => setPendingProfile(null)} onConfirm={confirmSave} />
     </section>
   )
 }
