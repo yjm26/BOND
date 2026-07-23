@@ -120,6 +120,50 @@ function json(res, data, status = 200, origin = '*') {
   res.end(JSON.stringify(data))
 }
 
+const STATIC_DIR = path.join(__dirname, 'frontend', 'dist')
+const CONTENT_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+}
+
+function serveStatic(res, pathname) {
+  const safePath = path.normalize(pathname).replace(/^\/+/, '')
+  let filePath = path.join(STATIC_DIR, safePath)
+  if (!filePath.startsWith(STATIC_DIR)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' })
+    return res.end('Forbidden')
+  }
+
+  if (pathname === '/' || !path.extname(filePath)) {
+    filePath = path.join(STATIC_DIR, 'index.html')
+  }
+
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      fs.readFile(path.join(STATIC_DIR, 'index.html'), (indexErr, indexData) => {
+        if (indexErr) {
+          res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
+          return res.end('Frontend build not found. Run npm run render-build first.')
+        }
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+        res.end(indexData)
+      })
+      return
+    }
+
+    res.writeHead(200, { 'Content-Type': CONTENT_TYPES[path.extname(filePath)] || 'application/octet-stream' })
+    res.end(data)
+  })
+}
+
 function parseAuth(req) {
   return {
     wallet: req.headers['x-wallet-address'] || '',
@@ -512,6 +556,13 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/api/health' && req.method === 'GET') {
       return json(res, { status: 'ok' }, 200, origin)
+    }
+
+    // ── FRONTEND SPA ──
+    // Render runs this as a single Web Service. API routes stay under /api;
+    // every other route serves the Vite build with SPA fallback.
+    if (!pathname.startsWith('/api/')) {
+      return serveStatic(res, pathname)
     }
 
     json(res, { error: 'Not found' }, 404, origin)

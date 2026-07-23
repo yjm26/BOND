@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: bond-arc-escrow
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run render-build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production

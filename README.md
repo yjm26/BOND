@@ -65,6 +65,42 @@ After deploying, update `ESCROW_ADDRESS` in `frontend/index.html` with your depl
 npx hardhat test
 ```
 
+## Deploy on Render
+
+This repo is configured for a **single Render Web Service**:
+
+- `server.js` serves the API under `/api/*`.
+- The same server serves the built Vite frontend from `frontend/dist`.
+- Frontend API calls default to same-origin, so no separate backend URL is needed.
+
+### Render settings
+
+You can use the included `render.yaml` blueprint, or create a Web Service manually:
+
+```text
+Runtime: Node
+Build Command: npm install && npm run render-build
+Start Command: npm start
+Health Check Path: /api/health
+```
+
+Local production check:
+
+```bash
+npm install
+npm run render-build
+PORT=4100 npm start
+curl http://localhost:4100/api/health
+```
+
+Then open `http://localhost:4100`.
+
+### Backend placement
+
+For the current MVP, the cleanest deployment is **one Render Web Service** from the repo root. Keep `server.js` as the production backend and let it serve both API and frontend. This avoids CORS and `VITE_API_URL` setup.
+
+The old `backend/` folder is legacy/simple backend code. Prefer the root `server.js` because it has wallet-signature auth, sanitization, and the current API routes used by the frontend.
+
 ## Contract
 
 ### Flow

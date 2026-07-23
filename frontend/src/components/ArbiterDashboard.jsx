@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { getContract, STATE_NAMES, parseRoom } from '../utils/contract'
 import Skeleton from './Skeleton'
 import { useSmartPolling } from '../hooks/useSmartPolling'
+import { API_URL } from '../lib/api'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://arc-escrow-agent-production.up.railway.app'
 const ARBITER_ADDR = '0xB8b4e8E7Ad2651d36b8E0D24B5EF1ae06EE2cC4a'
 
 function fmt(addr) {

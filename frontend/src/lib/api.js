@@ -1,6 +1,8 @@
 import { ethers } from 'ethers'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// Empty fallback keeps API calls same-origin for single-service deploys
+// like Render Web Service serving frontend/dist and /api from server.js.
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 /**
  * Build SIWE-like message matching server's expected format.
