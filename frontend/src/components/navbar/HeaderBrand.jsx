@@ -4,10 +4,10 @@ export default function HeaderBrand({ tone = 'light', to = '/', hideSubtitle = f
   const dark = tone === 'dark'
   const subtitle = dark ? 'Deal rooms' : 'Escrow rooms on Arc'
   const logoSrc = dark ? '/brand/bond-logo-white.png' : '/brand/bond-logo-black.png'
-  const markClass = bareMark
+  const markClass = bareMark || dark
     ? 'flex h-8 w-10 items-center justify-center transition'
     : `flex h-8 w-10 items-center justify-center border transition ${
-      dark ? 'border-[#ede9df]/14 bg-[#111110]' : 'border-[#0d0d0b]/12 bg-[#ede9df]'
+      'border-[#0d0d0b]/12 bg-[#ede9df]'
     }`
 
   return (
