@@ -1,9 +1,16 @@
 export default function ListingDescription({ description }) {
-  if (!description) return <div className="text-[13px] text-zinc-400 italic">No description provided.</div>
+  if (!description) {
+    return (
+      <div className="border border-[#ede9df]/10 bg-[#20201f]/55 p-4 text-[13px] italic leading-[1.6] text-[#ede9df]/42">
+        No description provided.
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <div className="font-mono text-[10px] uppercase tracking-[2px] text-zinc-400 mb-1.5">Description</div>
-      <p className="text-[14px] text-zinc-700 dark:text-gray-300 leading-[1.6] whitespace-pre-wrap">{description}</p>
+    <div className="border border-[#ede9df]/10 bg-[#20201f]/55 p-4">
+      <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#ede9df]/34">Description</div>
+      <p className="mt-2 whitespace-pre-wrap text-[14px] leading-[1.65] text-[#d8d1c2]">{description}</p>
     </div>
   )
 }

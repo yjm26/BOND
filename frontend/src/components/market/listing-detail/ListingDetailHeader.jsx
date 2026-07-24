@@ -3,20 +3,34 @@ import { formatAddress, timeAgo } from '../marketUtils'
 
 export default function ListingDetailHeader({ listing, isBuyerListing, catStyle, onClose }) {
   return (
-    <div className="p-5 border-b border-zinc-100 dark:border-white/10">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${isBuyerListing ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10'}`}>
-            {isBuyerListing ? '◈ BUYER LISTING' : '◆ SELLER LISTING'}
+    <header className="border-b border-[#ede9df]/10 p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`border px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] ${isBuyerListing ? 'border-[#b7c8a3]/26 bg-[#b7c8a3]/8 text-[#b7c8a3]' : 'border-[#ede9df]/14 bg-[#ede9df]/6 text-[#ede9df]/72'}`}>
+            {isBuyerListing ? 'Buyer listing' : 'Seller listing'}
           </span>
-          <span className="inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px] font-semibold tracking-wide uppercase border" style={{ background: catStyle.bg, color: catStyle.color, borderColor: catStyle.border }}>
-            {CATEGORY_ICON[listing.category] || '▪'} {listing.category?.toUpperCase()}
+          <span
+            className="inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em]"
+            style={{ background: catStyle.bg, color: catStyle.color, borderColor: catStyle.border }}
+          >
+            {CATEGORY_ICON[listing.category] || '▪'} {listing.category || 'Other'}
           </span>
         </div>
-        <button onClick={onClose} className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white text-xl leading-none">×</button>
+        <button
+          onClick={onClose}
+          className="flex h-9 w-9 items-center justify-center border border-[#ede9df]/12 text-[20px] leading-none text-[#ede9df]/48 transition hover:border-[#ede9df]/30 hover:text-[#ede9df] focus:outline-none focus:ring-2 focus:ring-[#d8b15f]/40"
+          aria-label="Close listing detail"
+        >
+          ×
+        </button>
       </div>
-      <h2 className="text-[18px] font-semibold text-zinc-900 dark:text-white leading-snug">{listing.title}</h2>
-      <p className="text-[11px] text-zinc-400 dark:text-gray-500 font-mono mt-1">Posted {timeAgo(listing.createdAt)} by {formatAddress(listing.creator)}</p>
-    </div>
+
+      <h2 id="listing-detail-title" className="mt-4 text-[clamp(28px,4vw,40px)] font-medium leading-[0.92] tracking-[-0.075em] text-[#ede9df]">
+        {listing.title}
+      </h2>
+      <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#ede9df]/36">
+        Posted {timeAgo(listing.createdAt)} by <span className="text-[#ede9df]/56">{formatAddress(listing.creator)}</span>
+      </p>
+    </header>
   )
 }
