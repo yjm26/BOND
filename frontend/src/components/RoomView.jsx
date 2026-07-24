@@ -282,8 +282,8 @@ export default function RoomView({ wallet }) {
           const gas = { ...ARC_GAS, nonce }
           const contract = getContract(signer)
           const tx = await fn(contract, gas)
-            setStatus({ type: 'info', msg: `TX sent: ${tx.hash.slice(0, 10)}\u2026 \u2014 waiting for confirmation\u2026` })
-            addToast(`TX sent ${tx.hash.slice(0, 14)}...`, 'info')
+            setStatus({ type: 'info', msg: `Wallet signed. Waiting for Arc confirmation: ${tx.hash.slice(0, 10)}\u2026` })
+            addToast(`Pending on Arc · ${tx.hash.slice(0, 10)}…`, 'info')
 
             // Stuck-tx detection: if not on chain within 15s, warn user about wallet cache
             const stuckTimer = setTimeout(async () => {
@@ -467,9 +467,9 @@ export default function RoomView({ wallet }) {
     setDisputeReason('')
   }
 
-  const handleCancel = () => doAction((c, gas) => c.cancelRoom(id, gas), 'Cancelling\u2026', 'Cancelled. Collateral returned.')
-  const handleLeave = () => doAction((c, gas) => c.leaveRoom(id, gas), 'Leaving…', 'Left room. Collateral returned.')
-  const handleExpire = () => doAction((c, gas) => c.expireRoom(id, gas), 'Expiring…', 'Expired. Collateral returned.')
+  const handleCancel = () => doAction((c, gas) => c.cancelRoom(id, gas), 'Preparing room cancellation…', 'Room cancelled. Collateral returned.')
+  const handleLeave = () => doAction((c, gas) => c.leaveRoom(id, gas), 'Preparing room exit…', 'You left the room. Collateral returned.')
+  const handleExpire = () => doAction((c, gas) => c.expireRoom(id, gas), 'Preparing room expiry…', 'Expired room closed. Collateral returned.')
 
   const handleRequestMutualCancel = () => doAction((c, gas) => c.requestMutualCancel(id, gas), 'Requesting mutual cancel…', 'You approved mutual cancel. Waiting for counterparty.')
   const handleRevokeMutualCancel = () => doAction((c, gas) => c.revokeMutualCancel(id, gas), 'Revoking mutual cancel…', 'You revoked your approval.')

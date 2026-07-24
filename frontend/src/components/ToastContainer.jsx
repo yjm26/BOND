@@ -13,9 +13,9 @@ const ICONS = {
 }
 
 const STYLES = {
-  ok:   'bg-green-50 text-green-800 border-green-200 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/20',
-  err:  'bg-red-50 text-red-800 border-red-200 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/20',
-  info: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/20',
+  ok:   'border-[#b7c8a3]/32 bg-[#111110]/96 text-[#b7c8a3]',
+  err:  'border-[#c98b4a]/38 bg-[#111110]/96 text-[#c98b4a]',
+  info: 'border-[#d8b15f]/30 bg-[#111110]/96 text-[#d8b15f]',
 }
 
 export default function ToastContainer() {
@@ -23,17 +23,17 @@ export default function ToastContainer() {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="fixed bottom-6 right-6 z-[100] flex w-full max-w-sm flex-col gap-2 px-4 pointer-events-none sm:px-0">
       {toasts.map(t => (
         <div
           key={t.id}
-          className={`pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-lg border shadow-lg text-[13px] font-medium animate-[slideIn_0.2s_ease-out] ${STYLES[t.type]}`}
+          className={`pointer-events-auto flex items-start gap-3 border px-4 py-3 text-[13px] font-medium shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur animate-[slideIn_0.2s_ease-out] ${STYLES[t.type]}`}
           style={{
             animation: 'slideIn 0.25s ease-out',
           }}
         >
-          <span className="mt-0.5 shrink-0 opacity-70">{ICONS[t.type]}</span>
-          <span className="flex-1 leading-snug">{t.message}</span>
+          <span className="mt-0.5 shrink-0 opacity-80">{ICONS[t.type]}</span>
+          <span className="flex-1 leading-snug tracking-[-0.01em]">{t.message}</span>
           <button
             onClick={() => removeToast(t.id)}
             className="shrink-0 opacity-50 hover:opacity-100 transition"
