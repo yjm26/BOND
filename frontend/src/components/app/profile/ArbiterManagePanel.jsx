@@ -18,14 +18,19 @@ export default function ArbiterManagePanel({ wallet }) {
   const [checkAddress, setCheckAddress] = useState('')
   const [checkedArbiter, setCheckedArbiter] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [accessReady, setAccessReady] = useState(false)
   const [status, setStatus] = useState(null)
 
   const isOwner = useMemo(() => Boolean(wallet?.address && owner && wallet.address.toLowerCase() === owner.toLowerCase()), [wallet?.address, owner])
   const walletRole = isOwner ? 'Owner' : currentIsArbiter ? 'Arbiter' : 'User'
 
   useEffect(() => {
-    if (!wallet?.provider) return
+    if (!wallet?.provider) {
+      setAccessReady(false)
+      return
+    }
     let stale = false
+    setAccessReady(false)
     ;(async () => {
       try {
         const contract = getContract(wallet.provider)
@@ -42,6 +47,8 @@ export default function ArbiterManagePanel({ wallet }) {
         setCurrentIsArbiter(isActiveArbiter)
       } catch (err) {
         if (!stale) setStatus({ type: 'err', msg: 'Cannot read owner/arbiter from current contract.' })
+      } finally {
+        if (!stale) setAccessReady(true)
       }
     })()
     return () => { stale = true }
@@ -107,6 +114,8 @@ export default function ArbiterManagePanel({ wallet }) {
       setStatus({ type: 'err', msg: err.message || 'Could not check arbiter.' })
     }
   }
+
+  if (!accessReady || (!isOwner && !currentIsArbiter)) return null
 
   return (
     <div className="border border-[#ede9df]/10 bg-[#20201f] p-5 sm:p-6">
