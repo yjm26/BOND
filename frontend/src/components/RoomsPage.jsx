@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ethers } from 'ethers'
-import { getContract, STATE_NAMES, parseRoom } from '../utils/contract'
+import { getContract, STATE_NAMES, parseRoom, ARC_READ_PROVIDER } from '../utils/contract'
 import RoomList from './rooms/RoomList'
 import RoomsFilters from './rooms/RoomsFilters'
 import RoomsLoadingState from './rooms/RoomsLoadingState'
@@ -29,7 +29,7 @@ export default function RoomsPage({ wallet }) {
     else setIsRefreshing(true)
 
     try {
-      const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
+      const rpcProvider = ARC_READ_PROVIDER
       const contract = getContract(rpcProvider)
       const addr = wallet.address.toLowerCase()
       const total = await contract.roomCount()

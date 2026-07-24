@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
-import { getContract, getUsdc, ensureArcChain, ARC_GAS, ARC_GAS_APPROVE, STATE_NAMES, CONTRACT_ADDRESS, waitForTx , parseRoom, fixSignerNonce } from '../utils/contract'
+import { getContract, getUsdc, ensureArcChain, ARC_GAS, ARC_GAS_APPROVE, ARC_READ_PROVIDER, STATE_NAMES, CONTRACT_ADDRESS, waitForTx , parseRoom, fixSignerNonce, getLatestNonce } from '../utils/contract'
 import { fetchReputation } from '../utils/reputation'
 import RoomHistory from './room/RoomHistory'
 import ActionPanel from './room/ActionPanel'
@@ -146,7 +146,7 @@ export default function RoomView({ wallet }) {
     try {
       if (!wallet) { setRoom(null); setLoading(false); return }
       // Use PUBLIC RPC for reads — wallet provider often lags behind latest block
-      const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
+      const rpcProvider = ARC_READ_PROVIDER
       const contract = getContract(rpcProvider)
       const data = parseRoom(await contract.rooms(id))
       setRoom({
@@ -277,9 +277,8 @@ export default function RoomView({ wallet }) {
           const signer = await wallet.provider.getSigner()
           await ensureArcChain(signer)
           const addr = await signer.getAddress()
-          // Query nonce from PUBLIC RPC to bypass wallet stale cache
-          const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
-          const nonce = await rpcProvider.getTransactionCount(addr, 'latest')
+          // Query nonce from Arc RPC fallbacks to bypass wallet stale cache
+          const nonce = await getLatestNonce(addr, wallet.provider)
           const gas = { ...ARC_GAS, nonce }
           const contract = getContract(signer)
           const tx = await fn(contract, gas)
@@ -289,7 +288,7 @@ export default function RoomView({ wallet }) {
             // Stuck-tx detection: if not on chain within 15s, warn user about wallet cache
             const stuckTimer = setTimeout(async () => {
               try {
-                const rpc = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
+                const rpc = ARC_READ_PROVIDER
                 const found = await rpc.getTransaction(tx.hash)
                 if (!found) {
                   addToast('TX not found on-chain — your wallet may have a stuck nonce. Try: MetaMask → Settings → Advanced → Clear Activity Tab Data, then retry.', 'err')
@@ -345,10 +344,9 @@ export default function RoomView({ wallet }) {
     try {
       const signer = await wallet.provider.getSigner()
       await ensureArcChain(signer)
-      // Query nonce from PUBLIC RPC
+      // Query nonce from Arc RPC fallbacks
       const addr = await signer.getAddress()
-      const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
-      let nonce = await rpcProvider.getTransactionCount(addr, 'latest')
+      let nonce = await getLatestNonce(addr, wallet.provider)
       try {
         const contract = getContract(signer)
         // Pre-verify join code to avoid wasting gas
@@ -383,10 +381,9 @@ export default function RoomView({ wallet }) {
     try {
       const signer = await wallet.provider.getSigner()
       await ensureArcChain(signer)
-      // Query nonce from PUBLIC RPC
+      // Query nonce from Arc RPC fallbacks
       const addr = await signer.getAddress()
-      const rpcProvider = new ethers.JsonRpcProvider('https://rpc.testnet.arc.network', 5042002)
-      let nonce = await rpcProvider.getTransactionCount(addr, 'latest')
+      let nonce = await getLatestNonce(addr, wallet.provider)
       try {
         const contract = getContract(signer)
         // Fetch dynamic tax from contract — never hardcode

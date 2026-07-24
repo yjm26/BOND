@@ -2,13 +2,12 @@ import { ethers } from 'ethers';
 
 export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x1A3ea0d24ff15a90417508F38ABD8E173921082A'; // BoundTestnet on Arc Testnet
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'; // Arc USDC precompile
-export const ARC_RPC_URL = 'https://rpc.testnet.arc.network'
+export const ARC_RPC_URL = import.meta.env.VITE_ARC_RPC_URL || 'https://rpc.blockdaemon.testnet.arc.network'
 export const ARC_RPC_URLS = [
   ARC_RPC_URL,
-  'https://rpc.blockdaemon.testnet.arc.network',
   'https://rpc.drpc.testnet.arc.network',
-  'https://rpc.quicknode.testnet.arc.network',
-]
+  'https://rpc.blockdaemon.testnet.arc.network',
+].filter((url, index, urls) => urls.indexOf(url) === index)
 export const ARC_NETWORK = { chainId: 5042002, name: 'arcTestnet' }
 export const ARC_READ_PROVIDER = new ethers.JsonRpcProvider(ARC_RPC_URL, ARC_NETWORK, { staticNetwork: true })
 export const ARC_READ_PROVIDERS = ARC_RPC_URLS.map((url) => new ethers.JsonRpcProvider(url, ARC_NETWORK, { staticNetwork: true }))
@@ -76,7 +75,7 @@ export async function ensureArcChain(signerOrProvider) {
             params: [{
               chainId: '0x4cef52',
               chainName: 'Arc Testnet',
-              rpcUrls: ['https://rpc.testnet.arc.network'],
+              rpcUrls: ARC_RPC_URLS,
               nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
               blockExplorerUrls: ['https://testnet.arcscan.app'],
             }],

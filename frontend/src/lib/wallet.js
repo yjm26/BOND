@@ -1,11 +1,11 @@
 import { ethers } from 'ethers'
-import { CONTRACT_ADDRESS, CONTRACT_ABI, ensureArcChain } from '../utils/contract'
+import { CONTRACT_ADDRESS, CONTRACT_ABI, ARC_RPC_URL, ensureArcChain } from '../utils/contract'
 
 const ARC_TESTNET = {
   chainId: 5042002,
   hex: '0x4cef52',
   name: 'Arc Testnet',
-  rpcUrl: 'https://rpc.testnet.arc.network',
+  rpcUrl: ARC_RPC_URL,
   explorer: 'https://testnet.arcscan.app',
   nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
 }
