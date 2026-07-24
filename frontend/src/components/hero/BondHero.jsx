@@ -1,4 +1,5 @@
 import HeroCopy from './HeroCopy'
+import HeroSettlementArtifact from './HeroSettlementArtifact'
 
 export default function BondHero({ wallet, onConnect }) {
   return (
@@ -9,8 +10,9 @@ export default function BondHero({ wallet, onConnect }) {
       <div className="absolute left-0 top-[72px] z-10 hidden h-[calc(100%-72px)] w-px bg-[#0d0d0b]/10 lg:block" />
       <div className="absolute bottom-0 left-0 z-10 hidden h-px w-full bg-[#0d0d0b]/10 lg:block" />
 
-      <div className="relative z-10 flex min-h-[648px] items-stretch lg:min-h-[calc(100vh-72px)]">
+      <div className="relative z-10 grid min-h-[648px] items-stretch lg:min-h-[calc(100vh-72px)] lg:grid-cols-[58%_42%] xl:grid-cols-[56%_44%]">
         <HeroCopy wallet={wallet} onConnect={onConnect} />
+        <HeroSettlementArtifact />
       </div>
     </section>
   )
