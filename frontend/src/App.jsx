@@ -115,6 +115,22 @@ export default function App() {
       manualDisconnect.current = false
       return
     }
+
+    const activeWalletAddress = walletRef.current?.address?.toLowerCase()
+    const nextAddress = address.toLowerCase()
+    if (activeWalletAddress && activeWalletAddress !== nextAddress) {
+      setDisconnecting(true)
+      setConnecting(false)
+      setConnectError('Wallet changed. Connect again to open a clean BOND session.')
+      localStorage.removeItem('bond_wallet_connected')
+      resetAuthCache()
+      setWallet(null)
+      setDisconnectRedirectTick((tick) => tick + 1)
+      disconnect().catch((e) => console.error('Wallet switch disconnect failed:', e))
+      window.setTimeout(() => setDisconnecting(false), 650)
+      return
+    }
+
     let cancelled = false
     ;(async () => {
       setConnecting(true)
@@ -134,7 +150,7 @@ export default function App() {
       }
     })()
     return () => { cancelled = true }
-  }, [isConnected, address, walletProvider])
+  }, [isConnected, address, walletProvider, disconnect])
 
   const handleConnect = useCallback(() => openAppKit(), [openAppKit])
 
