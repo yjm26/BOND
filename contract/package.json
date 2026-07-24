@@ -1,15 +1,16 @@
 {
-  "name": "arc-escrow-contract",
-  "version": "16.0.0",
+  "name": "bond-contracts",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.js --network arcTestnet",
+    "deploy": "npm run deploy:bound-testnet",
     "deploy:bound-testnet": "hardhat run scripts/deploy-bound-testnet.js --network arcTestnet",
     "test:bound-testnet": "hardhat test test/BoundTestnet.test.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.28.6"
-  }
+  },
+  "description": "BOND Arc Testnet escrow contracts."
 }

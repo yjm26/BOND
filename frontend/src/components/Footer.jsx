@@ -7,7 +7,7 @@ const PRODUCT_LINKS = [
 ]
 
 const RESOURCE_LINKS = [
-  { label: 'GitHub', href: 'https://github.com/yjm26/arc-escrow-agent' },
+  { label: 'GitHub', href: 'https://github.com/yjm26/BOND' },
   { label: 'Contract', href: 'https://testnet.arcscan.app/address/0x1A3ea0d24ff15a90417508F38ABD8E173921082A' },
 ]
 

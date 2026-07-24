@@ -1,81 +1,166 @@
-# Arc Escrow Agent
+# BOND
 
-Trustless USDC escrow on Arc Network — automate Discord middleman services with smart contracts.
+BOND is an Arc-native settlement workspace for people who make deals with strangers on the internet.
 
-## Why?
+It is built for the messy middle of online trade: digital goods, account transfers, private service work, NFT/allowlist spots, OTC arrangements, and small USDC deals where both sides want a cleaner option than trusting a Discord middleman.
 
-Discord middleman services exist everywhere: gaming, crypto P2P, digital goods. But they rely on **trusting a human** who takes 5-10% fees and can scam you.
+BOND does not try to make trust disappear. It makes the deal state explicit, keeps funds in an auditable escrow contract, and gives both parties a clear path to finish, refund, or escalate when something goes wrong.
 
-This replaces that with a **$0.01 smart contract** that can't scam anyone.
+## What BOND does
 
-## How It Works
+- Creates private escrow rooms on Arc Testnet.
+- Lets a buyer fund a room in USDC.
+- Lets the seller mark delivery.
+- Lets the buyer release funds or open a dispute.
+- Lets a seller escalate if the buyer goes silent after delivery.
+- Lets approved arbiters resolve disputes on-chain.
+- Keeps marketplace listings visible for 30 days unless taken or removed.
+- Shows human-readable profiles next to wallet addresses when users publish a BOND profile.
 
+The product is intentionally quiet: clear room state, clear money movement, clear next action. No fake agent labels, no noisy crypto dashboard, no hidden signing.
+
+## Current network
+
+BOND currently runs on Arc Testnet.
+
+| Item | Value |
+| --- | --- |
+| Chain | Arc Testnet |
+| Chain ID | `5042002` |
+| Primary RPC | `https://rpc.blockdaemon.testnet.arc.network` |
+| Backup RPC | `https://rpc.drpc.testnet.arc.network` |
+| Explorer | `https://testnet.arcscan.app` |
+| USDC token | `0x3600000000000000000000000000000000000000` |
+| Contract | `0x1A3ea0d24ff15a90417508F38ABD8E173921082A` |
+
+Contract source: `contract/contracts/BoundTestnet.sol`.
+
+## Product flow
+
+A room moves through a small set of states:
+
+1. **Created** — a room exists, waiting for the counterparty.
+2. **Joined** — both parties are in, waiting for funding.
+3. **Funded** — buyer funds are locked in escrow.
+4. **Delivered** — seller marks the item or work as delivered.
+5. **Released / Refunded / Disputed / Cancelled** — the room closes or moves to arbiter review.
+
+The current contract keeps the buyer response buffer internal and fixed:
+
+```text
+RESPONSE_BUFFER = 12 hours
 ```
-Client → create deal + deposit USDC to contract
-                ↓
-Freelancer → does the work
-                ↓
-Client → approve → USDC releases to freelancer
-                ↓
-(or) Client → refund → USDC returns to client
+
+That means the UI does not ask users to choose confusing deal types or arbitrary review-day presets. Buyer settlement stays simple: if the buyer confirms, the deal settles.
+
+## Repository layout
+
+```text
+.
+├── server.js                         # Production API + static frontend server
+├── render.yaml                       # Render single-service deploy blueprint
+├── frontend/                         # Vite/React app
+│   ├── public/brand/                 # BOND logo assets
+│   └── src/                          # Product UI, wallet, room, market code
+└── contract/                         # Hardhat project
+    ├── contracts/BoundTestnet.sol    # Current escrow contract
+    ├── scripts/deploy-bound-testnet.js
+    └── test/BoundTestnet.test.js
 ```
 
-No middleman. No trust needed.
+Legacy prototype contracts, old deploy scripts, and old frontend-only deploy configs were intentionally removed so the repo reflects the current BOND product.
 
-## Stack
+## Local development
 
-- **Solidity** — Escrow smart contract
-- **Arc Testnet** — EVM L1, USDC native gas ($0.01/tx)
-- **ethers.js** — Frontend wallet integration
-- **HTML/JS** — Simple UI (no framework needed)
+Prerequisites:
 
-## Quick Start
+- Node.js 20+
+- npm
+- A wallet that can connect to Arc Testnet
+- Test USDC for Arc Testnet
 
-### Prerequisites
-
-- Node.js v22+
-- MetaMask or compatible wallet
-- Testnet USDC from [Circle Faucet](https://faucet.circle.com)
-
-### Setup
+Install and run the frontend/API together:
 
 ```bash
-# Install dependencies
 npm install
-
-# Copy env file
-cp .env.example .env
-# Edit .env — add your PRIVATE_KEY
-
-# Compile contracts
-npx hardhat compile
-
-# Deploy to Arc Testnet
-npx hardhat run scripts/deploy.js --network arcTestnet
+npm run render-build
+PORT=4100 npm start
 ```
 
-### Update Frontend
+Open:
 
-After deploying, update `ESCROW_ADDRESS` in `frontend/index.html` with your deployed contract address.
+```text
+http://localhost:4100
+```
 
-### Test
+For frontend-only development:
 
 ```bash
-# Run local tests
-npx hardhat test
+npm install --prefix frontend
+npm run dev --prefix frontend
 ```
+
+## Contracts
+
+Install contract dependencies:
+
+```bash
+npm install --prefix contract
+```
+
+Compile:
+
+```bash
+npm run compile --prefix contract
+```
+
+Run targeted tests:
+
+```bash
+npm run test:bound-testnet --prefix contract
+```
+
+Deploying requires a local `.env` inside `contract/` or an exported environment. Never commit private keys.
+
+Expected environment values:
+
+```text
+PRIVATE_KEY=...
+USDC_ADDRESS=0x3600000000000000000000000000000000000000
+TREASURY_ADDRESS=...
+ARBITER_ADDRESS=...
+ARBITER_NAME=BOND Arbiter
+```
+
+Deploy:
+
+```bash
+npm run deploy:bound-testnet --prefix contract
+```
+
+## API storage
+
+The backend stores MVP data as JSON files under:
+
+```text
+DATA_DIR
+```
+
+If `DATA_DIR` is not set, it falls back to the repo directory. For production on Render, attach a persistent disk and set:
+
+```text
+DATA_DIR=/data
+```
+
+Without persistent storage, marketplace listings, offers, notifications, room codes, and public profiles can disappear when the service restarts or gets redeployed.
+
+For a longer-lived production setup, move this storage to Postgres, Supabase, or Neon.
 
 ## Deploy on Render
 
-This repo is configured for a **single Render Web Service**:
+This repo is designed for one Render Web Service from the repo root.
 
-- `server.js` serves the API under `/api/*`.
-- The same server serves the built Vite frontend from `frontend/dist`.
-- Frontend API calls default to same-origin, so no separate backend URL is needed.
-
-### Render settings
-
-You can use the included `render.yaml` blueprint, or create a Web Service manually:
+Render settings:
 
 ```text
 Runtime: Node
@@ -84,57 +169,24 @@ Start Command: npm start
 Health Check Path: /api/health
 ```
 
-Local production check:
+`server.js` serves both:
 
-```bash
-npm install
-npm run render-build
-PORT=4100 npm start
-curl http://localhost:4100/api/health
-```
+- `/api/*` backend routes
+- `frontend/dist` static app
 
-Then open `http://localhost:4100`.
+That keeps API calls same-origin and avoids separate CORS/deployment plumbing.
 
-If Render shows `Frontend build not found. Run npm run render-build first.`, the backend started but `frontend/dist` was not created during the build step. Check that the Render service uses the repo root and this build command:
+## Security notes
 
-```text
-npm install && npm run render-build
-```
+- Never commit `.env` files or private keys.
+- Wallet signatures are only requested for actions that need wallet-authenticated writes.
+- Read-only views should not request signatures.
+- Changing wallets resets the current BOND session and requires a clean reconnect.
+- Arbiters are owner-managed in the current testnet contract.
 
-`npm run build` is also aliased to the same command for Render setups that expect a standard build script.
+## Status
 
-### Backend placement
-
-For the current MVP, the cleanest deployment is **one Render Web Service** from the repo root. Keep `server.js` as the production backend and let it serve both API and frontend. This avoids CORS and `VITE_API_URL` setup.
-
-The old `backend/` folder is legacy/simple backend code. Prefer the root `server.js` because it has wallet-signature auth, sanitization, and the current API routes used by the frontend.
-
-## Contract
-
-### Flow
-
-1. **Create Deal** — Client calls `createDeal(freelancer, amount, description)`
-2. **Fund Deal** — Client approves USDC spend, then calls `fundDeal(dealId)`
-3. **Approve** — Client calls `approveDeal(dealId)` → USDC releases to freelancer
-4. **Refund** — Client calls `refundDeal(dealId)` → USDC returns (before approval)
-
-### Events
-
-All state changes emit events for easy indexing:
-- `DealCreated` — new escrow created
-- `DealFunded` — USDC deposited
-- `DealCompleted` — USDC released to freelancer
-- `DealRefunded` — USDC returned to client
-
-## Network
-
-| Property | Value |
-|----------|-------|
-| Network | Arc Testnet |
-| Chain ID | 9001 |
-| RPC | https://rpc.testnet.arc.network |
-| Explorer | https://testnet.arcscan.app |
-| Faucet | https://faucet.circle.com |
+BOND is testnet software. It is useful for demos, product validation, and Arc-native escrow testing, but it is not a mainnet funds product yet.
 
 ## License
 
