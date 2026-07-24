@@ -43,13 +43,21 @@ export function useSmartPolling(callback, deps, opts = {}) {
     }
     schedule()
 
-    // resume on visibility change
-    const onVis = () => { if (!document.hidden) { clearTimeout(timerRef.current); schedule() } }
+    // resume immediately on visibility/focus so counterparty state changes show without manual refresh
+    const resumeNow = () => {
+      if (document.hidden) return
+      clearTimeout(timerRef.current)
+      run()
+      schedule()
+    }
+    const onVis = () => { if (!document.hidden) resumeNow() }
+    window.addEventListener('focus', resumeNow)
     document.addEventListener('visibilitychange', onVis)
 
     return () => {
       mountedRef.current = false
       clearTimeout(timerRef.current)
+      window.removeEventListener('focus', resumeNow)
       document.removeEventListener('visibilitychange', onVis)
     }
   }, [enabled, interval, run])

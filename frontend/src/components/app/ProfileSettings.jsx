@@ -44,7 +44,7 @@ export default function ProfileSettings({ wallet, connecting, connectError, onCo
   const confirmSave = () => {
     if (!wallet?.address || !pendingProfile) return
     setSaving(true)
-    saveProfile(wallet.address, pendingProfile)
+    saveProfile(wallet.address, pendingProfile, wallet)
     window.setTimeout(() => {
       setProfile(pendingProfile)
       setForm(pendingProfile)

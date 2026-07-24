@@ -27,7 +27,7 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
             <>
               <Link to="/market" className={linkClass} onClick={onClose}>Market</Link>
               <Link to="/rooms" className={linkClass} onClick={onClose}>My rooms</Link>
-              <Link to="/arbiter" className={linkClass} onClick={onClose}>Disputes</Link>
+              {isAdmin && <Link to="/arbiter" className={linkClass} onClick={onClose}>Disputes</Link>}
               <Link to="/profile" className={linkClass} onClick={onClose}>Profile</Link>
               <Link to="/profile" className={linkClass} onClick={onClose}>Settings</Link>
             </>

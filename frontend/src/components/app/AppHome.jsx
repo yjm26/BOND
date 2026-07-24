@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import AppActionCard from './AppActionCard'
-import { APP_ACTIONS } from './appHomeData'
+import { visibleAppActions } from './appHomeData'
+import useDisputeAccess from './useDisputeAccess'
 
 export default function AppHome({ wallet, profile }) {
   const name = profile?.displayName || 'BOND member'
+  const canAccessDisputes = useDisputeAccess(wallet)
+  const actions = visibleAppActions(canAccessDisputes)
 
   return (
     <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
@@ -11,7 +14,7 @@ export default function AppHome({ wallet, profile }) {
         <aside className="hidden border border-[#ede9df]/10 bg-[#20201f] p-4 lg:block">
           <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">BOND App</div>
           <div className="mt-6 space-y-1">
-            {APP_ACTIONS.map((item) => (
+            {actions.map((item) => (
               <Link key={item.label} to={item.to} className="flex h-10 items-center justify-between border border-transparent px-3 text-[13px] text-[#ede9df]/62 transition hover:border-[#ede9df]/10 hover:bg-[#ede9df]/5 hover:text-[#ede9df]">
                 {item.label}
                 <span className="text-[#ede9df]/24">→</span>
@@ -70,7 +73,7 @@ export default function AppHome({ wallet, profile }) {
           </div>
 
           <div className="grid gap-px bg-[#ede9df]/10 p-px md:grid-cols-2 xl:grid-cols-5">
-            {APP_ACTIONS.map((item, index) => (
+            {actions.map((item, index) => (
               <AppActionCard key={item.label} item={item} index={index} />
             ))}
           </div>

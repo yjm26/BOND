@@ -29,5 +29,8 @@ export const APP_ACTIONS = [
     title: 'Resolve rooms that need arbiter review.',
     body: 'Owner and active arbiters review frozen rooms, evidence, and settlement outcomes.',
     to: '/arbiter',
+    adminOnly: true,
   },
 ]
+
+export const visibleAppActions = (canAccessDisputes) => APP_ACTIONS.filter((item) => !item.adminOnly || canAccessDisputes)

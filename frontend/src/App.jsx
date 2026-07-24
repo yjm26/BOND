@@ -93,10 +93,22 @@ export default function App() {
   const [disconnectRedirectTick, setDisconnectRedirectTick] = useState(0)
   const [connectError, setConnectError] = useState(null)
   const manualDisconnect = useRef(false)
+  const walletRef = useRef(null)
+
+  useEffect(() => { walletRef.current = wallet }, [wallet])
 
   useEffect(() => {
     if (!isConnected || !address) {
-      setWallet(null)
+      if (walletRef.current && !manualDisconnect.current && localStorage.getItem('bond_wallet_connected') === '1') {
+        setConnecting(true)
+        const grace = window.setTimeout(() => {
+          setWallet(null)
+          setConnecting(false)
+        }, 3000)
+        return () => window.clearTimeout(grace)
+      }
+      if (!manualDisconnect.current) setWallet(null)
+      setConnecting(false)
       return
     }
     if (manualDisconnect.current) {

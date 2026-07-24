@@ -9,6 +9,7 @@ const DATA_FILE = path.join(STORAGE_DIR, 'listings.json')
 const NOTIF_FILE = path.join(STORAGE_DIR, 'notifications.json')
 const OFFERS_FILE = path.join(STORAGE_DIR, 'offers.json')
 const ROOM_CODES_FILE = path.join(STORAGE_DIR, 'room_codes.json')
+const PROFILES_FILE = path.join(STORAGE_DIR, 'profiles.json')
 const LISTING_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 // ═══════════════════════════════════════
@@ -133,6 +134,17 @@ function getDefaultListings() {
   return seeds
 }
 
+function shapePublicProfile(profile) {
+  if (!profile) return null
+  return {
+    address: profile.address,
+    displayName: profile.displayName || '',
+    xProfile: profile.xProfile || '',
+    discord: profile.discord || '',
+    updatedAt: profile.updatedAt || profile.createdAt || 0,
+  }
+}
+
 // ═══════════════════════════════════════
 //  HTTP helpers
 // ═══════════════════════════════════════
@@ -240,6 +252,39 @@ const server = http.createServer(async (req, res) => {
       const verified = await verifySignature(body)
       if (!verified) return json(res, { error: 'Signature verification failed' }, 401, origin)
       return json(res, { ok: true, address: verified }, 200, origin)
+    }
+
+    // ── PROFILES ──
+
+    // GET /api/profiles/:wallet — public self-reported workspace profile
+    if (pathname.startsWith('/api/profiles/') && req.method === 'GET') {
+      const wallet = pathname.split('/')[3]?.toLowerCase()
+      if (!wallet || !ethers.isAddress(wallet)) return json(res, { error: 'Valid wallet required' }, 400, origin)
+      const profiles = readJSON(PROFILES_FILE, {})
+      const profile = shapePublicProfile(profiles[wallet])
+      return json(res, profile || { address: wallet }, 200, origin)
+    }
+
+    // POST /api/profiles — requires wallet auth, only owner updates own profile
+    if (pathname === '/api/profiles' && req.method === 'POST') {
+      const auth = parseAuth(req)
+      if (!auth.wallet || !auth.signature || !auth.nonce) return json(res, { error: 'Wallet authentication required' }, 401, origin)
+      const verified = await verifySignature(auth)
+      if (!verified) return json(res, { error: 'Invalid signature' }, 401, origin)
+
+      const body = await parseBody(req)
+      const profiles = readJSON(PROFILES_FILE, {})
+      const existing = profiles[verified] || {}
+      profiles[verified] = {
+        address: verified,
+        displayName: sanitize(body.displayName || '', 80),
+        xProfile: sanitize(body.xProfile || '', 80),
+        discord: sanitize(body.discord || '', 80),
+        createdAt: existing.createdAt || Date.now(),
+        updatedAt: Date.now(),
+      }
+      writeJSON(PROFILES_FILE, profiles)
+      return json(res, shapePublicProfile(profiles[verified]), 200, origin)
     }
 
     // ── LISTINGS ──

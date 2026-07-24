@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom'
-import { APP_ACTIONS } from '../appHomeData'
+import { visibleAppActions } from '../appHomeData'
+import useDisputeAccess from '../useDisputeAccess'
 import { formatAddress } from '../../../utils/constants'
 
 export default function ProfileSidebar({ wallet }) {
+  const actions = visibleAppActions(useDisputeAccess(wallet))
+
   return (
     <aside className="hidden border border-[#ede9df]/10 bg-[#20201f] p-4 lg:block">
       <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">BOND App</div>
       <div className="mt-6 space-y-1">
-        {APP_ACTIONS.map((item) => (
+        {actions.map((item) => (
           <Link key={item.label} to={item.to} className={`flex h-10 items-center justify-between border px-3 text-[13px] transition ${item.label === 'Profile' ? 'border-[#ede9df]/12 bg-[#ede9df]/6 text-[#ede9df]' : 'border-transparent text-[#ede9df]/62 hover:border-[#ede9df]/10 hover:bg-[#ede9df]/5 hover:text-[#ede9df]'}`}>
             {item.label}<span className="text-[#ede9df]/24">→</span>
           </Link>

@@ -223,13 +223,19 @@ export default function RoomView({ wallet }) {
     }
   }
 
+  function scheduleRoomRefresh() {
+    ;[1200, 3000, 6000, 10000].forEach((delay) => {
+      window.setTimeout(() => { loadRoom(); loadEvidence() }, delay)
+    })
+  }
+
   useEffect(() => { loadRoom(); loadEvidence() }, [id, wallet])
 
   const isTerminal = ['Released', 'Refunded', 'Expired', 'Cancelled'].includes(room?.state)
   useSmartPolling(
     async () => { await loadRoom(); await loadEvidence() },
     [id, wallet?.address],
-    { interval: 10000, enabled: !!wallet && !isTerminal }
+    { interval: 4000, enabled: !!wallet && !isTerminal }
   )
 
   useEffect(() => {
@@ -306,8 +312,7 @@ export default function RoomView({ wallet }) {
             }
             setStatus({ type: 'ok', msg: successMsg })
             addToast(successMsg, 'ok')
-            // Delay re-fetch to let RPC nodes sync
-            setTimeout(() => { loadRoom(); loadEvidence() }, 3000)
+            scheduleRoomRefresh()
             return true
         } catch (err) {
           const msg = err.reason || err.message || String(err)
@@ -366,7 +371,7 @@ export default function RoomView({ wallet }) {
         const tx = await contract.joinRoom(id, ethers.toUtf8Bytes(joinCode), { ...ARC_GAS, nonce: nonce++ })
         await waitForTx(wallet.provider, tx.hash, 180000)
         setStatus({ type: 'ok', msg: 'Joined!' })
-        loadRoom()
+        scheduleRoomRefresh()
       } catch (e) {
         setStatus({ type: 'err', msg: e.reason || e.message })
       }
@@ -400,8 +405,7 @@ export default function RoomView({ wallet }) {
         const fundTx = await contract.fundRoom(id, { ...ARC_GAS, nonce: nonce++ })
         await waitForTx(wallet.provider, fundTx.hash, 180000)
         setStatus({ type: 'ok', msg: 'Funded!' })
-        // Delay re-fetch to let RPC nodes sync
-        setTimeout(() => loadRoom(), 3000)
+        scheduleRoomRefresh()
       } catch (e) {
         setStatus({ type: 'err', msg: e.reason || e.message })
       }

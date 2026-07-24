@@ -1,9 +1,23 @@
+import { useEffect, useState } from 'react'
 import PartyCard from './PartyCard'
-import { loadProfile } from '../app/profile/profileStorage'
+import { fetchPublicProfile, loadProfile } from '../app/profile/profileStorage'
 
 export default function RoomPartiesPanel({ room, isCreator, isCounter, creatorRep, counterpartyRep, role }) {
-  const creatorProfile = loadProfile(room.creator)
-  const counterpartyProfile = loadProfile(room.counterparty)
+  const [publicProfiles, setPublicProfiles] = useState({})
+  const creatorProfile = loadProfile(room.creator) || publicProfiles[room.creator?.toLowerCase()]
+  const counterpartyProfile = loadProfile(room.counterparty) || publicProfiles[room.counterparty?.toLowerCase()]
+
+  useEffect(() => {
+    let stale = false
+    const addresses = [room.creator, room.counterparty]
+      .filter((address) => address && address !== '0x0000000000000000000000000000000000000000')
+    ;(async () => {
+      const entries = await Promise.all(addresses.map(async (address) => [address.toLowerCase(), await fetchPublicProfile(address).catch(() => null)]))
+      if (stale) return
+      setPublicProfiles(Object.fromEntries(entries.filter(([, profile]) => profile)))
+    })()
+    return () => { stale = true }
+  }, [room.creator, room.counterparty])
 
   return (
     <div className="border border-[#ede9df]/10 bg-[#20201f] p-5">

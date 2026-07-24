@@ -3,6 +3,7 @@ import AppGate from './AppGate'
 import AppHome from './AppHome'
 import ProfileSetup from './ProfileSetup'
 import WorkspaceLoading from './WorkspaceLoading'
+import { saveProfile } from './profile/profileStorage'
 
 const profileKey = (address) => `bond_profile_${address.toLowerCase()}`
 
@@ -43,7 +44,7 @@ export default function AppWorkspace({ wallet, connecting, connectError, onConne
   const completeSetup = (nextProfile) => {
     if (!wallet?.address) return
     setLoading(true)
-    window.localStorage.setItem(profileKey(wallet.address), JSON.stringify(nextProfile))
+    saveProfile(wallet.address, nextProfile, wallet)
     window.setTimeout(() => {
       setProfile(nextProfile)
       setNeedsSetup(false)
