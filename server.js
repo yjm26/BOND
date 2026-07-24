@@ -42,6 +42,7 @@ async function verifySignature({ address, signature, nonce, domain }) {
 
     const domainCandidates = [
       domain,
+      'bond-4us7.onrender.com',
       'arc-escrow-agent.onrender.com',
       'bond.yjm26.xyz',
       'bond.arc.network',
@@ -82,6 +83,7 @@ function sanitize(str, maxLen = 500) {
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:3000',
+  'https://bond-4us7.onrender.com',
   'https://arc-escrow-agent.onrender.com',
   'https://bond.yjm26.xyz',
 ]

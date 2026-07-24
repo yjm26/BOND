@@ -158,6 +158,12 @@ For a longer-lived production setup, move this storage to Postgres, Supabase, or
 
 ## Deploy on Render
 
+Current Render app:
+
+```text
+https://bond-4us7.onrender.com/
+```
+
 This repo is designed for one Render Web Service from the repo root.
 
 Render settings:
