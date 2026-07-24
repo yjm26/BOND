@@ -21,16 +21,13 @@ export default function AppGate({ connecting, connectError, onConnect }) {
           )}
         </div>
 
-        <div className="border border-[#ede9df]/14 bg-[#252523] p-5 sm:p-7">
-          <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ede9df]/38">No funds move at gate</div>
-          <div className="mt-10 grid gap-3">
-            {['Identify wallet', 'Load market and room context', 'Prepare create, profile, and settings access'].map((item, index) => (
-              <div key={item} className="flex items-center justify-between border-t border-[#ede9df]/10 py-4">
-                <span className="text-[15px] tracking-[-0.01em] text-[#ede9df]/82">{item}</span>
-                <span className="font-mono text-[10px] text-[#d8b15f]">0{index + 1}</span>
-              </div>
-            ))}
-          </div>
+        <div className="flex min-h-[300px] items-center justify-center lg:min-h-[420px]">
+          <img
+            src="/brand/bond-logo-white.png"
+            alt="BOND"
+            draggable="false"
+            className="w-[min(72vw,520px)] max-w-full select-none object-contain opacity-[0.96] sm:w-[min(58vw,560px)] lg:w-[min(42vw,620px)]"
+          />
         </div>
       </div>
     </section>
