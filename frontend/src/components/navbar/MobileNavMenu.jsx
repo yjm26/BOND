@@ -36,8 +36,8 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
           )
         ) : (
           <>
-            <a href="#how" onClick={(e) => { onHowClick(e); onClose() }} className={linkClass}>How it works</a>
-            <a href="#use-cases" onClick={(e) => { onUseCasesClick(e); onClose() }} className={linkClass}>Use cases</a>
+            <a href="#how" onClick={(e) => { onHowClick(e); onClose() }} className={linkClass}>Room states</a>
+            <a href="#use-cases" onClick={(e) => { onUseCasesClick(e); onClose() }} className={linkClass}>Where it fits</a>
             <Link to="/docs" className={linkClass} onClick={onClose}>Docs</Link>
           </>
         )}

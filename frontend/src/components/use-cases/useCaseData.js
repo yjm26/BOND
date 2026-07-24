@@ -1,17 +1,17 @@
 export const USE_CASES = [
   {
-    label: 'Digital work',
-    title: 'Scope, proof, and payment in one private room.',
-    points: ['Design and code gigs', 'Content or setup work', 'Delivery proof before release'],
+    label: 'Freelance work',
+    title: 'Small paid work where nobody wants to chase invoices.',
+    points: ['Landing pages, bots, setup work', 'Proof before release', 'Refund path if scope breaks'],
   },
   {
-    label: 'Marketplace trades',
-    title: 'Safer handoff for deals that start in chat.',
-    points: ['OTC assets or access', 'Buyer-funded escrow', 'Refund path if terms break'],
+    label: 'Private handoffs',
+    title: 'Deals that start in a group chat but should not end on trust.',
+    points: ['Access, accounts, allowlists', 'Buyer funds first', 'Seller sees money is locked'],
   },
   {
-    label: 'Service milestones',
-    title: 'Deadline-based settlement without chasing trust.',
-    points: ['Delivery windows', 'Collateral when needed', 'Dispute fallback stays visible'],
+    label: 'OTC marketplace',
+    title: 'Listings where the payment path matters as much as the listing.',
+    points: ['One listing opens one room', 'Counteroffers stay attached', 'Settlement stays on Arc'],
   },
 ]

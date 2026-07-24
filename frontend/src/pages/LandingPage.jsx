@@ -7,9 +7,9 @@ export default function LandingPage({ wallet, onConnect }) {
   return (
     <>
       <Hero wallet={wallet} onConnect={onConnect} />
-      <HowItWorks />
       <RoomClaritySection />
       <UseCasesSection />
+      <HowItWorks />
     </>
   )
 }

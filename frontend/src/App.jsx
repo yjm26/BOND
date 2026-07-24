@@ -74,7 +74,7 @@ createAppKit({
   networks: [ARC_TESTNET],
   metadata: {
     name: 'BOND',
-    description: 'Trustless USDC escrow on Arc Network',
+    description: 'USDC escrow rooms for internet deals on Arc.',
     url: typeof window !== 'undefined' ? window.location.origin : '',
     icons: ['https://avatars.githubusercontent.com/u/179229932'],
   },

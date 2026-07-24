@@ -27,7 +27,7 @@ export default function Footer() {
           </Link>
 
           <p className="mt-6 max-w-[520px] text-[14px] leading-[1.65] tracking-[-0.01em] text-[#b9b2a5] sm:mt-8 sm:text-[15px] sm:leading-[1.7]">
-            Private escrow rooms for risky digital work and marketplace deals. Lock USDC on Arc, attach proof, and settle with release, refund, or arbitration.
+            Private rooms for internet deals that need more than a promise. Lock USDC on Arc, keep proof beside the money, and settle through release, refund, or dispute review.
           </p>
 
           <div className="mt-6 max-w-[560px] border border-[#d8b15f]/22 bg-[#d8b15f]/[0.07] px-4 py-3 font-mono text-[9px] uppercase leading-[1.65] tracking-[0.14em] text-[#d8b15f]/82 sm:mt-8 sm:text-[10px] sm:tracking-[0.16em]">

@@ -28,8 +28,8 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
 
   return (
     <div className="hidden items-center gap-6 md:flex">
-      <a href="#how" onClick={onHowClick} className={navLink}>How it works</a>
-      <a href="#use-cases" onClick={onUseCasesClick} className={navLink}>Use cases</a>
+      <a href="#how" onClick={onHowClick} className={navLink}>Room states</a>
+      <a href="#use-cases" onClick={onUseCasesClick} className={navLink}>Where it fits</a>
       <Link to="/docs" className={navLink}>Docs</Link>
       {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Disputes</Link>}
     </div>

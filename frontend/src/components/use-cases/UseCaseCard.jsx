@@ -2,7 +2,7 @@ export default function UseCaseCard({ item, index }) {
   return (
     <article className="group grid gap-4 border-t border-[#171716]/15 py-5 transition duration-300 hover:border-[#171716]/35 sm:grid-cols-[120px_1fr_280px] sm:items-start sm:gap-6 sm:py-7">
       <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#6f6b62]">
-        0{index + 1}<span className="hidden sm:inline"> / Case</span>
+        0{index + 1}
       </div>
       <div>
         <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">{item.label}</div>
