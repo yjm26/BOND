@@ -28,14 +28,8 @@ export default function AppGate({ connecting, connectError, onConnect }) {
               src="/brand/bond-logo-white.png"
               alt="BOND"
               draggable="false"
-              className="w-[min(76vw,440px)] max-w-full select-none object-contain opacity-[0.96] sm:w-[min(58vw,500px)] lg:w-[min(36vw,560px)] xl:w-[min(38vw,620px)]"
+              className="w-[min(78vw,480px)] max-w-full select-none object-contain opacity-[0.96] sm:w-[min(60vw,540px)] lg:w-[min(38vw,600px)] xl:w-[min(40vw,660px)]"
             />
-            <div className="mt-8 grid w-full max-w-[430px] gap-3 border-t border-[#ede9df]/12 pt-5 text-center lg:text-left">
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">One wallet. One clean session.</div>
-              <p className="text-[14px] leading-[1.6] tracking-[-0.01em] text-[#ede9df]/54">
-                BOND loads rooms, market context, and profile access only after the wallet is confirmed.
-              </p>
-            </div>
           </div>
         </div>
       </div>
