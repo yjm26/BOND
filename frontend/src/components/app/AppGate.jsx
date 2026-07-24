@@ -1,7 +1,7 @@
 export default function AppGate({ connecting, connectError, onConnect }) {
   return (
     <section className="min-h-screen bg-[#20201f] px-6 pt-[112px] text-[#ede9df] sm:px-10 lg:px-14">
-      <div className="grid min-h-[calc(100vh-112px)] gap-10 py-10 lg:grid-cols-[46%_1fr] lg:items-center lg:gap-8 lg:py-0 xl:grid-cols-[44%_1fr]">
+      <div className="grid min-h-[calc(100vh-112px)] gap-10 py-10 lg:grid-cols-[44%_1fr] lg:items-center lg:gap-4 lg:py-0 xl:grid-cols-[42%_1fr]">
         <div className="relative z-10 max-w-[680px]">
           <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">BOND Gate</div>
           <h1 className="mt-5 max-w-[620px] text-[clamp(48px,7vw,96px)] font-medium leading-[0.9] tracking-[-0.08em]">
@@ -21,14 +21,13 @@ export default function AppGate({ connecting, connectError, onConnect }) {
           )}
         </div>
 
-        <div className="relative flex min-h-[280px] items-center justify-center lg:min-h-[520px] lg:justify-start">
-          <div className="absolute left-0 top-1/2 hidden h-px w-[18vw] -translate-y-1/2 bg-[#ede9df]/12 lg:block" />
-          <div className="relative flex w-full flex-col items-center lg:items-start lg:pl-[12vw] xl:pl-[10vw]">
+        <div className="relative flex min-h-[280px] items-center justify-center overflow-visible lg:min-h-[520px] lg:justify-end">
+          <div className="relative flex w-full flex-col items-center lg:-mr-10 lg:items-end xl:-mr-16 2xl:-mr-20">
             <img
               src="/brand/bond-logo-white.png"
               alt="BOND"
               draggable="false"
-              className="w-[min(78vw,480px)] max-w-full select-none object-contain opacity-[0.96] sm:w-[min(60vw,540px)] lg:w-[min(38vw,600px)] xl:w-[min(40vw,660px)]"
+              className="w-[min(86vw,540px)] max-w-none select-none object-contain opacity-[0.96] sm:w-[min(70vw,620px)] lg:w-[min(54vw,760px)] xl:w-[min(56vw,860px)] 2xl:w-[900px]"
             />
           </div>
         </div>
