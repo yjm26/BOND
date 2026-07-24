@@ -58,7 +58,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
         : 'border-b border-[#0d0d0b]/10 bg-[#ede9df]'
     }`}>
       <div className="flex items-center justify-between">
-        <HeaderBrand tone={isDarkHeader ? 'dark' : 'light'} to={isAppRoute ? '/app' : '/'} hideSubtitle={isDisconnectedAppRoute} />
+        <HeaderBrand tone={isDarkHeader ? 'dark' : 'light'} to={isDisconnectedAppRoute ? '/' : (isAppRoute ? '/app' : '/')} hideSubtitle={isDisconnectedAppRoute} bareMark={isDisconnectedAppRoute} />
 
         {!isDisconnectedAppRoute && <div className="hidden items-center gap-8 md:flex">
           <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} tone={isDarkHeader ? 'dark' : 'light'} mode={isAppRoute ? 'app' : 'landing'} onHowClick={scrollToHow} onUseCasesClick={scrollToUseCases} />
