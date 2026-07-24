@@ -11,6 +11,15 @@ export function timeAgo(ts) {
   return `${Math.floor(diff / 86400)}d ago`
 }
 
+export function listingExpiryLabel(listing) {
+  const ttlMs = 30 * 24 * 60 * 60 * 1000
+  const expiresAt = listing?.expiresAt || ((listing?.createdAt || Date.now()) + ttlMs)
+  const daysLeft = Math.max(0, Math.ceil((expiresAt - Date.now()) / (24 * 60 * 60 * 1000)))
+  if (listing?.taken) return 'In room'
+  if (daysLeft <= 0) return 'Expired'
+  return `${daysLeft}d left`
+}
+
 export function socialLink(type, value) {
   const clean = value.replace(/^@/, '')
   if (type === 'twitter') return `https://x.com/${clean}`

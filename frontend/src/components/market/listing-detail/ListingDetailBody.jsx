@@ -3,6 +3,7 @@ import ListingCreatorCard from './ListingCreatorCard'
 import ListingDelivery from './ListingDelivery'
 import ListingDescription from './ListingDescription'
 import ListingPriceRow from './ListingPriceRow'
+import { listingExpiryLabel } from '../marketUtils'
 
 export default function ListingDetailBody({ listing, wallet }) {
   return (
@@ -15,6 +16,10 @@ export default function ListingDetailBody({ listing, wallet }) {
       <div className="grid content-start gap-3">
         <ListingPriceRow listing={listing} />
         <ListingDelivery deliveryDays={listing.deliveryDays} />
+        <div className="flex items-center justify-between border border-[#ede9df]/10 bg-[#20201f]/55 px-3 py-2.5">
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#ede9df]/34">Listing expiry</span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#ede9df]">{listingExpiryLabel(listing)}</span>
+        </div>
         <div className="border border-[#d8b15f]/16 bg-[#d8b15f]/[0.045] p-3">
           <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#d8b15f]">Settlement path</div>
           <p className="mt-1.5 text-[12px] leading-[1.45] text-[#d8d1c2]">

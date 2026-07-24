@@ -1,4 +1,4 @@
-import { formatAddress, timeAgo } from './marketUtils'
+import { formatAddress, listingExpiryLabel, timeAgo } from './marketUtils'
 
 export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelete, onExpand }) {
   const isOwner = wallet && listing.creator?.toLowerCase() === wallet.address?.toLowerCase()
@@ -32,7 +32,7 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
           </div>
         </div>
         <div className="text-right font-mono text-[8px] uppercase leading-[1.55] tracking-[0.12em] text-[#ede9df]/38">
-          {isBuyerListing ? 'Buyer' : 'Seller'}<br />12h buffer
+          {isBuyerListing ? 'Buyer' : 'Seller'}<br />{listingExpiryLabel(listing)}
         </div>
       </div>
 

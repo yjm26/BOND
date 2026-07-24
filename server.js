@@ -4,10 +4,12 @@ const path = require('path')
 const { ethers } = require('ethers')
 
 const PORT = process.env.PORT || 3001
-const DATA_FILE = path.join(__dirname, 'listings.json')
-const NOTIF_FILE = path.join(__dirname, 'notifications.json')
-const OFFERS_FILE = path.join(__dirname, 'offers.json')
-const ROOM_CODES_FILE = path.join(__dirname, 'room_codes.json')
+const STORAGE_DIR = process.env.DATA_DIR || process.env.RENDER_DISK_MOUNT_PATH || __dirname
+const DATA_FILE = path.join(STORAGE_DIR, 'listings.json')
+const NOTIF_FILE = path.join(STORAGE_DIR, 'notifications.json')
+const OFFERS_FILE = path.join(STORAGE_DIR, 'offers.json')
+const ROOM_CODES_FILE = path.join(STORAGE_DIR, 'room_codes.json')
+const LISTING_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 // ═══════════════════════════════════════
 //  Auth: nonce-based wallet verification
@@ -103,7 +105,20 @@ function readJSON(file, fallback) {
 }
 
 function writeJSON(file, data) {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
   fs.writeFileSync(file, JSON.stringify(data, null, 2))
+}
+
+function isExpiredListing(listing) {
+  const expiresAt = listing.expiresAt || ((listing.createdAt || 0) + LISTING_TTL_MS)
+  return !listing.taken && expiresAt <= Date.now()
+}
+
+function readListings() {
+  const listings = readJSON(DATA_FILE, [])
+  const activeListings = listings.filter((listing) => !isExpiredListing(listing))
+  if (activeListings.length !== listings.length) writeJSON(DATA_FILE, activeListings)
+  return activeListings
 }
 
 function getDefaultListings() {
@@ -234,7 +249,7 @@ const server = http.createServer(async (req, res) => {
       const category = url.searchParams.get('category')
       const role = url.searchParams.get('role')
       const q = url.searchParams.get('q')?.toLowerCase()
-      let listings = readJSON(DATA_FILE, [])
+      let listings = readListings()
       if (category && category !== 'All') listings = listings.filter(l => l.category === category)
       if (role && role !== 'all') listings = listings.filter(l => l.role === role)
       if (q) listings = listings.filter(l =>
@@ -253,7 +268,7 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req)
       if (!body.title || !body.price) return json(res, { error: 'title, price required' }, 400, origin)
 
-      const listings = readJSON(DATA_FILE, [])
+      const listings = readListings()
       const newListing = {
         id: Date.now(),
         role: body.role || 'seller',
@@ -269,6 +284,7 @@ const server = http.createServer(async (req, res) => {
           discord: sanitize(body.socials.discord || '', 100) || undefined,
         } : undefined,
         createdAt: Date.now(),
+        expiresAt: Date.now() + LISTING_TTL_MS,
       }
       listings.unshift(newListing)
       writeJSON(DATA_FILE, listings)
@@ -283,7 +299,7 @@ const server = http.createServer(async (req, res) => {
       if (!verified) return json(res, { error: 'Invalid signature' }, 401, origin)
 
       const id = parseInt(pathname.split('/')[3])
-      const listings = readJSON(DATA_FILE, [])
+      const listings = readListings()
       const idx = listings.findIndex(l => l.id === id)
       if (idx === -1) return json(res, { error: 'Not found' }, 404, origin)
       if (listings[idx].creator.toLowerCase() !== verified) {
@@ -303,7 +319,7 @@ const server = http.createServer(async (req, res) => {
 
       const id = parseInt(pathname.split('/')[3])
       const body = await parseBody(req)
-      const listings = readJSON(DATA_FILE, [])
+      const listings = readListings()
       const listing = listings.find(l => l.id === id)
       if (!listing) return json(res, { error: 'Not found' }, 404, origin)
       if (listing.creator.toLowerCase() !== verified) {
