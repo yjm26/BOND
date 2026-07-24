@@ -17,8 +17,8 @@ export default function Footer() {
       <div className="grid gap-9 border-t border-[#ede9df]/14 pt-8 sm:gap-12 sm:pt-10 lg:grid-cols-[1fr_360px]">
         <div>
           <Link to="/" className="inline-flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center border border-[#ede9df]/18 bg-[#ede9df] font-mono text-[13px] font-semibold text-[#20201f]">
-              B
+            <span className="flex h-9 w-9 items-center justify-center border border-[#ede9df]/14 bg-[#111110]">
+              <img src="/brand/bond-logo-white-64.png" alt="BOND" className="h-5 w-5 object-contain" draggable="false" />
             </span>
             <span>
               <span className="block text-[15px] font-medium tracking-[-0.02em]">BOND</span>
