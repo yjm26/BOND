@@ -387,25 +387,47 @@ function Security() {
 
 function FAQ() {
   return (
-    <Section eyebrow="FAQ" title="Small answers for the current build.">
+    <Section
+      eyebrow="FAQ"
+      title="The questions people ask before they put money in a room."
+      intro="Short answers for buyers, sellers, and arbiters using the current BOND testnet flow."
+    >
       <div className="grid gap-3">
-        <Faq q="Why did the old docs mention deal types?">
-          They were stale. The current app does not expose Instant/Event/Service or review-day choices.
+        <Faq q="What is a BOND room?">
+          A room is a private deal workspace between two wallets. It records the buyer, seller, item, USDC price, optional seller collateral, deadlines, delivery proof, and the final settlement state.
         </Faq>
-        <Faq q="Can the buyer release right after delivery?">
-          Yes. Buyer release is immediate once the room is Delivered.
+        <Faq q="Who pays into the room?">
+          The buyer funds the room with the price plus the 1% platform fee. If seller collateral is used, the seller locks that collateral when their role requires it.
         </Faq>
-        <Faq q="What if the buyer does nothing after delivery?">
-          The seller can escalate after the fixed 12 hour response buffer. That creates a disputed room for owner/arbiter review.
+        <Faq q="When does the seller get paid?">
+          After the seller marks delivery, the buyer can release immediately. On release, the seller receives the room price and gets their collateral back.
         </Faq>
-        <Faq q="Why do profiles show across devices now?">
-          Profile saves publish a public profile to the backend with signed wallet auth. Room party labels can fetch that profile by address.
+        <Faq q="What happens if the seller does not deliver?">
+          If the delivery deadline passes while the room is still funded, the buyer can request a refund. The buyer receives the funded price plus seller collateral when collateral exists.
         </Faq>
-        <Faq q="Why do I get kicked to the gate after switching wallets?">
-          That is intentional. A wallet change is an identity change, so BOND clears the app session and requires a clean connect/sign again.
+        <Faq q="What if the buyer receives the work but does not respond?">
+          Once delivery is marked, a fixed 12 hour response buffer starts. If the buyer does not release or dispute during that buffer, the seller can escalate the room to dispute review.
         </Faq>
-        <Faq q="Is BOND mainnet safe?">
-          No. This is Arc Testnet. Treat it as a product and contract test environment.
+        <Faq q="When should the buyer open a dispute?">
+          The buyer should dispute after delivery if the delivered work does not match the deal, proof is missing, or the seller delivered something materially wrong. A reason and evidence should be attached.
+        </Faq>
+        <Faq q="Who can resolve a dispute?">
+          Only the contract owner or an active arbiter can resolve disputed rooms. Regular users do not see arbiter tools in the app.
+        </Faq>
+        <Faq q="Can both sides cancel a room?">
+          Yes. Joined, funded, and delivered rooms can be mutually cancelled if both participants approve. Before a counterparty joins, the creator can cancel. Before funding, the joined counterparty can leave.
+        </Faq>
+        <Faq q="How long do market listings stay visible?">
+          Active listings expire after 30 days. Accepted or taken listings are kept as history. Listing expiry is separate from room delivery and dispute timing.
+        </Faq>
+        <Faq q="Why does BOND ask me to sign messages?">
+          Signing proves wallet ownership for off-chain actions like profiles and listings. It is not a transaction and does not move funds. Mutating room actions still require wallet transactions.
+        </Faq>
+        <Faq q="Why do I have to reconnect after switching wallets?">
+          A wallet change is an identity change. BOND clears the old session and sends you back to the gate so the new wallet can connect and sign cleanly.
+        </Faq>
+        <Faq q="Is this production mainnet escrow?">
+          No. BOND is currently on Arc Testnet. Use it to test the product flow and contract behavior, not for production-value funds.
         </Faq>
       </div>
     </Section>
