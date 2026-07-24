@@ -7,21 +7,26 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 /**
  * Build SIWE-like message matching server's expected format.
  */
-function buildMessage(address, nonce) {
-  return `bond.arc.network wants you to sign in with your Ethereum account:\n${address}\n\nNonce: ${nonce}`
+function getAuthDomain() {
+  if (typeof window !== 'undefined' && window.location?.host) return window.location.host
+  return 'bond.arc.network'
+}
+
+function buildMessage(domain, address, nonce) {
+  return `${domain} wants you to sign in with your Ethereum account:\n${address}\n\nNonce: ${nonce}`
 }
 
 /**
  * Auth cache to avoid re-signing on every request.
  * Nonces expire after 5 min on server, cache for 4 min.
  */
-let authCache = { address: null, nonce: null, signature: null, expires: 0 }
+let authCache = { address: null, domain: null, nonce: null, signature: null, expires: 0 }
 
 /**
  * Reset auth cache on disconnect or wallet switch.
  */
 export function resetAuthCache() {
-  authCache = { address: null, nonce: null, signature: null, expires: 0 }
+  authCache = { address: null, domain: null, nonce: null, signature: null, expires: 0 }
 }
 
 /**
@@ -29,32 +34,39 @@ export function resetAuthCache() {
  * Caches result for 4 minutes to avoid repeated signing prompts.
  */
 export async function getAuthHeaders(wallet) {
-  if (!wallet?.address || !wallet?.signer) throw new Error('Wallet not connected')
+  if (!wallet?.address || (!wallet?.signer && !wallet?.provider)) throw new Error('Wallet not connected')
 
   const now = Date.now()
-  if (authCache.address === wallet.address && authCache.expires > now) {
+  const domain = getAuthDomain()
+
+  const signer = wallet.provider?.getSigner ? await wallet.provider.getSigner() : wallet.signer
+  const signerAddress = await signer.getAddress()
+
+  if (authCache.address === signerAddress && authCache.domain === domain && authCache.expires > now) {
     return {
-      'X-Wallet-Address': wallet.address,
+      'X-Wallet-Address': signerAddress,
       'X-Signature': authCache.signature,
       'X-Nonce': authCache.nonce,
+      'X-Auth-Domain': domain,
     }
   }
 
   // Fetch fresh nonce
-  const nonceRes = await fetch(`${API_URL}/api/auth/nonce?address=${wallet.address}`)
+  const nonceRes = await fetch(`${API_URL}/api/auth/nonce?address=${signerAddress}`)
   if (!nonceRes.ok) throw new Error('Failed to get auth nonce')
   const { nonce } = await nonceRes.json()
 
   // Sign with wallet
-  const msg = buildMessage(wallet.address, nonce)
-  const signature = await wallet.signer.signMessage(msg)
+  const msg = buildMessage(domain, signerAddress, nonce)
+  const signature = await signer.signMessage(msg)
 
-  authCache = { address: wallet.address, nonce, signature, expires: now + 4 * 60 * 1000 }
+  authCache = { address: signerAddress, domain, nonce, signature, expires: now + 4 * 60 * 1000 }
 
   return {
-    'X-Wallet-Address': wallet.address,
+    'X-Wallet-Address': signerAddress,
     'X-Signature': signature,
     'X-Nonce': nonce,
+    'X-Auth-Domain': domain,
   }
 }
 
@@ -76,6 +88,7 @@ export async function authFetch(path, options = {}, wallet) {
 
   // Retry once if auth failed (e.g., nonce expired)
   if (res.status === 401 && !options._retry) {
+    resetAuthCache()
     const freshHeaders = await getAuthHeaders(wallet)
     res = await fetch(`${API_URL}${path}`, {
       ...options,
