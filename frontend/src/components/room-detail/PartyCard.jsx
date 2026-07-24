@@ -1,9 +1,21 @@
 import { getCollateralBadge, getReputationBadge } from '../../utils/reputation'
 import { formatAddress } from '../../utils/constants'
 
-export default function PartyCard({ label, address, role, isYou, reputation }) {
+function partyName(profile, isYou) {
+  if (profile?.displayName?.trim()) return profile.displayName.trim()
+  return isYou ? 'You' : 'Unknown user'
+}
+
+function partyInitial(name, address) {
+  if (name && name !== 'Unknown user') return name.slice(0, 1).toUpperCase()
+  return address ? address.slice(2, 4).toUpperCase() : '—'
+}
+
+export default function PartyCard({ label, address, role, isYou, reputation, profile }) {
   const badge = reputation ? getReputationBadge(reputation) : null
   const collBadge = reputation ? getCollateralBadge(reputation.multiplier) : null
+  const name = partyName(profile, isYou)
+  const initial = partyInitial(name, address)
   return (
     <div className="border border-[#ede9df]/10 bg-[#111110] p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
@@ -13,7 +25,13 @@ export default function PartyCard({ label, address, role, isYou, reputation }) {
         </div>
         <span className="text-[12px] text-[#b9b2a5]">{role}</span>
       </div>
-      <div className="break-all font-mono text-[14px] text-[#ede9df]">{formatAddress(address)}</div>
+      <div className="flex items-center gap-3">
+        <div className="grid h-10 w-10 shrink-0 place-items-center border border-[#d8b15f]/24 bg-[#d8b15f]/[0.06] font-mono text-[12px] uppercase tracking-[0.12em] text-[#d8b15f]">{initial}</div>
+        <div className="min-w-0">
+          <div className="truncate text-[15px] font-medium text-[#ede9df]">{name}</div>
+          <div className="mt-1 font-mono text-[11px] text-[#ede9df]/42">{formatAddress(address)}</div>
+        </div>
+      </div>
       {reputation && reputation.totalDeals > 0 ? (
         <div className="mt-4 grid gap-3">
           <div className="flex flex-wrap gap-2">

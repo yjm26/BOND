@@ -1,13 +1,17 @@
 import PartyCard from './PartyCard'
+import { loadProfile } from '../app/profile/profileStorage'
 
 export default function RoomPartiesPanel({ room, isCreator, isCounter, creatorRep, counterpartyRep, role }) {
+  const creatorProfile = loadProfile(room.creator)
+  const counterpartyProfile = loadProfile(room.counterparty)
+
   return (
     <div className="border border-[#ede9df]/10 bg-[#20201f] p-5">
       <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/40">Parties</div>
       <div className="grid gap-3">
-        <PartyCard label="Creator" address={room.creator} role={room.creatorIsSeller ? 'Seller' : 'Buyer'} isYou={isCreator} reputation={creatorRep} />
+        <PartyCard label="Creator" address={room.creator} role={room.creatorIsSeller ? 'Seller' : 'Buyer'} isYou={isCreator} reputation={creatorRep} profile={creatorProfile} />
         {room.counterparty !== '0x0000000000000000000000000000000000000000' ? (
-          <PartyCard label="Counterparty" address={room.counterparty} role={room.creatorIsSeller ? 'Buyer' : 'Seller'} isYou={isCounter} reputation={counterpartyRep} />
+          <PartyCard label="Counterparty" address={room.counterparty} role={room.creatorIsSeller ? 'Buyer' : 'Seller'} isYou={isCounter} reputation={counterpartyRep} profile={counterpartyProfile} />
         ) : (
           <div className="border border-dashed border-[#ede9df]/14 bg-[#111110] p-4 text-[13px] text-[#b9b2a5]">Waiting for counterparty to join…</div>
         )}
