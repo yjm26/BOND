@@ -1,10 +1,3 @@
-export const HERO_FACTS = [
-  ['BUYER', 'Funds room'],
-  ['ESCROW', 'Holds USDC'],
-  ['SELLER', 'Delivers proof'],
-  ['ARBITER', 'Fallback path'],
-]
-
 export const SETTLEMENT_NODES = [
   {
     id: 'BUYER',
