@@ -7,7 +7,7 @@ export default function AppGateMark({ compact = false }) {
     <div className="relative mx-auto flex items-center justify-center">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[180%] w-[180%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#fafafa]/[0.04] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[180%] w-[180%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--a-inverse-bg,#fafafa)]/[0.04] blur-3xl"
       />
       <img
         src="/brand/bond-logo-white-512.png"

@@ -1,14 +1,13 @@
 import HeroCopy from './HeroCopy'
-import HeroNegativeSpace from './HeroNegativeSpace'
+import HeroRibbon from './HeroRibbon'
 
-export default function BondHero({ wallet, onConnect }) {
+export default function BondHero() {
   return (
-    <section className="relative min-h-[720px] overflow-hidden bg-[#fafafa] pt-[72px] text-[#0a0a0a] motion-soft-reveal lg:min-h-screen">
-      <div className="absolute bottom-0 left-0 z-10 hidden h-px w-full bg-[#0a0a0a]/10 lg:block" />
-
-      <div className="relative z-10 grid min-h-[648px] items-stretch lg:min-h-[calc(100vh-72px)] lg:grid-cols-[76%_24%] xl:grid-cols-[74%_26%]">
-        <HeroCopy wallet={wallet} onConnect={onConnect} />
-        <HeroNegativeSpace />
+    <section className="relative overflow-hidden bg-[#fafafa] px-6 pb-16 pt-28 text-[#0a0a0a] sm:px-10 sm:pb-20 sm:pt-32 lg:px-14 lg:pb-24">
+      <HeroRibbon />
+      <div className="relative z-10 mx-auto grid max-w-[1180px] items-end gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(240px,0.85fr)] lg:gap-8">
+        <HeroCopy />
+        <div className="pointer-events-none hidden min-h-[260px] lg:block" aria-hidden="true" />
       </div>
     </section>
   )

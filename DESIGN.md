@@ -179,3 +179,17 @@ Old → Stark:
 - `#20201f` → `#111111`
 - `#d8b15f` → `#a3a3a3` (brand accent)
 - modal danger fill clay → paper/ink mono buttons
+
+## App light / dark
+
+Landing stays light only — no theme toggle.
+
+App workspace (`/app`, workspace market, rooms, create, profile, …):
+
+- Toggle in top nav (sun/moon)
+- Stored as `bond_app_theme` = `light` | `dark`
+- Light tokens match landing paper (`#fafafa` / `#0a0a0a`)
+- Dark tokens stay stark mono black
+- Applied only via `html[data-app-theme]` CSS variables (`--a-bg`, `--a-ink`, …)
+
+Do not put a theme switch on the marketing landing.

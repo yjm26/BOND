@@ -13,10 +13,10 @@ export default function ArbiterStats({ disputes }) {
   return (
     <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map(([label, value, note]) => (
-        <div key={label} className="border border-[#fafafa]/10 bg-[#111111] p-4">
-          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#fafafa]/34">{label}</div>
-          <div className="mt-3 font-mono text-[26px] leading-none tracking-[-0.04em] text-[#fafafa]">{value}</div>
-          <div className="mt-2 text-[12px] text-[#a3a3a3]">{note}</div>
+        <div key={label} className="border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-4">
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[color:var(--a-faint)]">{label}</div>
+          <div className="mt-3 font-mono text-[26px] leading-none tracking-[-0.04em] text-[var(--a-ink,#fafafa)]">{value}</div>
+          <div className="mt-2 text-[12px] text-[var(--a-muted,#a3a3a3)]">{note}</div>
         </div>
       ))}
     </div>

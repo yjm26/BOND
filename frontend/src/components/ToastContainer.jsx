@@ -14,9 +14,9 @@ const ICONS = {
 
 // Stark mono toasts — no clay/gold/blue chrome
 const STYLES = {
-  ok: 'border-[#fafafa]/18 bg-[#111111]/96 text-[#fafafa]',
-  err: 'border-[#fafafa]/28 bg-[#111111]/96 text-[#fafafa]',
-  info: 'border-[#fafafa]/14 bg-[#111111]/96 text-[#a3a3a3]',
+  ok: 'border-[var(--a-ink,#fafafa)]/18 bg-[var(--a-surface,#111111)]/96 text-[var(--a-ink,#fafafa)]',
+  err: 'border-[var(--a-line-strong)] bg-[var(--a-surface,#111111)]/96 text-[var(--a-ink,#fafafa)]',
+  info: 'border-[var(--a-line)] bg-[var(--a-surface,#111111)]/96 text-[var(--a-muted,#a3a3a3)]',
 }
 
 export default function ToastContainer() {
