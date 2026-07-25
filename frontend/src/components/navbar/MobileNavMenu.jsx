@@ -81,7 +81,7 @@ export default function MobileNavMenu({
               : 'border-[#0a0a0a]/12 bg-white text-[#0a0a0a]/55'
           }`}
         >
-          Arc Testnet
+          Build on Arc
         </div>
         {mode === 'landing' ? (
           <Link

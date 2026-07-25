@@ -24,9 +24,9 @@ export default function AppHome({ wallet, profile }) {
           <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-2 lg:p-5">
             <AppHomeProfilePanel profile={profile} name={name} />
             <div className="border border-[var(--a-line-strong)] bg-[var(--a-chip)] p-5 sm:p-6">
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-muted)]">Arc Testnet</div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-muted)]">Build on Arc</div>
               <p className="mt-4 max-w-[420px] text-[14px] leading-[1.6] text-[color:var(--a-soft)]">
-                Test funds only. Money moves through explicit room actions: fund, release, refund, dispute.
+                Money moves through explicit room actions: fund, release, refund, dispute.
               </p>
               <div className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--a-faint)]">
                 Wallet {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}

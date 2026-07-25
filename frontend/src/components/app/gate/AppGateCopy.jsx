@@ -19,7 +19,7 @@ export default function AppGateCopy({ connecting, connectError, onConnect }) {
         </div>
       )}
       <div className="mt-8 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--a-faint)]">
-        Arc Testnet
+        Build on Arc
       </div>
     </div>
   )
