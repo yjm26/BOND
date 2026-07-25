@@ -42,8 +42,8 @@ export default function LandingPillars() {
                   {item.fig}
                 </div>
 
-                <div className="flex flex-1 items-center justify-center py-8 text-[#fafafa]/88">
-                  <Mark className="h-[120px] w-[140px] sm:h-[132px] sm:w-[152px]" />
+                <div className="flex flex-1 items-center justify-center py-6 sm:py-8">
+                  <Mark className="h-[128px] w-[152px] sm:h-[140px] sm:w-[168px]" />
                 </div>
 
                 <div>
