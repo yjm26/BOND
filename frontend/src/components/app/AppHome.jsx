@@ -11,16 +11,16 @@ export default function AppHome({ wallet, profile }) {
   const actions = visibleAppActions(canAccessDisputes)
 
   return (
-    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
-      <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
+    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] pb-6 text-[#ede9df] sm:px-6 lg:px-8">
+      <div className="grid gap-4 lg:grid-cols-[260px_1fr] lg:items-start">
         <AppHomeSidebar actions={actions} wallet={wallet} />
 
-        <main className="flex min-h-0 flex-col overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
-          <div className="border-b border-[#ede9df]/10 p-5 sm:p-7 lg:p-8">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <main className="flex flex-col overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
+          <div className="border-b border-[#ede9df]/10 p-5 sm:p-6 lg:p-7">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">Home</div>
-                <h1 className="mt-4 max-w-[780px] text-[clamp(42px,6vw,86px)] font-medium leading-[0.9] tracking-[-0.08em]">
+                <h1 className="mt-3 max-w-[780px] text-[clamp(36px,5.2vw,64px)] font-medium leading-[0.92] tracking-[-0.07em]">
                   Good to see you, {name}.
                 </h1>
               </div>
@@ -33,7 +33,7 @@ export default function AppHome({ wallet, profile }) {
             </div>
           </div>
 
-          <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-2 lg:p-6">
+          <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-2 lg:p-5">
             <AppHomeProfilePanel profile={profile} name={name} />
             <div className="border border-[#d8b15f]/20 bg-[#d8b15f]/[0.08] p-5 sm:p-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">Arc Testnet</div>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 export default function AppHomeSidebar({ actions, wallet }) {
   return (
-    <aside className="hidden border border-[#ede9df]/10 bg-[#20201f] p-4 lg:block">
+    <aside className="hidden border border-[#ede9df]/10 bg-[#20201f] p-4 lg:block lg:min-h-[calc(100vh-88px-1.5rem)]">
       <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">BOND App</div>
       <div className="mt-6 space-y-1">
         {actions.map((item) => (
