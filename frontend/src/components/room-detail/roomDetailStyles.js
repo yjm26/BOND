@@ -1,12 +1,12 @@
 export const ROOM_STATE_TONE = {
-  Created: 'border-[#d8b15f]/30 text-[#d8b15f]',
-  Joined: 'border-[#d8b15f]/30 text-[#d8b15f]',
-  Funded: 'border-[#b7c8a3]/30 text-[#b7c8a3]',
-  Delivered: 'border-[#b7c8a3]/30 text-[#b7c8a3]',
-  Released: 'border-[#b7c8a3]/30 text-[#b7c8a3]',
-  Disputed: 'border-[#c98b4a]/40 text-[#c98b4a]',
-  Refunded: 'border-[#c98b4a]/35 text-[#c98b4a]',
-  Expired: 'border-[#ede9df]/16 text-[#ede9df]/48',
-  Cancelled: 'border-[#ede9df]/16 text-[#ede9df]/48',
+  Created: 'border-[#a3a3a3]/30 text-[#a3a3a3]',
+  Joined: 'border-[#a3a3a3]/30 text-[#a3a3a3]',
+  Funded: 'border-[#8f9a88]/30 text-[#8f9a88]',
+  Delivered: 'border-[#8f9a88]/30 text-[#8f9a88]',
+  Released: 'border-[#8f9a88]/30 text-[#8f9a88]',
+  Disputed: 'border-[#b87333]/40 text-[#b87333]',
+  Refunded: 'border-[#b87333]/35 text-[#b87333]',
+  Expired: 'border-[#fafafa]/16 text-[#fafafa]/48',
+  Cancelled: 'border-[#fafafa]/16 text-[#fafafa]/48',
 }
 

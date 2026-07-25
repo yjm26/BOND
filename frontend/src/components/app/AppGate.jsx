@@ -4,7 +4,7 @@ import AppGateMark from './gate/AppGateMark'
 
 export default function AppGate({ connecting, connectError, onConnect }) {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#20201f] text-[#ede9df]">
+    <section className="relative min-h-screen overflow-hidden bg-[#111111] text-[#fafafa]">
       <div className="absolute inset-x-0 top-0 z-20 px-6 pt-6 sm:px-10 lg:px-14">
         <AppBackToLanding />
       </div>

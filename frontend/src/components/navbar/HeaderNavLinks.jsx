@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode = 'landing', onHowClick, onUseCasesClick }) {
   const dark = tone === 'dark'
   const navLink = dark
-    ? 'text-[13px] font-medium tracking-[-0.01em] !text-[#ede9df]/70 transition hover:!text-[#ede9df]'
-    : 'text-[13px] font-medium tracking-[-0.01em] !text-[#0d0d0b]/70 transition hover:!text-[#0d0d0b]'
+    ? 'text-[13px] font-medium tracking-[-0.01em] !text-[#fafafa]/70 transition hover:!text-[#fafafa]'
+    : 'text-[13px] font-medium tracking-[-0.01em] !text-[#0a0a0a]/70 transition hover:!text-[#0a0a0a]'
 
   if (mode === 'app') {
     if (!wallet) {
@@ -31,7 +31,7 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
       <a href="#how" onClick={onHowClick} className={navLink}>Room states</a>
       <a href="#use-cases" onClick={onUseCasesClick} className={navLink}>Where it fits</a>
       <Link to="/docs" className={navLink}>Docs</Link>
-      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#c98b4a] transition hover:text-[#d8b15f]">Disputes</Link>}
+      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#b87333] transition hover:text-[#a3a3a3]">Disputes</Link>}
     </div>
   )
 }

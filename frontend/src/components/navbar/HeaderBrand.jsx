@@ -7,7 +7,7 @@ export default function HeaderBrand({ tone = 'light', to = '/', hideSubtitle = f
   const markClass = bareMark || dark
     ? 'flex h-8 w-10 items-center justify-center transition'
     : `flex h-8 w-10 items-center justify-center border transition ${
-      'border-[#0d0d0b]/12 bg-[#ede9df]'
+      'border-[#0a0a0a]/12 bg-[#fafafa]'
     }`
 
   return (
@@ -16,8 +16,8 @@ export default function HeaderBrand({ tone = 'light', to = '/', hideSubtitle = f
         <img src={logoSrc} alt="BOND" className="w-8 object-contain" draggable="false" />
       </span>
       <span>
-        <span className={`block text-[15px] font-semibold tracking-[-0.03em] ${dark ? 'text-[#ede9df]' : 'text-[#0d0d0b]'}`}>BOND</span>
-        {!hideSubtitle && <span className={`hidden font-mono text-[9px] uppercase tracking-[0.22em] sm:block ${dark ? 'text-[#ede9df]/56' : 'text-[#0d0d0b]/55'}`}>{subtitle}</span>}
+        <span className={`block text-[15px] font-semibold tracking-[-0.03em] ${dark ? 'text-[#fafafa]' : 'text-[#0a0a0a]'}`}>BOND</span>
+        {!hideSubtitle && <span className={`hidden font-mono text-[9px] uppercase tracking-[0.22em] sm:block ${dark ? 'text-[#fafafa]/56' : 'text-[#0a0a0a]/55'}`}>{subtitle}</span>}
       </span>
     </Link>
   )

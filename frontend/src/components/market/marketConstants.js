@@ -9,11 +9,11 @@ export const CATEGORY_ICON = {
 }
 
 export const CATEGORY_STYLES = {
-  NFT:    { bg: 'rgba(216,177,95,0.08)', color: '#d8b15f', border: 'rgba(216,177,95,0.18)' },
-  Wallet: { bg: 'rgba(183,200,163,0.08)', color: '#b7c8a3', border: 'rgba(183,200,163,0.18)' },
-  Account:{ bg: 'rgba(201,139,74,0.08)', color: '#c98b4a', border: 'rgba(201,139,74,0.18)' },
-  Service:{ bg: 'rgba(237,233,223,0.06)', color: '#ede9df', border: 'rgba(237,233,223,0.14)' },
-  Other:  { bg: 'rgba(237,233,223,0.05)', color: '#b9b2a5', border: 'rgba(237,233,223,0.12)' },
+  NFT:    { bg: 'rgba(163,163,163,0.08)', color: '#a3a3a3', border: 'rgba(163,163,163,0.18)' },
+  Wallet: { bg: 'rgba(143,154,136,0.08)', color: '#8f9a88', border: 'rgba(143,154,136,0.18)' },
+  Account:{ bg: 'rgba(184,115,51,0.08)', color: '#b87333', border: 'rgba(184,115,51,0.18)' },
+  Service:{ bg: 'rgba(250,250,250,0.06)', color: '#fafafa', border: 'rgba(250,250,250,0.14)' },
+  Other:  { bg: 'rgba(250,250,250,0.05)', color: '#a3a3a3', border: 'rgba(250,250,250,0.12)' },
 }
 
 export const SOCIAL_OPTIONS = [

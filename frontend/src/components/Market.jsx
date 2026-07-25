@@ -96,11 +96,11 @@ export default function Market({ wallet }) {
   }
 
   return (
-    <section className="min-h-screen bg-[#050505] px-4 pt-[88px] text-[#ede9df] sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-[#000000] px-4 pt-[88px] text-[#fafafa] sm:px-6 lg:px-8">
       <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
         <MarketSidebar wallet={wallet} />
 
-        <main className="overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
+        <main className="overflow-hidden border border-[#fafafa]/10 bg-[#0a0a0a]">
           <div className="p-4 sm:p-5 lg:p-6">
             {showForm && (
               <MarketListingForm
@@ -114,7 +114,7 @@ export default function Market({ wallet }) {
               />
             )}
 
-            {deleteError && <div className="mb-4 border border-[#c98b4a]/30 bg-[#c98b4a]/10 px-4 py-3 text-[13px] text-[#c98b4a]">{deleteError}</div>}
+            {deleteError && <div className="mb-4 border border-[#b87333]/30 bg-[#b87333]/10 px-4 py-3 text-[13px] text-[#b87333]">{deleteError}</div>}
 
             <MarketToolbar
               wallet={wallet}

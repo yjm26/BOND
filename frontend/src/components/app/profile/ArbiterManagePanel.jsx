@@ -3,9 +3,9 @@ import { ethers } from 'ethers'
 import { ARC_GAS, ensureArcChain, getContract, waitForTx } from '../../../utils/contract'
 import { formatAddress } from '../../../utils/constants'
 
-const inputClass = 'h-11 w-full border border-[#ede9df]/12 bg-[#111110] px-3 text-[13px] text-[#ede9df] outline-none placeholder:text-[#ede9df]/24 focus:border-[#d8b15f]/60 disabled:opacity-50'
-const primaryButton = 'h-11 border border-[#ede9df] bg-[#ede9df] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition hover:bg-transparent hover:text-[#ede9df] disabled:cursor-not-allowed disabled:opacity-40'
-const ghostButton = 'h-11 border border-[#ede9df]/14 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#ede9df]/64 transition hover:border-[#ede9df]/34 hover:text-[#ede9df] disabled:cursor-not-allowed disabled:opacity-40'
+const inputClass = 'h-11 w-full border border-[#fafafa]/12 bg-[#0a0a0a] px-3 text-[13px] text-[#fafafa] outline-none placeholder:text-[#fafafa]/24 focus:border-[#a3a3a3]/60 disabled:opacity-50'
+const primaryButton = 'h-11 border border-[#fafafa] bg-[#fafafa] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[#fafafa] disabled:cursor-not-allowed disabled:opacity-40'
+const ghostButton = 'h-11 border border-[#fafafa]/14 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#fafafa]/64 transition hover:border-[#fafafa]/34 hover:text-[#fafafa] disabled:cursor-not-allowed disabled:opacity-40'
 const MAX_ARBITER_NAME_BYTES = 64
 
 export default function ArbiterManagePanel({ wallet }) {
@@ -118,20 +118,20 @@ export default function ArbiterManagePanel({ wallet }) {
   if (!accessReady || (!isOwner && !currentIsArbiter)) return null
 
   return (
-    <div className="border border-[#ede9df]/10 bg-[#20201f] p-5 sm:p-6">
-      <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#d8b15f]">Manage arbiters</div>
-      <h3 className="mt-4 text-[28px] font-medium leading-[1] tracking-[-0.06em] text-[#ede9df]">Owner controls dispute access.</h3>
-      <p className="mt-3 text-[13px] leading-[1.65] text-[#b9b2a5]">Active arbiters can resolve disputed rooms on-chain. Disputed rooms are already frozen until an owner or active arbiter resolves/splits them.</p>
+    <div className="border border-[#fafafa]/10 bg-[#111111] p-5 sm:p-6">
+      <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#a3a3a3]">Manage arbiters</div>
+      <h3 className="mt-4 text-[28px] font-medium leading-[1] tracking-[-0.06em] text-[#fafafa]">Owner controls dispute access.</h3>
+      <p className="mt-3 text-[13px] leading-[1.65] text-[#a3a3a3]">Active arbiters can resolve disputed rooms on-chain. Disputed rooms are already frozen until an owner or active arbiter resolves/splits them.</p>
 
-      <div className="mt-5 grid gap-px bg-[#ede9df]/10 p-px text-[13px]">
+      <div className="mt-5 grid gap-px bg-[#fafafa]/10 p-px text-[13px]">
         {[
           ['Owner', owner ? formatAddress(owner) : '—'],
           ['Primary arbiter', primaryArbiter ? `${primaryName || 'BOND Arbiter'} · ${formatAddress(primaryArbiter)}` : '—'],
           ['Role', walletRole],
         ].map(([label, value]) => (
-          <div key={label} className="grid grid-cols-[130px_1fr] bg-[#111110] p-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#ede9df]/34">{label}</span>
-            <span className="text-[#ede9df]">{value}</span>
+          <div key={label} className="grid grid-cols-[130px_1fr] bg-[#0a0a0a] p-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#fafafa]/34">{label}</span>
+            <span className="text-[#fafafa]">{value}</span>
           </div>
         ))}
       </div>
@@ -146,24 +146,24 @@ export default function ArbiterManagePanel({ wallet }) {
           </div>
         </div>
       ) : (
-        <div className="mt-5 border border-[#ede9df]/10 bg-[#111110] p-4 text-[13px] leading-[1.6] text-[#b9b2a5]">Only the contract owner can add or remove arbiters.</div>
+        <div className="mt-5 border border-[#fafafa]/10 bg-[#0a0a0a] p-4 text-[13px] leading-[1.6] text-[#a3a3a3]">Only the contract owner can add or remove arbiters.</div>
       )}
 
-      <div className="mt-5 grid gap-3 border-t border-[#ede9df]/10 pt-5">
-        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#ede9df]/40">Check arbiter access</div>
+      <div className="mt-5 grid gap-3 border-t border-[#fafafa]/10 pt-5">
+        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#fafafa]/40">Check arbiter access</div>
         <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
           <input className={inputClass} value={checkAddress} onChange={(event) => setCheckAddress(event.target.value)} placeholder="Address to check" />
           <button className={ghostButton} onClick={checkArbiter}>Check</button>
         </div>
         {checkedArbiter && (
-          <div className={`border px-4 py-3 text-[13px] ${checkedArbiter.active ? 'border-[#b7c8a3]/28 bg-[#b7c8a3]/10 text-[#b7c8a3]' : 'border-[#ede9df]/10 bg-[#111110] text-[#b9b2a5]'}`}>
+          <div className={`border px-4 py-3 text-[13px] ${checkedArbiter.active ? 'border-[#8f9a88]/28 bg-[#8f9a88]/10 text-[#8f9a88]' : 'border-[#fafafa]/10 bg-[#0a0a0a] text-[#a3a3a3]'}`}>
             {formatAddress(checkedArbiter.address)} is {checkedArbiter.active ? `active${checkedArbiter.name ? ` as ${checkedArbiter.name}` : ''}` : 'not an active arbiter'}.
           </div>
         )}
       </div>
 
       {status && (
-        <div className={`mt-5 border px-4 py-3 text-[13px] leading-[1.55] ${status.type === 'ok' ? 'border-[#b7c8a3]/28 bg-[#b7c8a3]/10 text-[#b7c8a3]' : status.type === 'err' ? 'border-[#c98b4a]/35 bg-[#c98b4a]/10 text-[#c98b4a]' : 'border-[#d8b15f]/24 bg-[#d8b15f]/[0.07] text-[#d8b15f]'}`}>{status.msg}</div>
+        <div className={`mt-5 border px-4 py-3 text-[13px] leading-[1.55] ${status.type === 'ok' ? 'border-[#8f9a88]/28 bg-[#8f9a88]/10 text-[#8f9a88]' : status.type === 'err' ? 'border-[#b87333]/35 bg-[#b87333]/10 text-[#b87333]' : 'border-[#a3a3a3]/24 bg-[#a3a3a3]/[0.07] text-[#a3a3a3]'}`}>{status.msg}</div>
       )}
     </div>
   )

@@ -1,5 +1,5 @@
 export default function RoleSelector({ creatorIsSeller, fromMarket, onSeller, onBuyer }) {
-  const roleClass = (active) => `border p-4 text-left transition ${active ? 'border-[#ede9df] bg-[#ede9df] text-[#20201f]' : 'border-[#ede9df]/12 bg-[#111110] text-[#ede9df]/58 hover:border-[#ede9df]/34 hover:text-[#ede9df]'} ${fromMarket ? 'cursor-not-allowed opacity-60' : ''}`
+  const roleClass = (active) => `border p-4 text-left transition ${active ? 'border-[#fafafa] bg-[#fafafa] text-[#111111]' : 'border-[#fafafa]/12 bg-[#0a0a0a] text-[#fafafa]/58 hover:border-[#fafafa]/34 hover:text-[#fafafa]'} ${fromMarket ? 'cursor-not-allowed opacity-60' : ''}`
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <button type="button" onClick={onSeller} disabled={fromMarket} className={roleClass(creatorIsSeller)}>

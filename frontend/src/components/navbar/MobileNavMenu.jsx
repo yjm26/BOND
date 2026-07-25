@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 'landing', connecting, onConnect, onHowClick, onUseCasesClick, onClose }) {
   const dark = tone === 'dark'
   const linkClass = dark
-    ? 'block border-t border-[#ede9df]/10 py-3 text-[15px] font-medium !text-[#ede9df]/74'
-    : 'block border-t border-[#0d0d0b]/10 py-3 text-[15px] font-medium !text-[#0d0d0b]/72'
+    ? 'block border-t border-[#fafafa]/10 py-3 text-[15px] font-medium !text-[#fafafa]/74'
+    : 'block border-t border-[#0a0a0a]/10 py-3 text-[15px] font-medium !text-[#0a0a0a]/72'
   const primaryClass = dark
-    ? 'border-[#ede9df] bg-[#ede9df] text-[#20201f]'
-    : 'border-[#0d0d0b] bg-[#0d0d0b] text-[#ede9df]'
+    ? 'border-[#fafafa] bg-[#fafafa] text-[#111111]'
+    : 'border-[#0a0a0a] bg-[#0a0a0a] text-[#fafafa]'
 
   const connectAndClose = () => {
     onConnect?.()
@@ -19,8 +19,8 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
       <div className="fixed inset-0 z-30 md:hidden" onClick={onClose} />
       <div className={`fixed left-0 right-0 top-[61px] z-40 border-b px-6 pb-6 pt-2 shadow-xl md:hidden ${
         dark
-          ? 'border-[#ede9df]/10 bg-[#20201f]'
-          : 'border-[#0d0d0b]/10 bg-[#ede9df]'
+          ? 'border-[#fafafa]/10 bg-[#111111]'
+          : 'border-[#0a0a0a]/10 bg-[#fafafa]'
       }`}>
         {mode === 'app' ? (
           wallet ? (
@@ -44,8 +44,8 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
         {isAdmin && mode !== 'app' && <Link to="/arbiter" className={linkClass} onClick={onClose}>Disputes</Link>}
         <div className={`mt-5 border px-4 py-3 font-mono text-[10px] uppercase tracking-[0.16em] ${
           dark
-            ? 'border-[#d8b15f]/25 bg-[#d8b15f]/[0.08] text-[#d8b15f]'
-            : 'border-[#d8b15f]/25 bg-[#d8b15f]/[0.08] text-[#7f6732]'
+            ? 'border-[#a3a3a3]/25 bg-[#a3a3a3]/[0.08] text-[#a3a3a3]'
+            : 'border-[#a3a3a3]/25 bg-[#a3a3a3]/[0.08] text-[#525252]'
         }`}>Arc Testnet</div>
         {wallet ? (
           <Link to="/create" className={`mt-4 flex h-11 items-center justify-center border text-[14px] font-medium ${primaryClass}`} onClick={onClose}>

@@ -4,16 +4,16 @@ import { getContract } from '../../utils/contract'
 import { formatAddress } from '../../utils/constants'
 
 const EVENT_CONFIG = {
-  RoomCreated: { label: 'Room created', tone: 'bg-[#d8b15f]' },
-  RoomJoined: { label: 'Counterparty joined', tone: 'bg-[#d8b15f]' },
-  RoomFunded: { label: 'Escrow funded', tone: 'bg-[#b7c8a3]' },
-  RoomDelivered: { label: 'Item delivered', tone: 'bg-[#b7c8a3]' },
-  RoomReleased: { label: 'Funds released', tone: 'bg-[#b7c8a3]' },
-  RoomDisputed: { label: 'Dispute opened', tone: 'bg-[#c98b4a]' },
-  RoomRefunded: { label: 'Buyer refunded', tone: 'bg-[#c98b4a]' },
-  RoomExpired: { label: 'Room expired', tone: 'bg-[#ede9df]/36' },
-  RoomCancelled: { label: 'Room cancelled', tone: 'bg-[#ede9df]/36' },
-  DisputeResolved: { label: 'Dispute resolved', tone: 'bg-[#c98b4a]' },
+  RoomCreated: { label: 'Room created', tone: 'bg-[#a3a3a3]' },
+  RoomJoined: { label: 'Counterparty joined', tone: 'bg-[#a3a3a3]' },
+  RoomFunded: { label: 'Escrow funded', tone: 'bg-[#8f9a88]' },
+  RoomDelivered: { label: 'Item delivered', tone: 'bg-[#8f9a88]' },
+  RoomReleased: { label: 'Funds released', tone: 'bg-[#8f9a88]' },
+  RoomDisputed: { label: 'Dispute opened', tone: 'bg-[#b87333]' },
+  RoomRefunded: { label: 'Buyer refunded', tone: 'bg-[#b87333]' },
+  RoomExpired: { label: 'Room expired', tone: 'bg-[#fafafa]/36' },
+  RoomCancelled: { label: 'Room cancelled', tone: 'bg-[#fafafa]/36' },
+  DisputeResolved: { label: 'Dispute resolved', tone: 'bg-[#b87333]' },
 }
 
 function formatTimestamp(ts) {
@@ -84,9 +84,9 @@ export default function RoomHistory({ roomId, provider }) {
   }
 
   if (loading) return (
-    <div className="border border-[#ede9df]/10 bg-[#20201f] p-5">
-      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/40">History</div>
-      <div className="text-[12px] text-[#b9b2a5]">Loading…</div>
+    <div className="border border-[#fafafa]/10 bg-[#111111] p-5">
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#fafafa]/40">History</div>
+      <div className="text-[12px] text-[#a3a3a3]">Loading…</div>
     </div>
   )
 
@@ -100,28 +100,28 @@ export default function RoomHistory({ roomId, provider }) {
   }
 
   return (
-    <div className="border border-[#ede9df]/10 bg-[#20201f] p-5">
-      <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/40">History</div>
+    <div className="border border-[#fafafa]/10 bg-[#111111] p-5">
+      <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[#fafafa]/40">History</div>
       <div className="space-y-5">
         {Object.entries(grouped).map(([date, dayEvents]) => (
           <div key={date}>
-            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#ede9df]/34">{date}</div>
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#fafafa]/34">{date}</div>
             <div className="space-y-0">
               {dayEvents.map((ev, i) => {
-                const config = EVENT_CONFIG[ev.name] || { label: ev.name, tone: 'bg-[#ede9df]/36' }
+                const config = EVENT_CONFIG[ev.name] || { label: ev.name, tone: 'bg-[#fafafa]/36' }
                 const detail = getEventDetail(ev.name, ev.args)
                 return (
                   <div key={i} className="flex items-start gap-3 py-2">
                     <div className="mt-1 flex flex-col items-center">
                       <div className={`h-2 w-2 ${config.tone}`} />
-                      {i < dayEvents.length - 1 && <div className="mt-1 h-5 w-px bg-[#ede9df]/10" />}
+                      {i < dayEvents.length - 1 && <div className="mt-1 h-5 w-px bg-[#fafafa]/10" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-3">
-                        <span className="text-[13px] font-medium text-[#ede9df]">{config.label}</span>
-                        <span className="shrink-0 font-mono text-[10px] text-[#ede9df]/34">{formatTimestamp(ev.timestamp)}</span>
+                        <span className="text-[13px] font-medium text-[#fafafa]">{config.label}</span>
+                        <span className="shrink-0 font-mono text-[10px] text-[#fafafa]/34">{formatTimestamp(ev.timestamp)}</span>
                       </div>
-                      {detail && <div className="mt-1 font-mono text-[11px] text-[#b9b2a5]">{detail}</div>}
+                      {detail && <div className="mt-1 font-mono text-[11px] text-[#a3a3a3]">{detail}</div>}
                     </div>
                   </div>
                 )

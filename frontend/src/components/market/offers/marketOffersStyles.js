@@ -1,6 +1,6 @@
 export const OFFER_STATUS_STYLE = {
-  pending: 'border-[#d8b15f]/35 text-[#d8b15f]',
-  accepted: 'border-[#b7c8a3]/35 text-[#b7c8a3]',
-  declined: 'border-[#c98b4a]/35 text-[#c98b4a]',
-  countered: 'border-[#ede9df]/20 text-[#ede9df]/66',
+  pending: 'border-[#a3a3a3]/35 text-[#a3a3a3]',
+  accepted: 'border-[#8f9a88]/35 text-[#8f9a88]',
+  declined: 'border-[#b87333]/35 text-[#b87333]',
+  countered: 'border-[#fafafa]/20 text-[#fafafa]/66',
 }

@@ -1,5 +1,5 @@
 export default function RoomStatusMessage({ status }) {
   if (!status) return null
-  const tone = status.type === 'ok' ? 'border-[#b7c8a3]/28 bg-[#b7c8a3]/10 text-[#b7c8a3]' : status.type === 'err' ? 'border-[#c98b4a]/35 bg-[#c98b4a]/10 text-[#c98b4a]' : 'border-[#d8b15f]/24 bg-[#d8b15f]/[0.07] text-[#d8b15f]'
+  const tone = status.type === 'ok' ? 'border-[#8f9a88]/28 bg-[#8f9a88]/10 text-[#8f9a88]' : status.type === 'err' ? 'border-[#b87333]/35 bg-[#b87333]/10 text-[#b87333]' : 'border-[#a3a3a3]/24 bg-[#a3a3a3]/[0.07] text-[#a3a3a3]'
   return <div className={`border px-4 py-3 text-[13px] leading-[1.55] ${tone}`}>{status.msg}</div>
 }

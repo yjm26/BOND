@@ -2,7 +2,7 @@ export default function RoomCountdownPanel({ countdown, room }) {
   if (!countdown) return null
   const danger = countdown === 'Expired' || room.state === 'Disputed'
   const warning = room.state === 'Funded' || room.state === 'Delivered'
-  const tone = danger ? 'text-[#c98b4a] border-[#c98b4a]/30 bg-[#c98b4a]/10' : warning ? 'text-[#d8b15f] border-[#d8b15f]/24 bg-[#d8b15f]/[0.07]' : 'text-[#ede9df] border-[#ede9df]/10 bg-[#20201f]'
+  const tone = danger ? 'text-[#b87333] border-[#b87333]/30 bg-[#b87333]/10' : warning ? 'text-[#a3a3a3] border-[#a3a3a3]/24 bg-[#a3a3a3]/[0.07]' : 'text-[#fafafa] border-[#fafafa]/10 bg-[#111111]'
   const label = room.state === 'Funded' ? 'Seller deadline' : room.state === 'Delivered' ? 'Review timeout' : room.state === 'Disputed' ? 'Arbiter status' : 'Deadline'
   return (
     <div className={`border p-5 ${tone}`}>

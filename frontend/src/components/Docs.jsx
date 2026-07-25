@@ -57,21 +57,21 @@ export default function Docs() {
   }[active] || Overview
 
   return (
-    <section className="min-h-screen bg-[#ede9df] px-4 pb-24 pt-[92px] text-[#171716] sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-[#fafafa] px-4 pb-24 pt-[92px] text-[#0a0a0a] sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1180px]">
-        <header className="border-b border-[#171716]/14 pb-8 sm:pb-10">
-          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#6f6b62]">BOND docs</div>
+        <header className="border-b border-[#0a0a0a]/14 pb-8 sm:pb-10">
+          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">BOND docs</div>
           <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
             <h1 className="max-w-[780px] text-[clamp(48px,8vw,104px)] font-medium leading-[0.86] tracking-[-0.09em]">
               The current room system, without the old ceremony.
             </h1>
-            <p className="max-w-[380px] text-[15px] leading-[1.7] tracking-[-0.01em] text-[#5f5a50] lg:justify-self-end">
+            <p className="max-w-[380px] text-[15px] leading-[1.7] tracking-[-0.01em] text-[#525252] lg:justify-self-end">
               BOND changed. These docs describe the live BoundTestnet flow: no deal types, no review presets, fast buyer settlement, and a fixed arbiter fallback when someone goes silent.
             </p>
           </div>
         </header>
 
-        <div className="sticky top-[60px] z-20 -mx-4 border-b border-[#171716]/12 bg-[#ede9df]/94 px-4 py-3 backdrop-blur md:hidden">
+        <div className="sticky top-[60px] z-20 -mx-4 border-b border-[#0a0a0a]/12 bg-[#fafafa]/94 px-4 py-3 backdrop-blur md:hidden">
           <div className="flex gap-2 overflow-x-auto">
             {SECTIONS.map((item) => <NavPill key={item.id} item={item} active={active === item.id} />)}
           </div>
@@ -79,8 +79,8 @@ export default function Docs() {
 
         <div className="grid gap-10 pt-8 md:grid-cols-[220px_1fr] lg:gap-14">
           <aside className="hidden md:block">
-            <nav className="sticky top-[96px] border-l border-[#171716]/14 pl-4">
-              <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-[#6f6b62]">Sections</div>
+            <nav className="sticky top-[96px] border-l border-[#0a0a0a]/14 pl-4">
+              <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-[#737373]">Sections</div>
               <div className="grid gap-1">
                 {SECTIONS.map((item) => <SideLink key={item.id} item={item} active={active === item.id} />)}
               </div>
@@ -100,7 +100,7 @@ function NavPill({ item, active }) {
   return (
     <Link
       to={`/docs/${item.id}`}
-      className={`shrink-0 border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] transition ${active ? 'border-[#171716] bg-[#171716] text-[#ede9df]' : 'border-[#171716]/14 text-[#5f5a50] hover:border-[#171716]/38'}`}
+      className={`shrink-0 border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] transition ${active ? 'border-[#0a0a0a] bg-[#0a0a0a] text-[#fafafa]' : 'border-[#0a0a0a]/14 text-[#525252] hover:border-[#0a0a0a]/38'}`}
     >
       {item.label}
     </Link>
@@ -111,7 +111,7 @@ function SideLink({ item, active }) {
   return (
     <Link
       to={`/docs/${item.id}`}
-      className={`block px-3 py-2 text-[14px] tracking-[-0.01em] transition ${active ? 'bg-[#171716] text-[#ede9df]' : 'text-[#5f5a50] hover:bg-[#171716]/[0.04] hover:text-[#171716]'}`}
+      className={`block px-3 py-2 text-[14px] tracking-[-0.01em] transition ${active ? 'bg-[#0a0a0a] text-[#fafafa]' : 'text-[#525252] hover:bg-[#0a0a0a]/[0.04] hover:text-[#0a0a0a]'}`}
     >
       {item.label}
     </Link>
@@ -121,42 +121,42 @@ function SideLink({ item, active }) {
 function Section({ eyebrow, title, intro, children }) {
   return (
     <article className="animate-page-enter">
-      <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">{eyebrow}</div>
+      <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#a3a3a3]">{eyebrow}</div>
       <h2 className="mt-4 max-w-[760px] text-[clamp(36px,5vw,68px)] font-medium leading-[0.92] tracking-[-0.075em]">
         {title}
       </h2>
-      {intro && <p className="mt-5 max-w-[680px] text-[16px] leading-[1.72] tracking-[-0.01em] text-[#5f5a50]">{intro}</p>}
+      {intro && <p className="mt-5 max-w-[680px] text-[16px] leading-[1.72] tracking-[-0.01em] text-[#525252]">{intro}</p>}
       <div className="mt-8 space-y-8">{children}</div>
     </article>
   )
 }
 
 function H3({ children }) {
-  return <h3 className="mb-3 text-[24px] font-medium leading-[1] tracking-[-0.055em] text-[#171716] sm:text-[30px]">{children}</h3>
+  return <h3 className="mb-3 text-[24px] font-medium leading-[1] tracking-[-0.055em] text-[#0a0a0a] sm:text-[30px]">{children}</h3>
 }
 
 function P({ children }) {
-  return <p className="max-w-[700px] text-[14px] leading-[1.72] tracking-[-0.01em] text-[#5f5a50] sm:text-[15px]">{children}</p>
+  return <p className="max-w-[700px] text-[14px] leading-[1.72] tracking-[-0.01em] text-[#525252] sm:text-[15px]">{children}</p>
 }
 
 function Code({ children }) {
-  return <code className="border border-[#171716]/14 bg-[#f4f0e7] px-1.5 py-0.5 font-mono text-[12px] text-[#171716]">{children}</code>
+  return <code className="border border-[#0a0a0a]/14 bg-[#f5f5f5] px-1.5 py-0.5 font-mono text-[12px] text-[#0a0a0a]">{children}</code>
 }
 
 function Card({ children, tone = 'paper' }) {
   const style = tone === 'dark'
-    ? 'border-[#ede9df]/12 bg-[#20201f] text-[#ede9df]'
-    : 'border-[#171716]/14 bg-[#f4f0e7] text-[#171716]'
+    ? 'border-[#fafafa]/12 bg-[#111111] text-[#fafafa]'
+    : 'border-[#0a0a0a]/14 bg-[#f5f5f5] text-[#0a0a0a]'
   return <div className={`border p-5 sm:p-6 ${style}`}>{children}</div>
 }
 
 function FactGrid({ items }) {
   return (
-    <div className="grid border border-[#171716]/14 md:grid-cols-2">
+    <div className="grid border border-[#0a0a0a]/14 md:grid-cols-2">
       {items.map(([label, body], index) => (
-        <div key={label} className={`bg-[#f4f0e7] p-5 sm:p-6 ${index > 0 ? 'border-t border-[#171716]/14 md:border-t-0' : ''} ${index % 2 ? 'md:border-l md:border-[#171716]/14' : ''} ${index > 1 ? 'md:border-t md:border-[#171716]/14' : ''}`}>
-          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#6f6b62]">{label}</div>
-          <p className="mt-4 text-[14px] leading-[1.65] tracking-[-0.01em] text-[#4f4a42]">{body}</p>
+        <div key={label} className={`bg-[#f5f5f5] p-5 sm:p-6 ${index > 0 ? 'border-t border-[#0a0a0a]/14 md:border-t-0' : ''} ${index % 2 ? 'md:border-l md:border-[#0a0a0a]/14' : ''} ${index > 1 ? 'md:border-t md:border-[#0a0a0a]/14' : ''}`}>
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#737373]">{label}</div>
+          <p className="mt-4 text-[14px] leading-[1.65] tracking-[-0.01em] text-[#525252]">{body}</p>
         </div>
       ))}
     </div>
@@ -165,19 +165,19 @@ function FactGrid({ items }) {
 
 function Table({ headers, rows }) {
   return (
-    <div className="overflow-hidden border border-[#171716]/14 bg-[#f4f0e7]">
+    <div className="overflow-hidden border border-[#0a0a0a]/14 bg-[#f5f5f5]">
       <table className="w-full text-left text-[13px]">
         <thead>
-          <tr className="border-b border-[#171716]/14 bg-[#171716]/[0.04]">
+          <tr className="border-b border-[#0a0a0a]/14 bg-[#0a0a0a]/[0.04]">
             {headers.map((header) => (
-              <th key={header} className="px-4 py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f6b62]">{header}</th>
+              <th key={header} className="px-4 py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">{header}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, index) => (
-            <tr key={index} className="border-t border-[#171716]/10 first:border-t-0">
-              {row.map((cell, cellIndex) => <td key={cellIndex} className="px-4 py-3 align-top text-[#312f2a]">{cell}</td>)}
+            <tr key={index} className="border-t border-[#0a0a0a]/10 first:border-t-0">
+              {row.map((cell, cellIndex) => <td key={cellIndex} className="px-4 py-3 align-top text-[#262626]">{cell}</td>)}
             </tr>
           ))}
         </tbody>
@@ -188,7 +188,7 @@ function Table({ headers, rows }) {
 
 function Callout({ title, children, danger = false }) {
   return (
-    <div className={`border px-4 py-3 ${danger ? 'border-[#c98b4a]/35 bg-[#c98b4a]/10 text-[#6b3f17]' : 'border-[#d8b15f]/30 bg-[#d8b15f]/[0.09] text-[#5e4b21]'}`}>
+    <div className={`border px-4 py-3 ${danger ? 'border-[#b87333]/35 bg-[#b87333]/10 text-[#44403c]' : 'border-[#a3a3a3]/30 bg-[#a3a3a3]/[0.09] text-[#404040]'}`}>
       <div className="font-mono text-[10px] uppercase tracking-[0.2em]">{title}</div>
       <div className="mt-2 text-[13px] leading-[1.65] tracking-[-0.01em]">{children}</div>
     </div>
@@ -211,10 +211,10 @@ function Overview() {
 
       <Card>
         <H3>Live deployment</H3>
-        <div className="grid gap-3 text-[14px] text-[#4f4a42]">
-          <div><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f6b62]">Contract</span><br /><Code>{CONTRACT_ADDRESS}</Code></div>
-          <div><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f6b62]">Explorer</span><br /><a className="underline decoration-[#171716]/25 underline-offset-4 hover:decoration-[#171716]" href={`https://testnet.arcscan.app/address/${CONTRACT_ADDRESS}`} target="_blank" rel="noreferrer">ArcScan verified code</a></div>
-          <div><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f6b62]">USDC</span><br /><Code>{USDC_ADDRESS}</Code></div>
+        <div className="grid gap-3 text-[14px] text-[#525252]">
+          <div><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">Contract</span><br /><Code>{CONTRACT_ADDRESS}</Code></div>
+          <div><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">Explorer</span><br /><a className="underline decoration-[#0a0a0a]/25 underline-offset-4 hover:decoration-[#0a0a0a]" href={`https://testnet.arcscan.app/address/${CONTRACT_ADDRESS}`} target="_blank" rel="noreferrer">ArcScan verified code</a></div>
+          <div><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">USDC</span><br /><Code>{USDC_ADDRESS}</Code></div>
         </div>
       </Card>
 
@@ -238,7 +238,7 @@ function Rooms() {
         <H3>Room lifecycle</H3>
         <Table
           headers={['State', 'Meaning']}
-          rows={STATES.map(([state, meaning]) => [<span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#171716]">{state}</span>, meaning])}
+          rows={STATES.map(([state, meaning]) => [<span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#0a0a0a]">{state}</span>, meaning])}
         />
       </Card>
 
@@ -436,21 +436,21 @@ function FAQ() {
 
 function SmallFact({ label, value }) {
   return (
-    <div className="border border-[#171716]/12 bg-[#ede9df] p-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f6b62]">{label}</div>
-      <div className="mt-2 text-[18px] font-medium tracking-[-0.04em] text-[#171716]">{value}</div>
+    <div className="border border-[#0a0a0a]/12 bg-[#fafafa] p-4">
+      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">{label}</div>
+      <div className="mt-2 text-[18px] font-medium tracking-[-0.04em] text-[#0a0a0a]">{value}</div>
     </div>
   )
 }
 
 function Faq({ q, children }) {
   return (
-    <details className="group border border-[#171716]/14 bg-[#f4f0e7] p-4 open:bg-[#f1ecdf]">
-      <summary className="cursor-pointer list-none text-[16px] font-medium tracking-[-0.035em] text-[#171716]">
+    <details className="group border border-[#0a0a0a]/14 bg-[#f5f5f5] p-4 open:bg-[#f5f5f5]">
+      <summary className="cursor-pointer list-none text-[16px] font-medium tracking-[-0.035em] text-[#0a0a0a]">
         {q}
-        <span className="float-right font-mono text-[11px] text-[#6f6b62] transition group-open:rotate-45">+</span>
+        <span className="float-right font-mono text-[11px] text-[#737373] transition group-open:rotate-45">+</span>
       </summary>
-      <div className="mt-3 text-[14px] leading-[1.7] tracking-[-0.01em] text-[#5f5a50]">{children}</div>
+      <div className="mt-3 text-[14px] leading-[1.7] tracking-[-0.01em] text-[#525252]">{children}</div>
     </details>
   )
 }

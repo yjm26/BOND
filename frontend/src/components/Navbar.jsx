@@ -58,8 +58,8 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
   return (
     <nav className={`fixed inset-x-0 top-0 z-50 px-4 py-3 sm:px-6 lg:px-10 ${
       isDarkHeader
-        ? 'border-b border-[#ede9df]/12 bg-[#20201f]'
-        : 'border-b border-[#0d0d0b]/10 bg-[#ede9df]'
+        ? 'border-b border-[#fafafa]/12 bg-[#111111]'
+        : 'border-b border-[#0a0a0a]/10 bg-[#fafafa]'
     }`}>
       <div className="flex items-center justify-between">
         <HeaderBrand tone={isDarkHeader ? 'dark' : 'light'} to={isDisconnectedAppRoute ? '/' : (isAppRoute ? '/app' : '/')} hideSubtitle={isDisconnectedAppRoute} bareMark={isDisconnectedAppRoute} />
@@ -80,8 +80,8 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
         {!isDisconnectedAppRoute && <button
           className={`flex h-9 w-9 items-center justify-center border md:hidden ${
             isDarkHeader
-              ? 'border-[#ede9df]/16 bg-[#ede9df]/8 text-[#ede9df]'
-              : 'border-[#0d0d0b]/14 bg-[#ede9df]/70 text-[#0d0d0b]'
+              ? 'border-[#fafafa]/16 bg-[#fafafa]/8 text-[#fafafa]'
+              : 'border-[#0a0a0a]/14 bg-[#fafafa]/70 text-[#0a0a0a]'
           }`}
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Open navigation"

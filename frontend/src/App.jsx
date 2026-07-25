@@ -59,11 +59,11 @@ function DisconnectRedirect({ tick }) {
 function DisconnectOverlay({ active }) {
   if (!active) return null
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-[#050505]/88 px-6 text-[#ede9df] backdrop-blur-md animate-page-enter">
-      <div className="w-full max-w-[420px] border border-[#ede9df]/12 bg-[#20201f] p-6 text-center shadow-2xl">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border border-[#ede9df]/14 border-t-[#d8b15f]" />
-        <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.24em] text-[#d8b15f]">Closing wallet session</div>
-        <p className="mt-3 text-[15px] leading-[1.55] text-[#ede9df]/72">Clearing the workspace and returning to the app gate.</p>
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-[#000000]/88 px-6 text-[#fafafa] backdrop-blur-md animate-page-enter">
+      <div className="w-full max-w-[420px] border border-[#fafafa]/12 bg-[#111111] p-6 text-center shadow-2xl">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border border-[#fafafa]/14 border-t-[#a3a3a3]" />
+        <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.24em] text-[#a3a3a3]">Closing wallet session</div>
+        <p className="mt-3 text-[15px] leading-[1.55] text-[#fafafa]/72">Clearing the workspace and returning to the app gate.</p>
       </div>
     </div>
   )

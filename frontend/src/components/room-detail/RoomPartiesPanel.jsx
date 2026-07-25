@@ -20,17 +20,17 @@ export default function RoomPartiesPanel({ room, isCreator, isCounter, creatorRe
   }, [room.creator, room.counterparty])
 
   return (
-    <div className="border border-[#ede9df]/10 bg-[#20201f] p-5">
-      <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[#ede9df]/40">Parties</div>
+    <div className="border border-[#fafafa]/10 bg-[#111111] p-5">
+      <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[#fafafa]/40">Parties</div>
       <div className="grid gap-3">
         <PartyCard label="Creator" address={room.creator} role={room.creatorIsSeller ? 'Seller' : 'Buyer'} isYou={isCreator} reputation={creatorRep} profile={creatorProfile} />
         {room.counterparty !== '0x0000000000000000000000000000000000000000' ? (
           <PartyCard label="Counterparty" address={room.counterparty} role={room.creatorIsSeller ? 'Buyer' : 'Seller'} isYou={isCounter} reputation={counterpartyRep} profile={counterpartyProfile} />
         ) : (
-          <div className="border border-dashed border-[#ede9df]/14 bg-[#111110] p-4 text-[13px] text-[#b9b2a5]">Waiting for counterparty to join…</div>
+          <div className="border border-dashed border-[#fafafa]/14 bg-[#0a0a0a] p-4 text-[13px] text-[#a3a3a3]">Waiting for counterparty to join…</div>
         )}
       </div>
-      <div className="mt-4 border-t border-[#ede9df]/10 pt-4 text-[13px] text-[#b9b2a5]">Your role: <span className="text-[#ede9df]">{role || 'Viewer'}</span></div>
+      <div className="mt-4 border-t border-[#fafafa]/10 pt-4 text-[13px] text-[#a3a3a3]">Your role: <span className="text-[#fafafa]">{role || 'Viewer'}</span></div>
     </div>
   )
 }

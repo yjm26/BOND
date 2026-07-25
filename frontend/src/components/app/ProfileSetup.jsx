@@ -37,7 +37,7 @@ export default function ProfileSetup({ wallet, onComplete }) {
   }
 
   return (
-    <section className="relative min-h-screen bg-[#20201f] px-6 pt-6 text-[#ede9df] sm:px-10 lg:px-14">
+    <section className="relative min-h-screen bg-[#111111] px-6 pt-6 text-[#fafafa] sm:px-10 lg:px-14">
       <div className="mb-6 sm:mb-8">
         <AppBackToLanding />
       </div>

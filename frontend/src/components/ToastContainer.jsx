@@ -13,9 +13,9 @@ const ICONS = {
 }
 
 const STYLES = {
-  ok:   'border-[#b7c8a3]/32 bg-[#111110]/96 text-[#b7c8a3]',
-  err:  'border-[#c98b4a]/38 bg-[#111110]/96 text-[#c98b4a]',
-  info: 'border-[#d8b15f]/30 bg-[#111110]/96 text-[#d8b15f]',
+  ok:   'border-[#8f9a88]/32 bg-[#0a0a0a]/96 text-[#8f9a88]',
+  err:  'border-[#b87333]/38 bg-[#0a0a0a]/96 text-[#b87333]',
+  info: 'border-[#a3a3a3]/30 bg-[#0a0a0a]/96 text-[#a3a3a3]',
 }
 
 export default function ToastContainer() {

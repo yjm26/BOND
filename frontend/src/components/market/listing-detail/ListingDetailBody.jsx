@@ -16,13 +16,13 @@ export default function ListingDetailBody({ listing, wallet }) {
       <div className="grid content-start gap-3">
         <ListingPriceRow listing={listing} />
         <ListingDelivery deliveryDays={listing.deliveryDays} />
-        <div className="flex items-center justify-between border border-[#ede9df]/10 bg-[#20201f]/55 px-3 py-2.5">
-          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#ede9df]/34">Listing expiry</span>
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#ede9df]">{listingExpiryLabel(listing)}</span>
+        <div className="flex items-center justify-between border border-[#fafafa]/10 bg-[#111111]/55 px-3 py-2.5">
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#fafafa]/34">Listing expiry</span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#fafafa]">{listingExpiryLabel(listing)}</span>
         </div>
-        <div className="border border-[#d8b15f]/16 bg-[#d8b15f]/[0.045] p-3">
-          <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#d8b15f]">Settlement path</div>
-          <p className="mt-1.5 text-[12px] leading-[1.45] text-[#d8d1c2]">
+        <div className="border border-[#a3a3a3]/16 bg-[#a3a3a3]/[0.045] p-3">
+          <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#a3a3a3]">Settlement path</div>
+          <p className="mt-1.5 text-[12px] leading-[1.45] text-[#e5e5e5]">
             Buyer can settle or dispute after delivery. Seller fallback opens after the fixed 12h buffer.
           </p>
         </div>
