@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import AppHomeActionGrid from './home/AppHomeActionGrid'
+import AppHomeOpenRooms from './home/AppHomeOpenRooms'
 import AppHomeProfilePanel from './home/AppHomeProfilePanel'
 import AppHomeSidebar from './home/AppHomeSidebar'
 import useDisputeAccess from './useDisputeAccess'
@@ -47,6 +48,7 @@ export default function AppHome({ wallet, profile }) {
           </div>
 
           <AppHomeActionGrid actions={actions} />
+          <AppHomeOpenRooms wallet={wallet} />
         </main>
       </div>
     </section>
