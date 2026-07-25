@@ -6,7 +6,7 @@ export default function MobileNavMenu({ wallet, isAdmin, tone = 'light', mode = 
     ? 'block border-t border-[#fafafa]/10 py-3 text-[15px] font-medium !text-[#fafafa]/74'
     : 'block border-t border-[#0a0a0a]/10 py-3 text-[15px] font-medium !text-[#0a0a0a]/72'
   const primaryClass = dark
-    ? 'border-[#fafafa] bg-[#fafafa] text-[var(--a-inverse-ink,#0a0a0a)]'
+    ? 'border-[#fafafa] bg-[#fafafa] text-[var(--a-inverse-ink)]'
     : 'border-[#0a0a0a] bg-[#0a0a0a] text-[#fafafa]'
 
   const connectAndClose = () => {

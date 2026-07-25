@@ -188,7 +188,7 @@ export default function HeroRoomDemo() {
                 {room.actionNote}
               </div>
               <div className="mt-3 flex flex-col gap-2.5">
-                <div className="flex h-11 items-center justify-center border border-[#fafafa] bg-[#fafafa] px-4 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)]">
+                <div className="flex h-11 items-center justify-center border border-[#fafafa] bg-[#fafafa] px-4 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)]">
                   {room.primaryAction}
                 </div>
                 {room.secondaryAction && (

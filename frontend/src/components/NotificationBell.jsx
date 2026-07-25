@@ -41,15 +41,15 @@ export default function NotificationBell({ wallet, tone = 'dark' }) {
   if (!wallet) return null
 
   const triggerClass = dark
-    ? 'text-[var(--a-ink,#fafafa)]/50 hover:text-[var(--a-ink,#fafafa)]'
-    : 'text-[var(--a-inverse-ink,#0a0a0a)]/50 hover:text-[var(--a-inverse-ink,#0a0a0a)]'
+    ? 'text-[var(--a-ink)]/50 hover:text-[var(--a-ink)]'
+    : 'text-[var(--a-inverse-ink)]/50 hover:text-[var(--a-inverse-ink)]'
   const panelClass = dark
-    ? 'border-[var(--a-line)] bg-[var(--a-surface,#111111)] text-[var(--a-ink,#fafafa)]'
-    : 'border-[#0a0a0a]/12 bg-[var(--a-inverse-bg,#fafafa)] text-[var(--a-inverse-ink,#0a0a0a)]'
+    ? 'border-[var(--a-line)] bg-[var(--a-surface)] text-[var(--a-ink)]'
+    : 'border-[#0a0a0a]/12 bg-[var(--a-inverse-bg)] text-[var(--a-inverse-ink)]'
   const borderClass = dark ? 'border-[var(--a-line)]' : 'border-[#0a0a0a]/10'
-  const muted = dark ? 'text-[var(--a-muted,#a3a3a3)]' : 'text-[var(--a-faint,#737373)]'
-  const rowUnread = dark ? 'bg-[var(--a-inverse-bg,#fafafa)]/4' : 'bg-[var(--a-panel,#0a0a0a)]/[0.03]'
-  const rowText = dark ? 'text-[var(--a-ink,#fafafa)]/88' : 'text-[var(--a-inverse-ink,#0a0a0a)]/80'
+  const muted = dark ? 'text-[var(--a-muted)]' : 'text-[var(--a-faint)]'
+  const rowUnread = dark ? 'bg-[var(--a-inverse-bg)]/4' : 'bg-[var(--a-panel)]/[0.03]'
+  const rowText = dark ? 'text-[var(--a-ink)]/88' : 'text-[var(--a-inverse-ink)]/80'
 
   return (
     <div className="relative">
@@ -65,7 +65,7 @@ export default function NotificationBell({ wallet, tone = 'dark' }) {
           <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center border border-[#0a0a0a] bg-[var(--a-inverse-bg,#fafafa)] font-mono text-[9px] font-bold text-[var(--a-inverse-ink,#0a0a0a)]">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center border border-[#0a0a0a] bg-[var(--a-inverse-bg)] font-mono text-[9px] font-bold text-[var(--a-inverse-ink)]">
             {unread > 9 ? '9+' : unread}
           </span>
         )}

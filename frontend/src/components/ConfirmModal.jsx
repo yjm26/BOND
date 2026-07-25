@@ -14,22 +14,22 @@ export default function ConfirmModal({
 
   const dark = tone === 'dark'
   const panelClass = dark
-    ? 'border-[var(--a-line)] bg-[var(--a-surface,#111111)] text-[var(--a-ink,#fafafa)]'
-    : 'border-[#0a0a0a]/14 bg-[var(--a-inverse-bg,#fafafa)] text-[var(--a-inverse-ink,#0a0a0a)]'
-  const mutedText = dark ? 'text-[var(--a-muted,#a3a3a3)]' : 'text-[var(--a-muted,#525252)]'
-  const subtleText = dark ? 'text-[color:var(--a-faint)]' : 'text-[var(--a-inverse-ink,#0a0a0a)]/44'
+    ? 'border-[var(--a-line)] bg-[var(--a-surface)] text-[var(--a-ink)]'
+    : 'border-[#0a0a0a]/14 bg-[var(--a-inverse-bg)] text-[var(--a-inverse-ink)]'
+  const mutedText = dark ? 'text-[var(--a-muted)]' : 'text-[var(--a-muted)]'
+  const subtleText = dark ? 'text-[color:var(--a-faint)]' : 'text-[var(--a-inverse-ink)]/44'
   const cancelButton = dark
-    ? 'border-[var(--a-line)] text-[color:var(--a-soft)] hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)] active:scale-[0.97]'
-    : 'border-[#0a0a0a]/14 text-[var(--a-inverse-ink,#0a0a0a)]/70 hover:border-[#0a0a0a]/34 hover:text-[var(--a-inverse-ink,#0a0a0a)] active:scale-[0.97]'
+    ? 'border-[var(--a-line)] text-[color:var(--a-soft)] hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)] active:scale-[0.97]'
+    : 'border-[#0a0a0a]/14 text-[var(--a-inverse-ink)]/70 hover:border-[#0a0a0a]/34 hover:text-[var(--a-inverse-ink)] active:scale-[0.97]'
   // Stark mono: danger is copy/priority, not clay/gold fill.
   const confirmButton = dark
-    ? 'border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] text-[var(--a-inverse-ink,#0a0a0a)] hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] active:scale-[0.97]'
-    : 'border-[#0a0a0a] bg-[var(--a-panel,#0a0a0a)] text-[var(--a-ink,#fafafa)] hover:bg-transparent hover:text-[var(--a-inverse-ink,#0a0a0a)] active:scale-[0.97]'
-  const eyebrowClass = danger ? (dark ? 'text-[var(--a-muted,#a3a3a3)]' : 'text-[var(--a-muted,#525252)]') : subtleText
+    ? 'border-[var(--a-ink)] bg-[var(--a-inverse-bg)] text-[var(--a-inverse-ink)] hover:bg-transparent hover:text-[var(--a-ink)] active:scale-[0.97]'
+    : 'border-[#0a0a0a] bg-[var(--a-panel)] text-[var(--a-ink)] hover:bg-transparent hover:text-[var(--a-inverse-ink)] active:scale-[0.97]'
+  const eyebrowClass = danger ? (dark ? 'text-[var(--a-muted)]' : 'text-[var(--a-muted)]') : subtleText
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-6" role="dialog" aria-modal="true">
-      <button className="absolute inset-0 cursor-default bg-[var(--a-bg,#000000)]/70 backdrop-blur-sm" aria-label="Close confirmation" onClick={onCancel} />
+      <button className="absolute inset-0 cursor-default bg-[var(--a-bg)]/70 backdrop-blur-sm" aria-label="Close confirmation" onClick={onCancel} />
       <div className={`relative w-full max-w-[460px] border p-5 shadow-2xl sm:p-6 ${panelClass}`}>
         <div className={`font-mono text-[10px] uppercase tracking-[0.24em] ${eyebrowClass}`}>{eyebrow}</div>
         <h2 className="mt-5 max-w-[360px] text-[34px] font-medium leading-[0.94] tracking-[-0.06em]">

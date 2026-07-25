@@ -51,7 +51,7 @@ export default function OfferModal({ listing, wallet, onClose, onSubmitted }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-[var(--a-surface,#111111)] rounded-lg border border-zinc-200 dark:border-white/10 shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-[var(--a-surface)] rounded-lg border border-zinc-200 dark:border-white/10 shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
 
         {/* Header */}
         <div className="p-5 border-b border-zinc-100 dark:border-white/10">
@@ -117,7 +117,7 @@ export default function OfferModal({ listing, wallet, onClose, onSubmitted }) {
             <button onClick={onClose} className="flex-1 py-2.5 rounded border border-zinc-200 dark:border-white/10 text-[13px] text-zinc-600 dark:text-gray-400 hover:bg-zinc-50 dark:hover:bg-white/5 transition">
               Cancel
             </button>
-            <button onClick={handleSubmit} disabled={!price || submitting} className={`flex-1 py-2.5 rounded text-[13px] font-medium transition disabled:opacity-40 ${isAccepting ? 'bg-zinc-900 dark:bg-white text-white dark:text-[var(--a-inverse-ink,#0a0a0a)] hover:bg-zinc-800 dark:hover:bg-gray-200' : 'bg-zinc-900 dark:bg-white text-white dark:text-[var(--a-inverse-ink,#0a0a0a)] hover:bg-zinc-800 dark:hover:bg-gray-200'}`}>
+            <button onClick={handleSubmit} disabled={!price || submitting} className={`flex-1 py-2.5 rounded text-[13px] font-medium transition disabled:opacity-40 ${isAccepting ? 'bg-zinc-900 dark:bg-white text-white dark:text-[var(--a-inverse-ink)] hover:bg-zinc-800 dark:hover:bg-gray-200' : 'bg-zinc-900 dark:bg-white text-white dark:text-[var(--a-inverse-ink)] hover:bg-zinc-800 dark:hover:bg-gray-200'}`}>
               {submitting ? 'Sending…' : isAccepting ? `Accept at ${listing.price} USDC →` : `Send Counter Offer →`}
             </button>
           </div>

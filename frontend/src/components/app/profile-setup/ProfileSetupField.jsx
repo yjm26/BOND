@@ -1,10 +1,10 @@
 export default function ProfileSetupField({ step, value, onChange }) {
   return (
     <>
-      <h2 className="mt-12 max-w-[380px] text-[42px] font-medium leading-[0.94] tracking-[-0.07em] text-[var(--a-ink,#fafafa)]">
+      <h2 className="mt-12 max-w-[380px] text-[42px] font-medium leading-[0.94] tracking-[-0.07em] text-[var(--a-ink)]">
         {step.title}
       </h2>
-      <p className="mt-4 max-w-[380px] text-[14px] leading-[1.65] text-[var(--a-muted,#a3a3a3)]">
+      <p className="mt-4 max-w-[380px] text-[14px] leading-[1.65] text-[var(--a-muted)]">
         {step.helper}
       </p>
       <label className="mt-10 block">
@@ -15,7 +15,7 @@ export default function ProfileSetupField({ step, value, onChange }) {
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={step.placeholder}
-          className="mt-3 h-12 w-full border border-[var(--a-line)] bg-[var(--a-surface,#111111)] px-4 text-[15px] text-[var(--a-ink,#fafafa)] outline-none transition placeholder:text-[var(--a-ink,#fafafa)]/28 focus:border-[var(--a-muted,#a3a3a3)]/70"
+          className="mt-3 h-12 w-full border border-[var(--a-line)] bg-[var(--a-surface)] px-4 text-[15px] text-[var(--a-ink)] outline-none transition placeholder:text-[var(--a-ink)]/28 focus:border-[var(--a-muted)]/70"
         />
       </label>
     </>

@@ -1,5 +1,13 @@
 export default function RoleSelector({ creatorIsSeller, fromMarket, onSeller, onBuyer }) {
-  const roleClass = (active) => `border p-4 text-left transition ${active ? 'border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] text-[var(--a-inverse-ink,#0a0a0a)]' : 'border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] text-[color:var(--a-muted)] hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]'} ${fromMarket ? 'cursor-not-allowed opacity-60' : ''}`
+  const roleClass = (active) =>
+    [
+      'border p-4 text-left transition duration-160 ease-out',
+      active
+        ? 'border-[var(--a-ink)] bg-[var(--a-panel)] text-[var(--a-ink)] shadow-[inset_0_0_0_1px_var(--a-ink)]'
+        : 'border-[var(--a-line)] bg-[var(--a-panel)] text-[var(--a-muted)] hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)]',
+      fromMarket ? 'cursor-not-allowed opacity-60' : 'active:scale-[0.99]',
+    ].join(' ')
+
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <button type="button" onClick={onSeller} disabled={fromMarket} className={roleClass(creatorIsSeller)}>

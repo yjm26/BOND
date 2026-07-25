@@ -4,15 +4,15 @@ import { getContract } from '../../utils/contract'
 import { formatAddress } from '../../utils/constants'
 
 const EVENT_CONFIG = {
-  RoomCreated: { label: 'Room created', tone: 'bg-[var(--a-muted,#a3a3a3)]' },
-  RoomJoined: { label: 'Counterparty joined', tone: 'bg-[var(--a-muted,#a3a3a3)]' },
+  RoomCreated: { label: 'Room created', tone: 'bg-[var(--a-muted)]' },
+  RoomJoined: { label: 'Counterparty joined', tone: 'bg-[var(--a-muted)]' },
   RoomFunded: { label: 'Escrow funded', tone: 'bg-[#8f9a88]' },
   RoomDelivered: { label: 'Item delivered', tone: 'bg-[#8f9a88]' },
   RoomReleased: { label: 'Funds released', tone: 'bg-[#8f9a88]' },
   RoomDisputed: { label: 'Dispute opened', tone: 'bg-[#b87333]' },
   RoomRefunded: { label: 'Buyer refunded', tone: 'bg-[#b87333]' },
-  RoomExpired: { label: 'Room expired', tone: 'bg-[var(--a-inverse-bg,#fafafa)]/36' },
-  RoomCancelled: { label: 'Room cancelled', tone: 'bg-[var(--a-inverse-bg,#fafafa)]/36' },
+  RoomExpired: { label: 'Room expired', tone: 'bg-[var(--a-inverse-bg)]/36' },
+  RoomCancelled: { label: 'Room cancelled', tone: 'bg-[var(--a-inverse-bg)]/36' },
   DisputeResolved: { label: 'Dispute resolved', tone: 'bg-[#b87333]' },
 }
 
@@ -84,9 +84,9 @@ export default function RoomHistory({ roomId, provider }) {
   }
 
   if (loading) return (
-    <div className="border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-5">
-      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink,#fafafa)]/40">History</div>
-      <div className="text-[12px] text-[var(--a-muted,#a3a3a3)]">Loading…</div>
+    <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">History</div>
+      <div className="text-[12px] text-[var(--a-muted)]">Loading…</div>
     </div>
   )
 
@@ -100,28 +100,28 @@ export default function RoomHistory({ roomId, provider }) {
   }
 
   return (
-    <div className="border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-5">
-      <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink,#fafafa)]/40">History</div>
+    <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
+      <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">History</div>
       <div className="space-y-5">
         {Object.entries(grouped).map(([date, dayEvents]) => (
           <div key={date}>
             <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--a-faint)]">{date}</div>
             <div className="space-y-0">
               {dayEvents.map((ev, i) => {
-                const config = EVENT_CONFIG[ev.name] || { label: ev.name, tone: 'bg-[var(--a-inverse-bg,#fafafa)]/36' }
+                const config = EVENT_CONFIG[ev.name] || { label: ev.name, tone: 'bg-[var(--a-inverse-bg)]/36' }
                 const detail = getEventDetail(ev.name, ev.args)
                 return (
                   <div key={i} className="flex items-start gap-3 py-2">
                     <div className="mt-1 flex flex-col items-center">
                       <div className={`h-2 w-2 ${config.tone}`} />
-                      {i < dayEvents.length - 1 && <div className="mt-1 h-5 w-px bg-[var(--a-inverse-bg,#fafafa)]/10" />}
+                      {i < dayEvents.length - 1 && <div className="mt-1 h-5 w-px bg-[var(--a-inverse-bg)]/10" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-3">
-                        <span className="text-[13px] font-medium text-[var(--a-ink,#fafafa)]">{config.label}</span>
+                        <span className="text-[13px] font-medium text-[var(--a-ink)]">{config.label}</span>
                         <span className="shrink-0 font-mono text-[10px] text-[color:var(--a-faint)]">{formatTimestamp(ev.timestamp)}</span>
                       </div>
-                      {detail && <div className="mt-1 font-mono text-[11px] text-[var(--a-muted,#a3a3a3)]">{detail}</div>}
+                      {detail && <div className="mt-1 font-mono text-[11px] text-[var(--a-muted)]">{detail}</div>}
                     </div>
                   </div>
                 )

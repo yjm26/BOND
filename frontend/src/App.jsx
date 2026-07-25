@@ -19,6 +19,7 @@ import ProfilePage from './pages/ProfilePage'
 import RoomDetailPage from './pages/RoomDetailPage'
 import RoomsIndexPage from './pages/RoomsIndexPage'
 import { ToastProvider } from './contexts/ToastContext'
+import { useAppThemeRouteSync } from './contexts/ThemeContext'
 import { reconnectWallet } from './lib/wallet'
 import { resetAuthCache } from './lib/api'
 import { ARC_RPC_URLS } from './utils/contract'
@@ -31,6 +32,16 @@ const ARC_TESTNET = {
   rpcUrls: { default: { http: ARC_RPC_URLS } },
   blockExplorers: { default: { name: 'ArcScan', url: 'https://testnet.arcscan.app' } },
   testnet: true,
+}
+
+function AppThemeSync() {
+  const { pathname } = useLocation()
+  const alwaysApp = ['/app', '/rooms', '/room', '/offers', '/create', '/profile', '/settings', '/arbiter'].some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  )
+  // Workspace market theme stays owned by Navbar (needs wallet+profile).
+  useAppThemeRouteSync(alwaysApp)
+  return null
 }
 
 function PageTransition({ children }) {
@@ -195,6 +206,7 @@ export default function App() {
   return (
     <ToastProvider>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <AppThemeSync />
       <DisconnectRedirect tick={disconnectRedirectTick} />
       <Navbar onConnect={handleConnect} onDisconnect={handleDisconnect} wallet={wallet} connecting={connecting} profileReady={profileReady} />
       <ErrorBoundary>

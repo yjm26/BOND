@@ -8,9 +8,9 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
   return (
     <div
       onClick={onExpand}
-      className="group relative flex min-h-[188px] cursor-pointer flex-col border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-4 shadow-[0_16px_40px_rgba(0,0,0,0.22)] transition hover:-translate-y-px hover:border-[var(--a-muted,#a3a3a3)]/34 hover:bg-[var(--a-surface,#111111)] focus-within:border-[var(--a-muted,#a3a3a3)]/50"
+      className="group relative flex min-h-[188px] cursor-pointer flex-col border border-[var(--a-line)] bg-[var(--a-surface)] p-4 shadow-[0_16px_40px_rgba(0,0,0,0.22)] transition hover:-translate-y-px hover:border-[var(--a-muted)]/34 hover:bg-[var(--a-surface)] focus-within:border-[var(--a-muted)]/50"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--a-inverse-bg,#fafafa)]/18 transition group-hover:bg-[var(--a-muted,#a3a3a3)]/45" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--a-inverse-bg)]/18 transition group-hover:bg-[var(--a-muted)]/45" />
       <div className="flex items-start justify-between gap-3">
         <div className="truncate font-mono text-[9px] uppercase tracking-[0.18em] text-[color:var(--a-faint)]">
           {listing.category || 'Other'} / {timeAgo(listing.createdAt)}
@@ -20,7 +20,7 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
         </span>
       </div>
 
-      <h3 className="mt-5 line-clamp-2 min-h-[42px] text-[22px] font-medium leading-[0.96] tracking-[-0.06em] text-[var(--a-ink,#fafafa)]">
+      <h3 className="mt-5 line-clamp-2 min-h-[42px] text-[22px] font-medium leading-[0.96] tracking-[-0.06em] text-[var(--a-ink)]">
         {listing.title}
       </h3>
 
@@ -28,7 +28,7 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
         <div>
           <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-[color:var(--a-faint)]">Price</div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="font-mono text-[22px] leading-none tracking-[-0.04em] text-[var(--a-ink,#fafafa)]">{listing.price}</span>
+            <span className="font-mono text-[22px] leading-none tracking-[-0.04em] text-[var(--a-ink)]">{listing.price}</span>
             <span className="text-[11px] text-[color:var(--a-faint)]">USDC</span>
           </div>
         </div>
@@ -37,7 +37,7 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
         </div>
       </div>
 
-      <div className="mt-3 grid gap-1.5 text-[11px] text-[var(--a-muted,#a3a3a3)]">
+      <div className="mt-3 grid gap-1.5 text-[11px] text-[var(--a-muted)]">
         <div className="flex items-center justify-between gap-3">
           <span>Creator</span>
           <span className="font-mono text-[color:var(--a-muted)]">{formatAddress(listing.creator)}</span>
@@ -69,7 +69,7 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
         ) : (
           <button
             onClick={(event) => { event.stopPropagation(); onOpenDeal() }}
-            className="h-8 w-full border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]"
+            className="h-8 w-full border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--a-inverse-ink)] transition hover:bg-transparent hover:text-[var(--a-ink)]"
           >
             {listing.role === 'buyer' ? 'Sell' : 'Open deal'}
           </button>

@@ -5,9 +5,23 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* Safe defaults before app theme attaches */
+    --a-bg: #fafafa;
+    --a-ink: #0a0a0a;
+    --a-panel: #ffffff;
+    --a-surface: #f5f5f5;
+    --a-muted: #525252;
+    --a-faint: #737373;
+    --a-line: rgba(10, 10, 10, 0.1);
+    --a-line-strong: rgba(10, 10, 10, 0.16);
+    --a-soft: rgba(10, 10, 10, 0.72);
+    --a-inverse-bg: #0a0a0a;
+    --a-inverse-ink: #fafafa;
+    --a-chip: rgba(10, 10, 10, 0.05);
+    --a-danger: #b87333;
   }
 
-  /* App workspace theme tokens — only active when data-app-theme is set */
+  /* App workspace theme tokens */
   html[data-app-theme='dark'] {
     color-scheme: dark;
     --a-bg: #000000;

@@ -12,12 +12,12 @@ export default function ListingDetailModal({ listing, wallet, API_URL, onClose, 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-[var(--a-bg,#000000)]/82 px-4 pb-4 pt-[88px] backdrop-blur-md sm:items-center sm:pt-4"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-[var(--a-bg)]/82 px-4 pb-4 pt-[88px] backdrop-blur-md sm:items-center sm:pt-4"
       onClick={onClose}
       role="presentation"
     >
       <section
-        className="max-h-[calc(100vh-112px)] w-full max-w-[760px] overflow-y-auto border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] text-[var(--a-ink,#fafafa)] shadow-2xl sm:max-h-[90vh]"
+        className="max-h-[calc(100vh-112px)] w-full max-w-[760px] overflow-y-auto border border-[var(--a-line)] bg-[var(--a-panel)] text-[var(--a-ink)] shadow-2xl sm:max-h-[90vh]"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"

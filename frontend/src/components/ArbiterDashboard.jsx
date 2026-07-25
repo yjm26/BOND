@@ -120,9 +120,9 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
   }
 
   return (
-    <section className="min-h-screen bg-[var(--a-bg,#000000)] px-4 pt-[88px] text-[var(--a-ink,#fafafa)] sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-[var(--a-bg)] px-4 pt-[88px] text-[var(--a-ink)] sm:px-6 lg:px-8">
       <div className="pb-4">
-        <main className="overflow-hidden border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)]">
+        <main className="overflow-hidden border border-[var(--a-line)] bg-[var(--a-panel)]">
           <div className="p-4 sm:p-5 lg:p-6">
             {roleLoading || !canUseDesk ? (
               <ArbiterGate role={role} loadingRole={roleLoading} error={roleError} />

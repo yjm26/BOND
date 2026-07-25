@@ -3,14 +3,14 @@ import CreateRoomField from './CreateRoomField'
 import CreateRoomFlow from './CreateRoomFlow'
 import RoleSelector from './RoleSelector'
 
-const inputClass = 'h-12 w-full border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] px-4 text-[14px] text-[var(--a-ink,#fafafa)] outline-none transition placeholder:text-[var(--a-ink,#fafafa)]/24 focus:border-[var(--a-muted,#a3a3a3)]/60 disabled:cursor-not-allowed disabled:opacity-60'
+const inputClass = 'h-12 w-full border border-[var(--a-line)] bg-[var(--a-panel)] px-4 text-[14px] text-[var(--a-ink)] outline-none transition placeholder:text-[var(--a-ink)]/24 focus:border-[var(--a-muted)]/60 disabled:cursor-not-allowed disabled:opacity-60'
 
 export default function CreateRoomForm({ state, setters, fromMarket, canSubmit, loading, step, error, onRequestCreate }) {
   const { item, price, collateral, noCollateral, deliveryDays, creatorIsSeller } = state
   const { setItem, setPrice, setCollateral, setNoCollateral, setDeliveryDays, setCreatorIsSeller } = setters
   return (
-    <div className="border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-5 sm:p-6">
-      <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink,#fafafa)]/40">Room terms</div>
+    <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5 sm:p-6">
+      <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">Room terms</div>
       <div className="grid gap-5">
         <RoleSelector creatorIsSeller={creatorIsSeller} fromMarket={fromMarket} onSeller={() => !fromMarket && setCreatorIsSeller(true)} onBuyer={() => { if (!fromMarket) { setCreatorIsSeller(false); setNoCollateral(true); setCollateral('') } }} />
         <CreateRoomFlow creatorIsSeller={creatorIsSeller} />
@@ -24,7 +24,7 @@ export default function CreateRoomForm({ state, setters, fromMarket, canSubmit, 
         <CreateRoomField label="Seller deadline" suffix="days" note="Seller should deliver before this deadline. Buyer can settle or dispute immediately after delivery; seller fallback opens after the fixed response buffer." disabled={fromMarket}>
           <input className={`${inputClass} pr-16`} type="number" min={1} max={90} step={1} value={deliveryDays} onChange={(event) => !fromMarket && setDeliveryDays(Math.max(1, Math.min(90, Number(event.target.value) || 1)))} readOnly={fromMarket} disabled={fromMarket} />
         </CreateRoomField>
-        <button onClick={onRequestCreate} disabled={loading || !canSubmit} className="h-12 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">
+        <button onClick={onRequestCreate} disabled={loading || !canSubmit} className="h-12 border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition hover:bg-transparent hover:text-[var(--a-ink)] disabled:cursor-not-allowed disabled:opacity-40">
           {loading ? step || 'Processing…' : fromMarket ? 'Confirm deal →' : `Create room${creatorIsSeller && !noCollateral && collateral ? ' + collateral' : ''}`}
         </button>
         {error && <div className="border border-[#b87333]/35 bg-[#b87333]/10 px-4 py-3 text-[13px] leading-[1.55] text-[#b87333]">{error}</div>}

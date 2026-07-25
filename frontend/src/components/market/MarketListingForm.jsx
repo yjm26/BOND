@@ -10,18 +10,18 @@ export default function MarketListingForm({ form, formError, setForm, setTouched
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm" onClick={onClose}>
       <form
         onSubmit={submit}
-        className="w-full max-w-[720px] border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-5 text-[var(--a-ink,#fafafa)] shadow-2xl shadow-black/40 sm:p-6"
+        className="w-full max-w-[720px] border border-[var(--a-line)] bg-[var(--a-surface)] p-5 text-[var(--a-ink)] shadow-2xl shadow-black/40 sm:p-6"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-5 border-b border-[var(--a-line)] pb-5">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--a-muted,#a3a3a3)]">New listing</div>
-            <h2 className="mt-3 text-[34px] font-medium leading-[0.95] tracking-[-0.06em] text-[var(--a-ink,#fafafa)]">Create market listing</h2>
+            <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--a-muted)]">New listing</div>
+            <h2 className="mt-3 text-[34px] font-medium leading-[0.95] tracking-[-0.06em] text-[var(--a-ink)]">Create market listing</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center border border-[var(--a-line)] text-[20px] leading-none text-[var(--a-ink,#fafafa)]/54 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]"
+            className="flex h-9 w-9 items-center justify-center border border-[var(--a-line)] text-[20px] leading-none text-[var(--a-ink)]/54 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)]"
             aria-label="Close listing form"
           >
             ×
@@ -29,13 +29,13 @@ export default function MarketListingForm({ form, formError, setForm, setTouched
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <input className="h-12 border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] px-4 text-[14px] text-[var(--a-ink,#fafafa)] outline-none placeholder:text-[var(--a-ink,#fafafa)]/28 focus:border-[var(--a-muted,#a3a3a3)]/60" placeholder="Title *" value={form.title} onChange={(event) => { setForm({ ...form, title: event.target.value }); setTouched((current) => ({ ...current, title: true })) }} />
+          <input className="h-12 border border-[var(--a-line)] bg-[var(--a-panel)] px-4 text-[14px] text-[var(--a-ink)] outline-none placeholder:text-[var(--a-ink)]/28 focus:border-[var(--a-muted)]/60" placeholder="Title *" value={form.title} onChange={(event) => { setForm({ ...form, title: event.target.value }); setTouched((current) => ({ ...current, title: true })) }} />
           <div className="relative">
-            <input className="h-12 w-full border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] px-4 pr-16 text-[14px] text-[var(--a-ink,#fafafa)] outline-none placeholder:text-[var(--a-ink,#fafafa)]/28 focus:border-[var(--a-muted,#a3a3a3)]/60" type="number" placeholder="Price *" value={form.price} onChange={(event) => { setForm({ ...form, price: event.target.value }); setTouched((current) => ({ ...current, price: true })) }} />
+            <input className="h-12 w-full border border-[var(--a-line)] bg-[var(--a-panel)] px-4 pr-16 text-[14px] text-[var(--a-ink)] outline-none placeholder:text-[var(--a-ink)]/28 focus:border-[var(--a-muted)]/60" type="number" placeholder="Price *" value={form.price} onChange={(event) => { setForm({ ...form, price: event.target.value }); setTouched((current) => ({ ...current, price: true })) }} />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--a-faint)]">USDC</span>
           </div>
-          <select className="h-12 border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] px-4 text-[13px] text-[var(--a-ink,#fafafa)] outline-none focus:border-[var(--a-muted,#a3a3a3)]/60 sm:col-span-2" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>{CATEGORIES.filter((category) => category !== 'All').map((category) => <option key={category} value={category}>{category}</option>)}</select>
-          <textarea className="min-h-[112px] border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] px-4 py-3 text-[14px] text-[var(--a-ink,#fafafa)] outline-none placeholder:text-[var(--a-ink,#fafafa)]/28 focus:border-[var(--a-muted,#a3a3a3)]/60 sm:col-span-2" placeholder="Description — terms, proof, delivery expectations" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
+          <select className="h-12 border border-[var(--a-line)] bg-[var(--a-panel)] px-4 text-[13px] text-[var(--a-ink)] outline-none focus:border-[var(--a-muted)]/60 sm:col-span-2" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>{CATEGORIES.filter((category) => category !== 'All').map((category) => <option key={category} value={category}>{category}</option>)}</select>
+          <textarea className="min-h-[112px] border border-[var(--a-line)] bg-[var(--a-panel)] px-4 py-3 text-[14px] text-[var(--a-ink)] outline-none placeholder:text-[var(--a-ink)]/28 focus:border-[var(--a-muted)]/60 sm:col-span-2" placeholder="Description — terms, proof, delivery expectations" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
         </div>
 
         {formError && <div className="mt-4 border border-[#b87333]/30 bg-[#b87333]/10 px-4 py-3 text-[13px] text-[#b87333]">{formError}</div>}
@@ -43,8 +43,8 @@ export default function MarketListingForm({ form, formError, setForm, setTouched
         <div className="mt-5 flex flex-col gap-3 border-t border-[var(--a-line)] pt-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--a-faint)]">Contact details come from your BOND profile.</div>
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="h-11 border border-[var(--a-line)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">Cancel</button>
-            <button className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Post listing</button>
+            <button type="button" onClick={onClose} className="h-11 border border-[var(--a-line)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-ink)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)]">Cancel</button>
+            <button className="h-11 border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition hover:bg-transparent hover:text-[var(--a-ink)]">Post listing</button>
           </div>
         </div>
       </form>

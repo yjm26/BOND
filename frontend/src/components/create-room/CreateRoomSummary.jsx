@@ -10,18 +10,18 @@ export default function CreateRoomSummary({ state, fromMarket }) {
     ['Source', fromMarket ? 'Market listing' : 'Manual room'],
   ]
   return (
-    <div className="border border-[var(--a-line)] bg-[var(--a-surface,#111111)] p-5 sm:p-6">
-      <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink,#fafafa)]/40">Review</div>
-      <h3 className="mt-4 text-[24px] font-medium leading-[1] tracking-[-0.06em] text-[var(--a-ink,#fafafa)]">{item || 'Untitled room'}</h3>
-      <div className="mt-5 grid gap-px bg-[var(--a-inverse-bg,#fafafa)]/10 p-px">
+    <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5 sm:p-6">
+      <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">Review</div>
+      <h3 className="mt-4 text-[24px] font-medium leading-[1] tracking-[-0.06em] text-[var(--a-ink)]">{item || 'Untitled room'}</h3>
+      <div className="mt-5 grid gap-px bg-[var(--a-inverse-bg)]/10 p-px">
         {rows.map(([label, value]) => (
-          <div key={label} className="grid grid-cols-[110px_1fr] bg-[var(--a-panel,#0a0a0a)] p-3 text-[13px]">
+          <div key={label} className="grid grid-cols-[110px_1fr] bg-[var(--a-panel)] p-3 text-[13px]">
             <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--a-faint)]">{label}</span>
-            <span className="text-[var(--a-ink,#fafafa)]">{value}</span>
+            <span className="text-[var(--a-ink)]">{value}</span>
           </div>
         ))}
       </div>
-      <p className="mt-4 text-[12px] leading-[1.65] text-[var(--a-muted,#a3a3a3)]">Creating the room may require wallet confirmation. If seller collateral is enabled, USDC approval can happen before room creation.</p>
+      <p className="mt-4 text-[12px] leading-[1.65] text-[var(--a-muted)]">Creating the room may require wallet confirmation. If seller collateral is enabled, USDC approval can happen before room creation.</p>
     </div>
   )
 }
