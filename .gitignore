@@ -5,12 +5,28 @@ node_modules/
 artifacts/
 cache/
 typechain-types/
+coverage/
+dist/
 
 __pycache__/
 *.pyc
 apply-refactor.py
 frontend/full_test.mjs
 
-# Local Hermes workspace notes and generated screenshots
+# Local agent / design workspace — never ship to GitHub
 .hermes/
 screenshots/
+sketches/
+docs/
+docs/superpowers/
+.superpowers/
+*.plan.md
+
+# Local data / test dumps
+.data-test/
+data/
+*.log
+
+# Design / notes — local only
+DESIGN.md
+frontend/README.md
