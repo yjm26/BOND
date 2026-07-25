@@ -65,35 +65,36 @@ export default function HeroRoomDemo() {
 
       <div className="relative rounded-[2px] border border-[#0a0a0a]/35 bg-[#000000] p-[3px] shadow-[0_1px_0_rgba(255,255,255,0.75)_inset,0_18px_50px_rgba(0,0,0,0.16),0_2px_0_rgba(10,10,10,0.04)]">
         <div className="relative overflow-hidden border border-[#fafafa]/14 bg-[#000000] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#fafafa]/12 bg-[#111111] px-3 py-2.5 sm:px-4">
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/18" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/12" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/12" />
-              <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">
-                BOND · Room
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {DEMO_STATES.map((state) => {
-                const on = roomState === state
-                return (
-                  <button
-                    key={state}
-                    type="button"
-                    onClick={() => setRoomState(state)}
-                    className={`h-7 border px-2.5 font-mono text-[9px] uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] ${
-                      on
-                        ? 'border-[#fafafa] bg-[#fafafa] text-[#0a0a0a]'
-                        : 'border-[#fafafa]/14 text-[#a3a3a3] hover:border-[#fafafa]/28 hover:text-[#fafafa]'
-                    }`}
-                  >
-                    {state}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          <div className="border-b border-[#fafafa]/12 bg-[#111111] px-3 py-2.5 sm:px-4">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/18" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/12" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/12" />
+                        <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">
+                          BOND · Room
+                        </span>
+                      </div>
+                      {/* Mobile: horizontal scroll chips so state tabs don’t wrap into a wall */}
+                      <div className="-mx-3 mt-2.5 flex gap-1.5 overflow-x-auto px-3 pb-0.5 sm:mx-0 sm:mt-2 sm:flex-wrap sm:overflow-visible sm:px-0">
+                        {DEMO_STATES.map((state) => {
+                          const on = roomState === state
+                          return (
+                            <button
+                              key={state}
+                              type="button"
+                              onClick={() => setRoomState(state)}
+                              className={`h-8 shrink-0 border px-2.5 font-mono text-[9px] uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] sm:h-7 ${
+                                on
+                                  ? 'border-[#fafafa] bg-[#fafafa] text-[#0a0a0a]'
+                                  : 'border-[#fafafa]/14 text-[#a3a3a3] hover:border-[#fafafa]/28 hover:text-[#fafafa]'
+                              }`}
+                            >
+                              {state}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
 
           <HeroHotspotBar hotspots={DEMO_HOTSPOTS} activeId={activeId} onSelect={setActiveId} />
 

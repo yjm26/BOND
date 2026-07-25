@@ -26,13 +26,15 @@ export default function LandingUseCasesSection() {
           {LANDING_USE_CASES.map((row, index) => (
             <div
               key={row.id}
-              className="grid gap-3 border-b border-[#0a0a0a]/12 py-7 sm:grid-cols-[72px_minmax(0,0.9fr)_minmax(0,1.3fr)] sm:items-baseline sm:gap-8 sm:py-8"
+              className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 border-b border-[#0a0a0a]/12 py-7 sm:grid-cols-[72px_minmax(0,0.9fr)_minmax(0,1.3fr)] sm:items-baseline sm:gap-8 sm:py-8"
             >
               <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#737373]">
                 0{index + 1}
               </div>
               <div className="text-[clamp(20px,2.4vw,26px)] font-medium tracking-[-0.035em]">{row.title}</div>
-              <p className="text-[15px] leading-[1.5] tracking-[-0.01em] text-[#525252]">{row.body}</p>
+              <p className="col-span-2 text-[15px] leading-[1.5] tracking-[-0.01em] text-[#525252] sm:col-span-1 sm:col-start-3">
+                {row.body}
+              </p>
             </div>
           ))}
         </div>

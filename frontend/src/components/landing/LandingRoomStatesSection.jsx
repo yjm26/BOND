@@ -22,38 +22,55 @@ export default function LandingRoomStatesSection() {
               Each state has one next action.
             </h2>
           </div>
-          <p className="max-w-[240px] text-[14px] leading-[1.5] text-[#a3a3a3] sm:text-right">
-            Hover a step for the detail line.
+          <p className="max-w-[280px] text-[14px] leading-[1.5] text-[#a3a3a3] sm:text-right">
+            <span className="sm:hidden">Tap a step for the detail line.</span>
+            <span className="hidden sm:inline">Hover or tap a step for the detail line.</span>
           </p>
         </div>
 
-        <div className="mt-9 grid border border-[#fafafa]/10 sm:grid-cols-5">
-          {LANDING_ROOM_STATES.map((step, index) => {
-            const isActive = index === active
-            return (
-              <button
+        {/* Mobile: horizontal snap rail. sm+: 5-col grid. */}
+        <div className="mt-8 sm:mt-9">
+          <div className="-mx-6 flex gap-0 overflow-x-auto overscroll-x-contain border-y border-[#fafafa]/10 px-6 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:border sm:border-[#fafafa]/10 sm:px-0 sm:snap-none">
+            {LANDING_ROOM_STATES.map((step, index) => {
+              const isActive = index === active
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  onMouseEnter={() => setActive(index)}
+                  onFocus={() => setActive(index)}
+                  onClick={() => setActive(index)}
+                  className={`flex w-[min(78vw,280px)] shrink-0 snap-center flex-col border-[#fafafa]/10 px-4 py-5 text-left transition duration-160 ease-out sm:w-auto sm:min-h-[168px] sm:border-r sm:last:border-r-0 ${
+                    isActive ? 'bg-[#fafafa]/[0.06] outline outline-1 outline-[#fafafa]/18 -outline-offset-1' : ''
+                  } ${
+                    index < LANDING_ROOM_STATES.length - 1
+                      ? 'border-r sm:border-r'
+                      : ''
+                  }`}
+                  style={{ transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)' }}
+                >
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#fafafa]/35">
+                    0{index + 1} · {step.label}
+                  </div>
+                  <div className="mt-3 text-[18px] font-medium tracking-[-0.03em]">{step.label}</div>
+                  <div className="mt-4 pt-1 text-[13px] leading-[1.45] text-[#a3a3a3] sm:mt-auto sm:pt-5">
+                    <span className="font-medium text-[#fafafa]">
+                      {step.id === 'closed' ? 'Ends:' : 'Next:'}
+                    </span>{' '}
+                    {step.next}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+          <div className="mt-3 flex justify-center gap-1.5 sm:hidden" aria-hidden="true">
+            {LANDING_ROOM_STATES.map((step, index) => (
+              <span
                 key={step.id}
-                type="button"
-                onMouseEnter={() => setActive(index)}
-                onFocus={() => setActive(index)}
-                className={`flex min-h-[168px] flex-col border-[#fafafa]/10 px-4 py-5 text-left transition duration-160 ease-out sm:border-r sm:last:border-r-0 ${
-                  isActive ? 'bg-[#fafafa]/[0.06] outline outline-1 outline-[#fafafa]/18 -outline-offset-1' : ''
-                } ${index < LANDING_ROOM_STATES.length - 1 ? 'border-b sm:border-b-0' : ''}`}
-                style={{ transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)' }}
-              >
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#fafafa]/35">
-                  0{index + 1} · {step.label}
-                </div>
-                <div className="mt-3 text-[18px] font-medium tracking-[-0.03em]">{step.label}</div>
-                <div className="mt-auto pt-5 text-[13px] leading-[1.45] text-[#a3a3a3]">
-                  <span className="font-medium text-[#fafafa]">
-                    {step.id === 'closed' ? 'Ends:' : 'Next:'}
-                  </span>{' '}
-                  {step.next}
-                </div>
-              </button>
-            )
-          })}
+                className={`h-1 w-1 rounded-full ${index === active ? 'bg-[#fafafa]' : 'bg-[#fafafa]/25'}`}
+              />
+            ))}
+          </div>
         </div>
 
         <p className="mt-5 max-w-[52ch] text-[13px] leading-[1.5] text-[#fafafa]/45">{detail}</p>

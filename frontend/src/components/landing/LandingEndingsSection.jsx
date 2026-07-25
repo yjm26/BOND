@@ -44,7 +44,7 @@ export default function LandingEndingsSection() {
           {ENDINGS.map((item, index) => (
             <div
               key={item.key}
-              className="grid gap-4 py-8 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-baseline sm:gap-8 sm:py-9"
+              className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 py-7 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-baseline sm:gap-8 sm:py-9"
             >
               <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#525252]">
                 0{index + 1}
@@ -60,7 +60,9 @@ export default function LandingEndingsSection() {
               >
                 {item.label}
               </div>
-              <p className="text-[15px] leading-[1.5] tracking-[-0.01em] text-[#a3a3a3]">{item.line}</p>
+              <p className="col-span-2 text-[15px] leading-[1.5] tracking-[-0.01em] text-[#a3a3a3] sm:col-span-1 sm:col-start-3">
+                {item.line}
+              </p>
             </div>
           ))}
         </div>

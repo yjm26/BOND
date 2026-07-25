@@ -38,8 +38,9 @@ export default function HeroHotspotBar({ hotspots, activeId, onSelect }) {
             </>
           ) : (
             <p className="text-[13px] leading-[1.5] text-white/40">
-              Hover a label.
-            </p>
+                          <span className="sm:hidden">Tap a label.</span>
+                          <span className="hidden sm:inline">Hover or tap a label.</span>
+                        </p>
           )}
         </div>
       </div>
