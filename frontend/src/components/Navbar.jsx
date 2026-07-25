@@ -19,15 +19,17 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
   const inWorkspace = Boolean(wallet?.address && profileReady === true)
   const onMarket = pathname === '/market' || pathname.startsWith('/market/')
   const isAppShellRoute =
-    APP_SHELL_PREFIXES.some((route) => pathname === route || pathname.startsWith(`${route}/`)) ||
-    (onMarket && inWorkspace)
+      APP_SHELL_PREFIXES.some((route) => pathname === route || pathname.startsWith(`${route}/`)) ||
+      (onMarket && inWorkspace)
+    // Invite links (/room/:id) should keep a minimal header so Connect is always reachable
+    const isPublicRoomRoute = pathname.startsWith('/room/')
 
-  useAppThemeRouteSync(isAppShellRoute)
+    useAppThemeRouteSync(isAppShellRoute)
 
-  const isDarkHeader = isAppShellRoute ? isDark : false
-  const isDisconnectedAppRoute = isAppShellRoute && !wallet
-  const isProfileSetupLocked = isAppShellRoute && Boolean(wallet?.address) && profileReady === false
-  const hideAppChrome = isDisconnectedAppRoute || isProfileSetupLocked
+    const isDarkHeader = isAppShellRoute ? isDark : false
+    const isDisconnectedAppRoute = isAppShellRoute && !wallet && !isPublicRoomRoute
+    const isProfileSetupLocked = isAppShellRoute && Boolean(wallet?.address) && profileReady === false
+    const hideAppChrome = isDisconnectedAppRoute || isProfileSetupLocked
 
   useEffect(() => {
     if (!wallet?.address) {

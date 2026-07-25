@@ -44,7 +44,7 @@ const STATE_GUIDES = {
   Cancelled: { both: ['Room cancelled.'] },
 }
 
-export default function RoomView({ wallet }) {
+export default function RoomView({ wallet, connecting, onConnect }) {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -127,7 +127,16 @@ export default function RoomView({ wallet }) {
   const displayRole = role ? role[0].toUpperCase() + role.slice(1) : null
 
   if (loading) return <RoomLoadingState />
-  if (!wallet || !room) return <RoomEmptyState wallet={wallet} status={status} />
+    if (!room) {
+      return (
+        <RoomEmptyState
+          wallet={wallet}
+          status={status}
+          connecting={connecting}
+          onConnect={onConnect}
+        />
+      )
+    }
 
   return (
     <section className="min-h-screen bg-[var(--a-bg)] px-4 pt-[88px] text-[var(--a-ink)] sm:px-6 lg:px-8">
@@ -135,86 +144,124 @@ export default function RoomView({ wallet }) {
         <main className="overflow-hidden border border-[var(--a-line)] bg-[var(--a-panel)]">
           <div className="p-4 sm:p-5 lg:p-6">
             <button
-              onClick={() => navigate(-1)}
-              className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--a-faint)] transition hover:text-[var(--a-ink)]"
-            >
-              ← Back
-            </button>
-            <RoomHeader id={id} room={room} role={displayRole} />
-            <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
-              <div className="grid gap-5">
-                <RoomTermsPanel room={room} priceUSDC={priceUSDC} taxUSDC={taxUSDC} totalUSDC={totalUSDC} hasCollateral={hasCollateral} />
-                <RoomPartiesPanel
-                  room={room}
-                  isCreator={isCreator}
-                  isCounter={isCounter}
-                  creatorRep={creatorRep}
-                  counterpartyRep={counterpartyRep}
-                  role={displayRole}
-                />
-                <RoomEvidencePanel room={room} evidence={evidence} />
-                <RoomHistory roomId={id} provider={wallet.provider} />
-              </div>
-              <aside className="grid content-start gap-5">
-                <RoomGuidePanel guide={guide} />
-                <RoomCountdownPanel countdown={countdown} room={room} />
-                <RoomJoinCodePanel
-                  joinCode={joinCode}
-                  room={room}
-                  isCreator={isCreator}
-                  isParticipant={isParticipant}
-                  joinCodeInput={joinCodeInput}
-                  setJoinCodeInput={setJoinCodeInput}
-                />
-                <ActionPanel
-                  room={room}
-                  id={id}
-                  isCreator={isCreator}
-                  isSeller={isSeller}
-                  isBuyer={isBuyer}
-                  isAdmin={isAdmin}
-                  isParticipant={isParticipant}
-                  arbiterName={arbiterName}
-                  totalUSDC={totalUSDC}
-                  joinCode={joinCode}
-                  copied={actions.copied}
-                  canExpire={canExpire}
-                  canEscalate={canEscalate}
-                  canBuyerRefund={canBuyerRefund}
-                  handleJoin={actions.handleJoin}
-                  handleFund={actions.handleFund}
-                  handleDeliver={actions.handleDeliver}
-                  handleRelease={actions.handleRelease}
-                  handleBuyerRefund={actions.handleBuyerRefund}
-                  handleCancel={actions.handleCancel}
-                  handleLeave={actions.handleLeave}
-                  handleExpire={actions.handleExpire}
-                  handleEscalate={actions.handleEscalate}
-                  handleArbRelease={actions.handleArbRelease}
-                  handleArbRefund={actions.handleArbRefund}
-                  handleArbSplit={actions.handleArbSplit}
-                  copyInvite={actions.copyInvite}
-                  showDisputeForm={showDisputeForm}
-                  setShowDisputeForm={setShowDisputeForm}
-                  disputeReason={disputeReason}
-                  setDisputeReason={setDisputeReason}
-                  handleDispute={actions.handleDispute}
-                  canMutualCancel={canMutualCancel}
-                  mutualCancelStatus={mutualCancelStatus}
-                  hasApprovedMutualCancel={hasApprovedMutualCancel}
-                  counterpartyApprovedMutualCancel={counterpartyApprovedMutualCancel}
-                  mutualCancelReady={mutualCancelReady}
-                  handleRequestMutualCancel={actions.handleRequestMutualCancel}
-                  handleRevokeMutualCancel={actions.handleRevokeMutualCancel}
-                  handleExecuteMutualCancel={actions.handleExecuteMutualCancel}
-                  txPending={actions.txPending}
-                  deliveryProofText={deliveryProofText}
-                  setDeliveryProofText={setDeliveryProofText}
-                />
-                <RoomStatusMessage status={status} />
-                <RoomArbiterPanel arbiterName={arbiterName} arbiterAddr={arbiterAddr} />
-              </aside>
-            </div>
+                          onClick={() => navigate(-1)}
+                          className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--a-faint)] transition hover:text-[var(--a-ink)]"
+                        >
+                          ← Back
+                        </button>
+                        <RoomHeader id={id} room={room} role={displayRole} />
+                        {!wallet && (
+                          <div className="mb-5 flex flex-col gap-3 border border-[var(--a-line)] bg-[var(--a-surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-[13px] leading-[1.55] text-[var(--a-muted)]">
+                              View only. Connect a wallet to join, fund, or act on this room.
+                            </p>
+                            {typeof onConnect === 'function' && (
+                              <button
+                                type="button"
+                                onClick={onConnect}
+                                disabled={connecting}
+                                className="inline-flex h-11 shrink-0 items-center justify-center border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink)] active:scale-[0.97] disabled:opacity-50"
+                              >
+                                {connecting ? 'Connecting…' : 'Connect wallet'}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
+                          <div className="grid gap-5">
+                            <RoomTermsPanel room={room} priceUSDC={priceUSDC} taxUSDC={taxUSDC} totalUSDC={totalUSDC} hasCollateral={hasCollateral} />
+                            <RoomPartiesPanel
+                              room={room}
+                              isCreator={isCreator}
+                              isCounter={isCounter}
+                              creatorRep={creatorRep}
+                              counterpartyRep={counterpartyRep}
+                              role={displayRole}
+                            />
+                            <RoomEvidencePanel room={room} evidence={evidence} />
+                            <RoomHistory roomId={id} provider={wallet?.provider || wallet?.walletProvider} />
+                          </div>
+                          <aside className="grid content-start gap-5">
+                            <RoomGuidePanel guide={guide} />
+                            <RoomCountdownPanel countdown={countdown} room={room} />
+                            <RoomJoinCodePanel
+                              joinCode={joinCode}
+                              room={room}
+                              isCreator={isCreator}
+                              isParticipant={isParticipant}
+                              joinCodeInput={joinCodeInput}
+                              setJoinCodeInput={setJoinCodeInput}
+                            />
+                            {wallet ? (
+                              <ActionPanel
+                                room={room}
+                                id={id}
+                                isCreator={isCreator}
+                                isSeller={isSeller}
+                                isBuyer={isBuyer}
+                                isAdmin={isAdmin}
+                                isParticipant={isParticipant}
+                                arbiterName={arbiterName}
+                                totalUSDC={totalUSDC}
+                                joinCode={joinCode}
+                                copied={actions.copied}
+                                canExpire={canExpire}
+                                canEscalate={canEscalate}
+                                canBuyerRefund={canBuyerRefund}
+                                handleJoin={actions.handleJoin}
+                                handleFund={actions.handleFund}
+                                handleDeliver={actions.handleDeliver}
+                                handleRelease={actions.handleRelease}
+                                handleBuyerRefund={actions.handleBuyerRefund}
+                                handleCancel={actions.handleCancel}
+                                handleLeave={actions.handleLeave}
+                                handleExpire={actions.handleExpire}
+                                handleEscalate={actions.handleEscalate}
+                                handleArbRelease={actions.handleArbRelease}
+                                handleArbRefund={actions.handleArbRefund}
+                                handleArbSplit={actions.handleArbSplit}
+                                copyInvite={actions.copyInvite}
+                                showDisputeForm={showDisputeForm}
+                                setShowDisputeForm={setShowDisputeForm}
+                                disputeReason={disputeReason}
+                                setDisputeReason={setDisputeReason}
+                                handleDispute={actions.handleDispute}
+                                canMutualCancel={canMutualCancel}
+                                mutualCancelStatus={mutualCancelStatus}
+                                hasApprovedMutualCancel={hasApprovedMutualCancel}
+                                counterpartyApprovedMutualCancel={counterpartyApprovedMutualCancel}
+                                mutualCancelReady={mutualCancelReady}
+                                handleRequestMutualCancel={actions.handleRequestMutualCancel}
+                                handleRevokeMutualCancel={actions.handleRevokeMutualCancel}
+                                handleExecuteMutualCancel={actions.handleExecuteMutualCancel}
+                                txPending={actions.txPending}
+                                deliveryProofText={deliveryProofText}
+                                setDeliveryProofText={setDeliveryProofText}
+                              />
+                            ) : (
+                              <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
+                                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--a-muted)]">
+                                  Room actions
+                                </div>
+                                <p className="mt-3 text-[13px] leading-[1.55] text-[var(--a-muted)]">
+                                  Connect a wallet to join, fund, deliver, release, or dispute.
+                                </p>
+                                {typeof onConnect === 'function' && (
+                                  <button
+                                    type="button"
+                                    onClick={onConnect}
+                                    disabled={connecting}
+                                    className="mt-5 inline-flex h-11 w-full items-center justify-center border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink)] active:scale-[0.97] disabled:opacity-50"
+                                  >
+                                    {connecting ? 'Connecting…' : 'Connect wallet'}
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            <RoomStatusMessage status={status} />
+                            <RoomArbiterPanel arbiterName={arbiterName} arbiterAddr={arbiterAddr} />
+                          </aside>
+                        </div>
           </div>
         </main>
       </div>

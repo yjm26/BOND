@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
-import { getContract } from '../../utils/contract'
+import { getContract, ARC_READ_PROVIDER } from '../../utils/contract'
 import { formatAddress } from '../../utils/constants'
 
 const EVENT_CONFIG = {
@@ -61,8 +61,8 @@ export default function RoomHistory({ roomId, provider }) {
   }, [roomId, provider])
 
   async function loadHistory() {
-    try {
-      const contract = getContract(provider)
+      try {
+        const contract = getContract(provider || ARC_READ_PROVIDER)
       const eventNames = Object.keys(EVENT_CONFIG)
       const allEvents = []
       for (const name of eventNames) {

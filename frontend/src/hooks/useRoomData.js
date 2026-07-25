@@ -56,28 +56,39 @@ export function useRoomData(id, wallet) {
     const gen = ++requestGen.current
     const w = walletRef.current
     try {
-      if (!w || !id) {
-        if (gen === requestGen.current) {
-          setRoom(null)
-          setLoading(false)
-        }
-        return
-      }
-      const contract = getContract(ARC_READ_PROVIDER)
-      const data = parseRoom(await contract.rooms(id))
-      if (gen !== requestGen.current) return
+          // Public read — room detail does not require a connected wallet
+          if (!id) {
+            if (gen === requestGen.current) {
+              setRoom(null)
+              setLoading(false)
+            }
+            return
+          }
+          const contract = getContract(ARC_READ_PROVIDER)
+          const data = parseRoom(await contract.rooms(id))
+          if (gen !== requestGen.current) return
 
-      setRoom(mapRoom(data))
-      await Promise.all([
-        contract.arbiterName().then((v) => gen === requestGen.current && setArbiterName(v)).catch(() => {}),
-        contract.arbiter().then((v) => gen === requestGen.current && setArbiterAddr(v)).catch(() => {}),
-        contract.owner().then((v) => gen === requestGen.current && setOwnerAddr(v)).catch(() => {}),
-        w.address
-          ? contract.isArbiter(w.address).then((v) => gen === requestGen.current && setIsActiveArbiter(v)).catch(() => {
-            if (gen === requestGen.current) setIsActiveArbiter(false)
-          })
-          : Promise.resolve(),
-        contract
+          // Empty / non-existent rooms often return zero creator
+          if (!data?.creator || data.creator === ethers.ZeroAddress) {
+            if (gen === requestGen.current) {
+              setRoom(null)
+              setLoading(false)
+              setStatus({ type: 'error', msg: 'This room does not exist on-chain.' })
+            }
+            return
+          }
+
+          setRoom(mapRoom(data))
+          await Promise.all([
+            contract.arbiterName().then((v) => gen === requestGen.current && setArbiterName(v)).catch(() => {}),
+            contract.arbiter().then((v) => gen === requestGen.current && setArbiterAddr(v)).catch(() => {}),
+            contract.owner().then((v) => gen === requestGen.current && setOwnerAddr(v)).catch(() => {}),
+            w?.address
+              ? contract.isArbiter(w.address).then((v) => gen === requestGen.current && setIsActiveArbiter(v)).catch(() => {
+                if (gen === requestGen.current) setIsActiveArbiter(false)
+              })
+              : Promise.resolve(setIsActiveArbiter(false)),
+            contract
           .getMutualCancelStatus(id)
           .then((mc) => {
             if (gen === requestGen.current) {

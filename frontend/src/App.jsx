@@ -348,12 +348,16 @@ export default function App() {
               />
               <Route
                 path="/room/:id"
-                element={
-                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
-                    <RoomDetailPage wallet={wallet} />
-                  </ProfileRequiredRoute>
-                }
-              />
+                                element={
+                                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                                    <RoomDetailPage
+                                      wallet={wallet}
+                                      connecting={connecting}
+                                      onConnect={handleConnect}
+                                    />
+                                  </ProfileRequiredRoute>
+                                }
+                              />
               <Route path="/docs/:section?" element={<DocsPage />} />
               <Route path="/market" element={<MarketPage wallet={wallet} profileReady={profileReady} />} />
               <Route
