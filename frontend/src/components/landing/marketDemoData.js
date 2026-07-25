@@ -7,7 +7,7 @@ export const STAGE_LISTINGS = [
     price: '380',
     days: 7,
     creator: '0x8c2a…1f90',
-    blurb: 'Figma to shipped page. Room opens from this listing.',
+    blurb: 'Fixed scope. Opens a seller room when accepted.',
   },
   {
     id: 's2',
@@ -17,7 +17,7 @@ export const STAGE_LISTINGS = [
     price: '650',
     days: 10,
     creator: '0x41be…9c22',
-    blurb: 'Buyer-posted scope. Seller joins, then funds lock in a room.',
+    blurb: 'Buyer listing. Seller joins, then escrow funds.',
   },
   {
     id: 's3',
@@ -27,7 +27,7 @@ export const STAGE_LISTINGS = [
     price: '220',
     days: 5,
     creator: '0x7a3f…c91e',
-    blurb: 'Fixed package. Delivery window is part of the terms.',
+    blurb: 'Package price and delivery days set up front.',
   },
   {
     id: 's4',
@@ -37,6 +37,6 @@ export const STAGE_LISTINGS = [
     price: '900',
     days: 4,
     creator: '0x2b88…4d0a',
-    blurb: 'Review notes stay beside escrow if the deal disputes.',
+    blurb: 'Notes attach in-room if the deal disputes.',
   },
 ]

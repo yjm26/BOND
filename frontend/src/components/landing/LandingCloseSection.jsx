@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom'
 
-/** Landing close — two doors, no essay. */
 export default function LandingCloseSection() {
   return (
     <section className="border-t border-[#0a0a0a]/10 bg-[#fafafa] px-6 py-14 text-[#0a0a0a] sm:px-10 sm:py-16 lg:px-14">
       <div className="mx-auto max-w-[1080px]">
         <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Start</div>
         <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,40px)] font-medium leading-[1.05] tracking-[-0.05em]">
-          Room or market.
+          Pick a door.
         </h2>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -16,9 +15,9 @@ export default function LandingCloseSection() {
             className="group border border-[#0a0a0a]/14 bg-white p-5 transition duration-160 ease-out hover:border-[#0a0a0a]/32 active:scale-[0.995] sm:p-6"
           >
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">Room</div>
-            <div className="mt-2 text-[20px] font-medium tracking-[-0.035em] sm:text-[22px]">Create a deal room</div>
+            <div className="mt-2 text-[20px] font-medium tracking-[-0.035em] sm:text-[22px]">Create room</div>
             <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#0a0a0a]/45 transition duration-160 group-hover:text-[#0a0a0a]">
-              Go to app →
+              App →
             </div>
           </Link>
 
@@ -29,9 +28,9 @@ export default function LandingCloseSection() {
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#fafafa]/45 transition group-hover:text-[#0a0a0a]/45">
               Market
             </div>
-            <div className="mt-2 text-[20px] font-medium tracking-[-0.035em] sm:text-[22px]">Browse open listings</div>
+            <div className="mt-2 text-[20px] font-medium tracking-[-0.035em] sm:text-[22px]">Browse listings</div>
             <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#fafafa]/50 transition group-hover:text-[#0a0a0a]">
-              Open market →
+              Market →
             </div>
           </Link>
         </div>

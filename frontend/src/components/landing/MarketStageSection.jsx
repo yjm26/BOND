@@ -29,19 +29,19 @@ export default function MarketStageSection() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
           <div className="min-w-0">
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">01 · Market</div>
-            <h2 className="mt-3 max-w-[14ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
-              Open deals. One board.
+            <h2 className="mt-3 max-w-[16ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
+              Listings that open rooms.
             </h2>
           </div>
           <div className="flex shrink-0 flex-col gap-3 sm:items-end">
-            <p className="max-w-[260px] text-[14px] leading-[1.55] tracking-[-0.01em] text-[#525252] sm:text-right">
-              Browse free. Connect only to open a room.
+            <p className="max-w-[240px] text-[14px] leading-[1.5] tracking-[-0.01em] text-[#525252] sm:text-right">
+              Public browse. Wallet only to act.
             </p>
             <Link
               to="/market"
               className="inline-flex h-10 w-fit items-center justify-center border border-[#0a0a0a] bg-[#0a0a0a] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#fafafa] transition duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97]"
             >
-              Browse market →
+              Browse market
             </Link>
           </div>
         </div>

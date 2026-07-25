@@ -4,27 +4,23 @@ const ENDINGS = [
   {
     key: 'release',
     label: 'Release',
-    line: 'Buyer confirms delivery. Funds move to seller.',
+    line: 'Buyer accepts delivery. Seller receives locked USDC.',
     tone: 'success',
   },
   {
     key: 'refund',
     label: 'Refund',
-    line: 'Terms fail or both sides walk. Buyer is made whole.',
+    line: 'Deal cancelled under terms. Buyer gets USDC back.',
     tone: 'neutral',
   },
   {
     key: 'dispute',
     label: 'Dispute',
-    line: 'Proof needed. Arbiter path after the buffer.',
+    line: 'Parties disagree. Evidence + arbiter after the 12h buffer.',
     tone: 'danger',
   },
 ]
 
-/**
- * Dark chapter — different surface from paper product frames.
- * Large type endings; not another app chrome clone.
- */
 export default function LandingEndingsSection() {
   return (
     <section
@@ -35,12 +31,12 @@ export default function LandingEndingsSection() {
         <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">02 · Endings</div>
-            <h2 className="mt-3 max-w-[14ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
-              Every room ends somewhere.
+            <h2 className="mt-3 max-w-[16ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
+              Three ways a room closes.
             </h2>
           </div>
-          <p className="max-w-[280px] text-[14px] leading-[1.55] text-[#a3a3a3] sm:text-right">
-            No vague “we’ll sort it later.” The exit is part of the deal.
+          <p className="max-w-[240px] text-[14px] leading-[1.5] text-[#a3a3a3] sm:text-right">
+            No off-platform “we’ll settle later.”
           </p>
         </div>
 
@@ -48,7 +44,7 @@ export default function LandingEndingsSection() {
           {ENDINGS.map((item, index) => (
             <div
               key={item.key}
-              className="grid gap-4 py-8 sm:grid-cols-[88px_minmax(0,1fr)_minmax(0,1.1fr)] sm:items-baseline sm:gap-8 sm:py-10"
+              className="grid gap-4 py-8 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-baseline sm:gap-8 sm:py-9"
             >
               <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#525252]">
                 0{index + 1}
@@ -64,7 +60,7 @@ export default function LandingEndingsSection() {
               >
                 {item.label}
               </div>
-              <p className="text-[15px] leading-[1.55] tracking-[-0.01em] text-[#a3a3a3]">{item.line}</p>
+              <p className="text-[15px] leading-[1.5] tracking-[-0.01em] text-[#a3a3a3]">{item.line}</p>
             </div>
           ))}
         </div>
@@ -74,13 +70,13 @@ export default function LandingEndingsSection() {
             to="/app"
             className="inline-flex h-11 items-center justify-center border border-[#fafafa] bg-[#fafafa] px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0a0a0a] transition duration-160 ease-out hover:bg-transparent hover:text-[#fafafa] active:scale-[0.97]"
           >
-            Open app
+            Go to app
           </Link>
           <Link
             to="/docs"
             className="inline-flex h-11 items-center justify-center border border-[#fafafa]/18 px-5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#fafafa]/70 transition duration-160 ease-out hover:border-[#fafafa]/40 hover:text-[#fafafa] active:scale-[0.97]"
           >
-            Read docs
+            Docs
           </Link>
         </div>
       </div>

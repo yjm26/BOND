@@ -114,8 +114,8 @@ export default function HeroRoomDemo() {
                 <h2 className="mt-3 max-w-[640px] text-[clamp(28px,4vw,44px)] font-medium leading-[0.94] tracking-[-0.07em]">
                   {room.item}
                 </h2>
-                <p className="mt-3 max-w-[480px] text-[13px] leading-[1.6] text-[#a3a3a3]">
-                  {room.roleHint}. Escrow terms, participants, and the next action stay visible in one room.
+                <p className="mt-3 max-w-[480px] text-[13px] leading-[1.55] text-[#a3a3a3]">
+                  {room.roleHint}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -136,19 +136,19 @@ export default function HeroRoomDemo() {
                 <Metric
                   label="Total to fund"
                   value={`${room.total} USDC`}
-                  note={`Includes ${room.fee} USDC platform fee.`}
+                  note={`+${room.fee} USDC fee`}
                   tone="warning"
                 />
                 <Metric
                   label="Locked escrow"
                   value={`${room.locked} USDC`}
-                  note="Held on-chain until release, refund, or dispute resolution."
+                  note="Until release, refund, or dispute."
                   tone="success"
                 />
                 <Metric
                   label="Delivery window"
                   value={`${room.deliveryDays} days`}
-                  note="Agreed before the room was funded."
+                  note="Set at create."
                 />
               </div>
 

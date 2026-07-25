@@ -38,7 +38,7 @@ export default function HeroHotspotBar({ hotspots, activeId, onSelect }) {
             </>
           ) : (
             <p className="text-[13px] leading-[1.5] text-white/40">
-              Hover a label to inspect that part of the room.
+              Hover a label.
             </p>
           )}
         </div>
