@@ -22,6 +22,9 @@ sketches/
 .superpowers/
 *.plan.md
 
+# Local secrets / test wallets — never push
+local/
+
 # Local data / test dumps
 .data-test/
 data/

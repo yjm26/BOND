@@ -12,13 +12,13 @@ const path = require('path')
 const { ethers } = require('ethers')
 
 const ROOT = path.join(__dirname, '..')
-const ENV_FILE = path.join(ROOT, '.env.smoke.local')
+const ENV_CANDIDATES = [
+  path.join(ROOT, 'local', 'smoke', '.env'),
+  path.join(ROOT, '.env.smoke.local'),
+]
 
 function loadEnvFile(file) {
-  if (!fs.existsSync(file)) {
-    console.error('Missing', file)
-    process.exit(1)
-  }
+  if (!fs.existsSync(file)) return null
   const out = {}
   for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
     const t = line.trim()
@@ -30,7 +30,19 @@ function loadEnvFile(file) {
   return out
 }
 
-const env = { ...loadEnvFile(ENV_FILE), ...process.env }
+function loadEnv() {
+  for (const file of ENV_CANDIDATES) {
+    const parsed = loadEnvFile(file)
+    if (parsed && (parsed.SELLER_PK || parsed.BUYER_PK)) {
+      console.log('env:', path.relative(ROOT, file))
+      return { ...parsed, ...process.env }
+    }
+  }
+  console.error('Missing smoke env. Create local/smoke/.env (see local/smoke/wallets.json)')
+  process.exit(1)
+}
+
+const env = loadEnv()
 
 const RPC = env.ARC_RPC_URL || 'https://rpc.blockdaemon.testnet.arc.network'
 const BOND = env.BOND_CONTRACT || '0x1A3ea0d24ff15a90417508F38ABD8E173921082A'
