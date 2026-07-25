@@ -10,7 +10,7 @@ export default function HeroIntro() {
         A deal room both sides can point to.
       </h1>
       <p className="mx-auto mt-5 max-w-[540px] text-[15px] leading-[1.65] tracking-[-0.015em] text-[#525252] sm:text-[16px]">
-        Money, terms, proof, and the next action stay visible. Hover the room below.
+        Money, terms, proof, and the next action stay visible. Switch demo states or inspect each part.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
