@@ -9,7 +9,7 @@ export default function ArbiterGate({ role, loadingRole, error }) {
         {loadingRole ? 'Checking access.' : 'Arbiter access required.'}
       </h1>
       <p className="mx-auto mt-4 max-w-[560px] text-[14px] leading-[1.7] text-[var(--a-muted)]">
-        {loadingRole ? 'Reading owner and arbiter status from the verified BoundTestnet contract.' : 'Only wallets with Role Owner or Role Arbiter can review disputed rooms and send resolution transactions.'}
+        {loadingRole ? 'Reading owner and arbiter status from the Bond contract.' : 'Only wallets with Role Owner or Role Arbiter can review disputed rooms and send resolution transactions.'}
       </p>
       {error && <div className="mx-auto mt-5 max-w-[560px] border border-[#b87333]/35 bg-[#b87333]/10 px-4 py-3 text-[13px] text-[#b87333]">{error}</div>}
       {!loadingRole && (

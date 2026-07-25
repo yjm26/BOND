@@ -63,7 +63,7 @@ That means the UI does not ask users to choose confusing deal types or arbitrary
 │   ├── public/brand/                 # BOND logo assets
 │   └── src/                          # Product UI, wallet, room, market code
 └── contract/                         # Hardhat project
-    ├── contracts/BoundTestnet.sol    # Current escrow contract
+    ├── contracts/BoundTestnet.sol    # Bond escrow contract (Solidity: BoundTestnet)
     ├── scripts/deploy-bound-testnet.js
     └── test/BoundTestnet.test.js
 ```

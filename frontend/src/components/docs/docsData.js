@@ -14,7 +14,7 @@ export const DOC_SECTIONS = [
   { id: 'faq', label: 'FAQ' },
 ]
 
-/** On-chain room states (BoundTestnet). */
+/** On-chain room states (Bond contract). */
 export const ROOM_STATES = [
   ['Created', 'Room exists with terms and join-code hash. Waiting for the counterparty.'],
   ['Joined', 'Both parties are set. Buyer can fund within 30 minutes.'],
@@ -72,7 +72,7 @@ export const DISPUTE_ROWS = [
 ]
 
 export const SECURITY_FACTS = [
-  ['Money path', 'USDC moves only via BoundTestnet functions. Market API cannot transfer funds.'],
+  ['Money path', 'USDC moves only via Bond contract functions. Market API cannot transfer funds.'],
   ['Keys', 'App never asks for a private key or seed. SIWE is for API writes only.'],
   ['SIWE scope', 'Listings, offers, profiles, room-index, evidence notes — not room fund/release.'],
   ['Arbiter power', 'Owner/active arbiter resolve disputed rooms only. Paths are fixed (buyer/seller/split).'],
@@ -115,6 +115,6 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'Is this mainnet?',
-    a: 'No. BoundTestnet on Arc Testnet only. Treat funds as test value.',
+    a: 'No. Bond on Arc Testnet only. Treat funds as test value.',
   },
 ]

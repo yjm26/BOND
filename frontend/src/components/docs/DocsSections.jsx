@@ -24,7 +24,7 @@ export function OverviewSection() {
       <FactGrid
         items={[
           ['Network', `Arc Testnet · chainId ${CHAIN_ID}. Gas accounting is USDC-native; escrow token is the Arc USDC precompile.`],
-          ['Contract', 'BoundTestnet — create, join, fund, deliver, release, refund, dispute, arbiter resolve.'],
+          ['Contract', 'Bond escrow — create, join, fund, deliver, release, refund, dispute, arbiter resolve.'],
           ['Roles', 'Buyer funds. Seller delivers. Owner or active arbiter only on Disputed rooms.'],
           ['Two layers', 'On-chain = money + state. API = listings, offers, profiles, room codes, case notes.'],
         ]}
@@ -60,7 +60,7 @@ export function OverviewSection() {
       </Card>
 
       <Callout title="Testnet" danger>
-        BoundTestnet is on Arc Testnet only. Do not send production-value funds.
+        Bond is on Arc Testnet only. Do not send production-value funds.
       </Callout>
     </Section>
   )
@@ -118,7 +118,7 @@ export function MarketSection() {
     <Section
       eyebrow="Market"
       title="Market finds counterparties. Rooms hold money."
-      intro="Listings and offers live in the API. When both sides agree, someone creates a BoundTestnet room. Until fundRoom succeeds, no escrow USDC is locked."
+      intro="Listings and offers live in the API. When both sides agree, someone creates a Bond room. Until fundRoom succeeds, no escrow USDC is locked."
     >
       <FactGrid items={MARKET_FACTS} />
 
@@ -224,7 +224,7 @@ export function FaqSection() {
     <Section
       eyebrow="FAQ"
       title="Common questions."
-      intro="Short answers tied to BoundTestnet behavior on Arc Testnet."
+      intro="Short answers tied to Bond behavior on Arc Testnet."
     >
       <div className="grid gap-3">
         {FAQ_ITEMS.map((item) => (

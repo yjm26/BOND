@@ -1,4 +1,4 @@
-/** Room state rail — next action per BoundTestnet state. */
+/** Room state rail — next action per Bond state. */
 export const LANDING_ROOM_STATES = [
   {
     id: 'created',
