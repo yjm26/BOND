@@ -73,10 +73,10 @@ export default function PublicListingDetail({ listing, onClose }) {
             to="/app"
             className="inline-flex h-11 w-full items-center justify-center border border-[#0a0a0a] bg-[#0a0a0a] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#fafafa] transition duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97]"
           >
-            {listing.taken ? 'Go to app' : 'Interested — enter app'}
+            {listing.taken ? 'Go to app' : 'Open in app'}
           </Link>
           <p className="mt-3 text-center text-[12px] leading-[1.5] text-[#737373]">
-            Opening a deal, posting, or messaging stays inside the connected workspace.
+            Wallet needed to open a room or post.
           </p>
         </div>
       </div>
