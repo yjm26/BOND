@@ -352,40 +352,6 @@
   .listing-card-enter:nth-child(11) { animation-delay: 0.50s; }
   .listing-card-enter:nth-child(12) { animation-delay: 0.55s; }
 
-  /* Landing hero ribbon — large mono field, continuous readable spin */
-  @keyframes bondRibbonDrift {
-    0% { transform: translate3d(0, 0, 0) scale(1); }
-    50% { transform: translate3d(-1.2%, 1%, 0) scale(1.035); }
-    100% { transform: translate3d(0, 0, 0) scale(1); }
-  }
-  @keyframes bondRibbonSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  @keyframes bondRibbonSheen {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
-  }
-  .bond-hero-stage {
-    mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 100%);
-  }
-  .bond-hero-ribbon {
-    animation: bondRibbonDrift 20s ease-in-out infinite;
-    will-change: transform;
-  }
-  .bond-hero-ribbon-spin {
-    animation: bondRibbonSpin 56s linear infinite;
-    transform-box: fill-box;
-    transform-origin: 55% 48%;
-    will-change: transform;
-  }
-  .bond-hero-ribbon-sheen {
-    animation: bondRibbonSheen 18s linear infinite;
-    transform-box: fill-box;
-    transform-origin: 55% 48%;
-    will-change: transform;
-  }
-
   @keyframes skeletonShimmer {
     0%   { background-position: -200% 0; }
     100% { background-position: 200% 0; }
