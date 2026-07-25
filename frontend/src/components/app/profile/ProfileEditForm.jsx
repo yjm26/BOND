@@ -16,7 +16,7 @@ export default function ProfileEditForm({ form, saving, canSave, onChange, onSub
         <ProfileField label="Discord" note="Optional and self-reported for prototype contact context." value={form.discord} onChange={(value) => onChange('discord', value)} placeholder="e.g. yjm#0001" />
       </div>
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <button type="submit" disabled={!canSave || saving} className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Saving…' : 'Save profile'}</button>
+        <button type="submit" disabled={!canSave || saving} className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Saving…' : 'Save profile'}</button>
       </div>
     </form>
   )

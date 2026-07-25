@@ -4,7 +4,7 @@ import { ARC_GAS, ensureArcChain, getContract, waitForTx } from '../../../utils/
 import { formatAddress } from '../../../utils/constants'
 
 const inputClass = 'h-11 w-full border border-[var(--a-line)] bg-[var(--a-panel,#0a0a0a)] px-3 text-[13px] text-[var(--a-ink,#fafafa)] outline-none placeholder:text-[var(--a-ink,#fafafa)]/24 focus:border-[var(--a-muted,#a3a3a3)]/60 disabled:opacity-50'
-const primaryButton = 'h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40'
+const primaryButton = 'h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40'
 const ghostButton = 'h-11 border border-[var(--a-line)] px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40'
 const MAX_ARBITER_NAME_BYTES = 64
 

@@ -14,7 +14,7 @@ export default function ArbiterGate({ role, loadingRole, error }) {
       {error && <div className="mx-auto mt-5 max-w-[560px] border border-[#b87333]/35 bg-[#b87333]/10 px-4 py-3 text-[13px] text-[#b87333]">{error}</div>}
       {!loadingRole && (
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/profile" className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Open profile</Link>
+          <Link to="/profile" className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Open profile</Link>
           <Link to="/rooms" className="h-11 border border-[var(--a-line)] px-5 py-3 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">My rooms</Link>
         </div>
       )}

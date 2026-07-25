@@ -21,7 +21,7 @@ export default function MarketCounterOfferModal({ target, price, message, onPric
           </label>
           <div className="flex gap-2 pt-2">
             <button onClick={onCancel} className="h-10 flex-1 border border-[var(--a-line)] font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">Cancel</button>
-            <button onClick={() => onSubmit(target.id)} disabled={!price || Number(price) <= 0} className="h-10 flex-1 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">Counter →</button>
+            <button onClick={() => onSubmit(target.id)} disabled={!price || Number(price) <= 0} className="h-10 flex-1 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">Counter →</button>
           </div>
         </div>
       </div>

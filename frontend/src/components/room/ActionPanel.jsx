@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ConfirmModal from '../ConfirmModal'
 
-const primaryButton = 'h-11 w-full border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40'
+const primaryButton = 'h-11 w-full border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40'
 const ghostButton = 'h-11 w-full border border-[var(--a-line)] px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40'
 const dangerButton = 'h-11 w-full border border-[#b87333]/38 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#b87333] transition hover:bg-[#b87333]/10 disabled:cursor-not-allowed disabled:opacity-40'
 

@@ -24,7 +24,7 @@ export default function CreateRoomForm({ state, setters, fromMarket, canSubmit, 
         <CreateRoomField label="Seller deadline" suffix="days" note="Seller should deliver before this deadline. Buyer can settle or dispute immediately after delivery; seller fallback opens after the fixed response buffer." disabled={fromMarket}>
           <input className={`${inputClass} pr-16`} type="number" min={1} max={90} step={1} value={deliveryDays} onChange={(event) => !fromMarket && setDeliveryDays(Math.max(1, Math.min(90, Number(event.target.value) || 1)))} readOnly={fromMarket} disabled={fromMarket} />
         </CreateRoomField>
-        <button onClick={onRequestCreate} disabled={loading || !canSubmit} className="h-12 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">
+        <button onClick={onRequestCreate} disabled={loading || !canSubmit} className="h-12 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] disabled:cursor-not-allowed disabled:opacity-40">
           {loading ? step || 'Processing…' : fromMarket ? 'Confirm deal →' : `Create room${creatorIsSeller && !noCollateral && collateral ? ' + collateral' : ''}`}
         </button>
         {error && <div className="border border-[#b87333]/35 bg-[#b87333]/10 px-4 py-3 text-[13px] leading-[1.55] text-[#b87333]">{error}</div>}

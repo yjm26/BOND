@@ -69,7 +69,7 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
         ) : (
           <button
             onClick={(event) => { event.stopPropagation(); onOpenDeal() }}
-            className="h-8 w-full border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]"
+            className="h-8 w-full border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]"
           >
             {listing.role === 'buyer' ? 'Sell' : 'Open deal'}
           </button>

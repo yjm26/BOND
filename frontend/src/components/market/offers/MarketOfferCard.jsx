@@ -32,23 +32,23 @@ export default function MarketOfferCard({ offer, tab, actions, timeAgo, fmt }) {
       <div className="flex flex-wrap gap-2">
         {isIncoming && offer.status === 'pending' && (
           <>
-            <button onClick={() => actions.accept(offer.id)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Accept</button>
+            <button onClick={() => actions.accept(offer.id)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Accept</button>
             <button onClick={() => actions.startCounter(offer, offer.offerPrice)} className="h-9 border border-[var(--a-line)] px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">Counter</button>
             <button onClick={() => actions.decline(offer.id)} className="h-9 border border-[#b87333]/34 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#b87333] transition hover:bg-[#b87333]/10">Decline</button>
           </>
         )}
         {isIncoming && offer.status === 'countered' && (
           <>
-            <button onClick={() => actions.accept(offer.id)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Accept {offer.counterPrice} USDC</button>
+            <button onClick={() => actions.accept(offer.id)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Accept {offer.counterPrice} USDC</button>
             <button onClick={() => actions.startCounter(offer, offer.counterPrice)} className="h-9 border border-[var(--a-line)] px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">Counter again</button>
             <button onClick={() => actions.decline(offer.id)} className="h-9 border border-[#b87333]/34 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#b87333] transition hover:bg-[#b87333]/10">Decline</button>
           </>
         )}
-        {isIncoming && offer.status === 'accepted' && <button onClick={() => actions.openRoom(offer, false)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Create room →</button>}
-        {!isIncoming && offer.status === 'accepted' && <button onClick={() => actions.openRoom(offer, true)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Create room →</button>}
+        {isIncoming && offer.status === 'accepted' && <button onClick={() => actions.openRoom(offer, false)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Create room →</button>}
+        {!isIncoming && offer.status === 'accepted' && <button onClick={() => actions.openRoom(offer, true)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Create room →</button>}
         {!isIncoming && offer.status === 'countered' && (
           <>
-            <button onClick={() => actions.accept(offer.id)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Accept {offer.counterPrice} USDC</button>
+            <button onClick={() => actions.accept(offer.id)} className="h-9 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Accept {offer.counterPrice} USDC</button>
             <button onClick={() => actions.startCounter(offer, offer.counterPrice || offer.offerPrice)} className="h-9 border border-[var(--a-line)] px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">Counter back</button>
             <button onClick={() => actions.decline(offer.id)} className="h-9 border border-[#b87333]/34 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#b87333] transition hover:bg-[#b87333]/10">Walk away</button>
           </>

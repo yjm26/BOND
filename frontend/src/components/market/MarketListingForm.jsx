@@ -44,7 +44,7 @@ export default function MarketListingForm({ form, formError, setForm, setTouched
           <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--a-faint)]">Contact details come from your BOND profile.</div>
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="h-11 border border-[var(--a-line)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-ink,#fafafa)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink,#fafafa)]">Cancel</button>
-            <button className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Post listing</button>
+            <button className="h-11 border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition hover:bg-transparent hover:text-[var(--a-ink,#fafafa)]">Post listing</button>
           </div>
         </div>
       </form>

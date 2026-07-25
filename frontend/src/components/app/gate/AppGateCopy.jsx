@@ -9,7 +9,7 @@ export default function AppGateCopy({ connecting, connectError, onConnect }) {
         type="button"
         onClick={onConnect}
         disabled={connecting}
-        className="mt-8 inline-flex h-12 items-center justify-center border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-7 font-mono text-[12px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-8 inline-flex h-12 items-center justify-center border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-7 font-mono text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {connecting ? 'Connecting…' : 'Connect wallet'}
       </button>

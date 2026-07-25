@@ -44,7 +44,7 @@ export default function AppHomeOpenRooms({ wallet }) {
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
               to="/create"
-              className="inline-flex h-10 items-center border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111111] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] active:scale-[0.97]"
+              className="inline-flex h-10 items-center border border-[var(--a-ink,#fafafa)] bg-[var(--a-inverse-bg,#fafafa)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink,#0a0a0a)] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink,#fafafa)] active:scale-[0.97]"
             >
               Create room
             </Link>
