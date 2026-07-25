@@ -13,6 +13,7 @@ import ArbiterPage from './pages/ArbiterPage'
 import CreateRoomPage from './pages/CreateRoomPage'
 import DocsPage from './pages/DocsPage'
 import LandingPage from './pages/LandingPage'
+import LandingSectionPrototypesPage from './pages/LandingSectionPrototypesPage'
 import MarketPage, { ListingsRedirect } from './pages/MarketPage'
 import OffersRedirectPage from './pages/OffersRedirectPage'
 import ProfilePage from './pages/ProfilePage'
@@ -213,6 +214,7 @@ export default function App() {
       <PageTransition>
       <Routes>
         <Route path="/" element={<LandingPage wallet={wallet} onConnect={handleConnect} />} />
+        <Route path="/dev/section-3" element={<LandingSectionPrototypesPage />} />
         <Route path="/listings" element={<ListingsRedirect />} />
         <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} onProfileStateChange={setProfileReady} />} />
         <Route path="/create" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><CreateRoomPage wallet={wallet} /></ProfileRequiredRoute>} />
