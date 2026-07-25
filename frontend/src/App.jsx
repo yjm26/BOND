@@ -50,8 +50,14 @@ function RouteFooter() {
 
 function DisconnectRedirect({ tick }) {
   const navigate = useNavigate()
+  const handledTick = useRef(0)
   useEffect(() => {
-    if (tick > 0) navigate('/app', { replace: true })
+    // Only react to a new disconnect. Do not re-force /app when navigate identity changes
+    // or the user later leaves the gate for landing via ‹ back.
+    if (tick > 0 && tick !== handledTick.current) {
+      handledTick.current = tick
+      navigate('/app', { replace: true })
+    }
   }, [tick, navigate])
   return null
 }
