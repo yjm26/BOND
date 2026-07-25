@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract, getUsdc, waitForTx, ARC_GAS, ARC_GAS_APPROVE, generateJoinCode, hashJoinCode, createInviteLink, CONTRACT_ADDRESS, ensureArcChain, fixSignerNonce, readMany, getLatestNonce } from '../utils/contract'
 import { authFetch } from '../lib/api'
+import { trackRoomId } from '../lib/roomIndexApi'
 import CreateRoomConfirm from './create-room/CreateRoomConfirm'
 import CreateRoomForm from './create-room/CreateRoomForm'
 import CreateRoomHeader from './create-room/CreateRoomHeader'
@@ -133,62 +134,67 @@ export default function CreateRoom({ wallet }) {
         if (!event) throw new Error('RoomCreated event not found in transaction receipt')
         const parsed = contract.interface.parseLog(event)
         if (!parsed?.args?.id) throw new Error('Could not parse room ID from event')
-
         const roomId = parsed.args.id.toString()
-        const inviteLink = createInviteLink(roomId, joinCode)
-        const nextResult = { roomId, inviteLink, joinCode, ts: Date.now() }
-        setResult(nextResult)
-        sessionStorage.setItem('bond_last_created', JSON.stringify(nextResult))
-        createdSuccessfully = true
+                const inviteLink = createInviteLink(roomId, joinCode)
+                const nextResult = { roomId, inviteLink, joinCode, ts: Date.now() }
+                setResult(nextResult)
+                sessionStorage.setItem('bond_last_created', JSON.stringify(nextResult))
+                createdSuccessfully = true
 
-        const listingId = searchParams.get('listingId')
-        let backendErr = null
-        try {
-          const ctrl = new AbortController()
-          const t = setTimeout(() => ctrl.abort(), 15000)
+                try {
+                  await trackRoomId(wallet, roomId)
+                } catch (e) {
+                  console.warn('room-index track failed', e)
+                }
 
-          if (listingId) {
-            await authFetch(`/api/listings/${listingId}/taken`, {
-              method: 'PUT',
-              signal: ctrl.signal,
-              body: JSON.stringify({ roomId }),
-            }, wallet)
-            if (counterparty) {
-              await authFetch('/api/notifications', {
-                method: 'POST',
-                signal: ctrl.signal,
-                body: JSON.stringify({
-                  to: counterparty,
-                  message: `Someone opened a deal for "${item}" — Room #${roomId}`,
-                  listingId,
-                }),
-              }, wallet)
-            }
-          }
+                const listingId = searchParams.get('listingId')
+                let backendErr = null
+                try {
+                  const ctrl = new AbortController()
+                  const t = setTimeout(() => ctrl.abort(), 15000)
 
-          if (counterparty) {
-            await authFetch('/api/room-codes', {
-              method: 'POST',
-              signal: ctrl.signal,
-              body: JSON.stringify({
-                roomId,
-                joinCode,
-                counterparty,
-                item,
-                price,
-                listingId,
-              }),
-            }, wallet)
-          }
-          clearTimeout(t)
-        } catch (e) {
-          console.error('Backend sync failed:', e)
-          backendErr = 'Seller notification failed — please share the invite link manually.'
-        }
-        if (backendErr) setError(backendErr)
-      } finally {
-        restore()
-      }
+                  if (listingId) {
+                    await authFetch(`/api/listings/${listingId}/taken`, {
+                      method: 'PUT',
+                      signal: ctrl.signal,
+                      body: JSON.stringify({ roomId }),
+                    }, wallet)
+                    if (counterparty) {
+                      await authFetch('/api/notifications', {
+                        method: 'POST',
+                        signal: ctrl.signal,
+                        body: JSON.stringify({
+                          to: counterparty,
+                          message: `Someone opened a deal for "${item}" — Room #${roomId}`,
+                          listingId,
+                        }),
+                      }, wallet)
+                    }
+                  }
+
+                  if (counterparty) {
+                    await authFetch('/api/room-codes', {
+                      method: 'POST',
+                      signal: ctrl.signal,
+                      body: JSON.stringify({
+                        roomId,
+                        joinCode,
+                        counterparty,
+                        item,
+                        price,
+                        listingId,
+                      }),
+                    }, wallet)
+                  }
+                  clearTimeout(t)
+                } catch (e) {
+                  console.error('Backend sync failed:', e)
+                  backendErr = 'Seller notification failed — please share the invite link manually.'
+                }
+                if (backendErr) setError(backendErr)
+              } finally {
+                restore()
+              }
     } catch (err) {
       console.error(err)
       setError(err.reason || err.message || 'Transaction failed')

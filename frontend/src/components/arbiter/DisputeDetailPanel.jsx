@@ -39,14 +39,26 @@ export default function DisputeDetailPanel({ room, role, resolving, onResolve, o
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
         <div className="grid gap-5">
           <div className="grid gap-3 sm:grid-cols-2">
-            <Fact label="Buyer"><span className="font-mono break-all">{room.buyer}</span></Fact>
-            <Fact label="Seller"><span className="font-mono break-all">{room.seller}</span></Fact>
-            <Fact label="Creator"><span className="font-mono">{formatAddress(room.creator)}</span></Fact>
-            <Fact label="Counterparty"><span className="font-mono">{formatAddress(room.counterparty)}</span></Fact>
-          </div>
+                      <Fact label="Buyer"><span className="font-mono break-all">{room.buyer}</span></Fact>
+                      <Fact label="Seller"><span className="font-mono break-all">{room.seller}</span></Fact>
+                      <Fact label="Creator"><span className="font-mono">{formatAddress(room.creator)}</span></Fact>
+                      <Fact label="Counterparty"><span className="font-mono">{formatAddress(room.counterparty)}</span></Fact>
+                    </div>
 
-          <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
-            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">Evidence</div>
+                    {room.apiReason && (
+                      <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
+                        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">API case reason</div>
+                        <p className="mt-3 text-[14px] leading-[1.65] text-[var(--a-ink)]/88">{room.apiReason}</p>
+                        {room.disputedBy && (
+                          <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--a-faint)]">
+                            Opened by {formatAddress(room.disputedBy)}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
+                      <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-ink)]/40">Evidence</div>
             {room.evidence?.length ? (
               <div className="mt-4 grid gap-3">
                 {room.evidence.map((item, index) => (

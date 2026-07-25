@@ -57,6 +57,8 @@ export default function ActionPanel({
   handleRevokeMutualCancel,
   handleExecuteMutualCancel,
   txPending,
+  deliveryProofText = '',
+  setDeliveryProofText,
 }) {
   const [pendingCloseAction, setPendingCloseAction] = useState(null)
   const pendingCopy = pendingCloseAction ? closeActionCopy[pendingCloseAction] : null
@@ -109,12 +111,28 @@ export default function ActionPanel({
           )}
 
           {room.state === 'Funded' && isSeller && (
-            <>
-              {Number(room.collateralAmount) > 0 && <ActionNote tone="success">Collateral locked: {room.collateralAmount} USDC</ActionNote>}
-              <ActionNote>Click below once you have sent the item or delivery proof.</ActionNote>
-              <button onClick={() => wrap(handleDeliver)} disabled={txPending} className={primaryButton}>{txPending ? 'Processing…' : 'Mark delivered'}</button>
-            </>
-          )}
+                      <>
+                        {Number(room.collateralAmount) > 0 && <ActionNote tone="success">Collateral locked: {room.collateralAmount} USDC</ActionNote>}
+                        <ActionNote>Add optional proof text or URL, then mark delivered. Proof is hashed on-chain.</ActionNote>
+                        <label className="block">
+                          <span className="mb-2 block font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--a-ink)]/40">Delivery proof</span>
+                          <textarea
+                            value={deliveryProofText}
+                            onChange={(e) => setDeliveryProofText?.(e.target.value)}
+                            rows={2}
+                            placeholder="Tracking link, file hash, or short note"
+                            className="w-full resize-none border border-[var(--a-line)] bg-[var(--a-panel)] px-3 py-2 text-[13px] text-[var(--a-ink)] outline-none transition placeholder:text-[var(--a-ink)]/26 focus:border-[var(--a-ink)]/35"
+                          />
+                        </label>
+                        <button
+                          onClick={() => wrap(handleDeliver)}
+                          disabled={txPending}
+                          className={`${primaryButton} active:scale-[0.97]`}
+                        >
+                          {txPending ? 'Processing…' : 'Mark delivered'}
+                        </button>
+                      </>
+                    )}
           {room.state === 'Funded' && isBuyer && (
             <>
               <ActionNote>Waiting for seller to deliver.</ActionNote>

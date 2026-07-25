@@ -152,7 +152,22 @@ If `DATA_DIR` is not set, it falls back to the repo directory. For production on
 DATA_DIR=/data
 ```
 
-Without persistent storage, marketplace listings, offers, notifications, room codes, and public profiles can disappear when the service restarts or gets redeployed.
+Files:
+
+| File | Purpose |
+| --- | --- |
+| `listings.json` | marketplace listings |
+| `offers.json` | offers / counters |
+| `notifications.json` | in-app notifications |
+| `room_codes.json` | invite codes for market handoff |
+| `profiles.json` | public display profiles |
+| `evidence.json` | off-chain evidence by room |
+| `disputes.json` | dispute desk case register |
+| `room_index.json` | address → roomIds for My Rooms |
+
+Server code is modular under `server/lib/*` and `server/routes/*`; `server.js` is the thin HTTP entry.
+
+Without persistent storage, marketplace listings, offers, notifications, room codes, profiles, evidence, disputes, and room index can disappear when the service restarts or gets redeployed.
 
 For a longer-lived production setup, move this storage to Postgres, Supabase, or Neon.
 

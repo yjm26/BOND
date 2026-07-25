@@ -1,21 +1,20 @@
-export const STATE_BADGE = {
-  Created: 'text-blue-700 bg-blue-50 border-blue-200',
-  Joined: 'text-purple-700 bg-purple-50 border-purple-200',
-  Funded: 'text-amber-700 bg-amber-50 border-amber-200',
-  Delivered: 'text-green-700 bg-green-50 border-green-200',
-  Released: 'text-emerald-700 bg-emerald-50 border-emerald-200',
-  Disputed: 'text-red-700 bg-red-50 border-red-200',
-  Refunded: 'text-orange-700 bg-orange-50 border-orange-200',
-  Expired: 'text-gray-600 bg-gray-50 border-gray-200',
-  Cancelled: 'text-gray-600 bg-gray-50 border-gray-200',
+/** Contract-aligned timers (seconds). Prefer on-chain constants for authority. */
+export const TIMERS = {
+  joinDeadline: 1 * 24 * 3600, // JOIN_DL = 1 day
+  fundDeadline: 30 * 60, // FUND_DL = 30 minutes
+  responseBuffer: 12 * 3600, // RESPONSE_BUFFER after delivery
 }
 
-export const TIMERS = {
-  joinDeadline: 1 * 3600,       // 1h
-  fundDeadline: 30 * 60,        // 30m
-  deliverDeadline: 4 * 3600,    // 4h
-  autoReleaseTime: 2 * 3600,    // 2h
-  disputeTimeout: 6 * 3600,     // 6h
+export const STATE_BADGE = {
+  Created: 'text-[var(--a-ink)] bg-[var(--a-panel)] border-[var(--a-line)]',
+  Joined: 'text-[var(--a-ink)] bg-[var(--a-panel)] border-[var(--a-line)]',
+  Funded: 'text-[#8f9a88] bg-[var(--a-panel)] border-[#8f9a88]/30',
+  Delivered: 'text-[#8f9a88] bg-[var(--a-panel)] border-[#8f9a88]/30',
+  Released: 'text-[#8f9a88] bg-[var(--a-panel)] border-[#8f9a88]/30',
+  Disputed: 'text-[#b87333] bg-[var(--a-panel)] border-[#b87333]/35',
+  Refunded: 'text-[var(--a-muted)] bg-[var(--a-panel)] border-[var(--a-line)]',
+  Expired: 'text-[var(--a-muted)] bg-[var(--a-panel)] border-[var(--a-line)]',
+  Cancelled: 'text-[var(--a-muted)] bg-[var(--a-panel)] border-[var(--a-line)]',
 }
 
 export function formatAddress(addr) {
