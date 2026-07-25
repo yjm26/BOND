@@ -1,17 +1,17 @@
 export default function AppGateMark() {
   return (
-    <div className="relative flex min-h-[200px] items-center justify-center lg:min-h-[380px] lg:justify-end">
+    <div className="relative flex min-h-[260px] items-center justify-center lg:min-h-[520px] lg:justify-center">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-[-8%] top-1/2 hidden h-[280px] w-[280px] -translate-y-1/2 rounded-full bg-[#ede9df]/[0.04] blur-3xl lg:block"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(52vw,420px)] w-[min(52vw,420px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ede9df]/[0.045] blur-3xl"
       />
       <img
         src="/brand/bond-logo-white-512.png"
         alt="BOND"
         draggable="false"
-        width={200}
-        height={200}
-        className="relative h-[150px] w-[150px] select-none object-contain opacity-[0.94] sm:h-[170px] sm:w-[170px] lg:h-[200px] lg:w-[200px]"
+        width={400}
+        height={400}
+        className="relative h-[min(42vw,280px)] w-[min(42vw,280px)] select-none object-contain opacity-[0.96] sm:h-[320px] sm:w-[320px] lg:h-[380px] lg:w-[380px] xl:h-[420px] xl:w-[420px]"
       />
     </div>
   )

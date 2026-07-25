@@ -1,8 +1,8 @@
 export default function AppGateCopy({ connecting, connectError, onConnect }) {
   return (
-    <div className="relative z-10 max-w-[560px]">
+    <div className="relative z-10 max-w-[640px] lg:pr-4">
       <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">BOND Gate</div>
-      <h1 className="mt-5 text-[clamp(40px,5.6vw,72px)] font-medium leading-[0.92] tracking-[-0.07em] text-[#ede9df]">
+      <h1 className="mt-5 text-[clamp(44px,6vw,84px)] font-medium leading-[0.9] tracking-[-0.075em] text-[#ede9df]">
         Connect wallet to enter your deal workspace.
       </h1>
       <button
