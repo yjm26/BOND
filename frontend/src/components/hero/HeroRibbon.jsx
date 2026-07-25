@@ -1,60 +1,152 @@
 /**
- * Soft Stripe-like gradient ribbon for landing hero only.
- * Pure CSS/SVG — no wallet, no app chrome.
+ * Monochrome Stripe-like ribbon field — right side only.
+ * Black body + moving specular highlights so the spin reads clearly.
  */
 export default function HeroRibbon() {
   return (
-    <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full overflow-hidden lg:w-[58%]" aria-hidden="true">
-      <div className="bond-hero-ribbon absolute -right-[8%] top-[-12%] h-[140%] w-[120%] lg:-right-[4%] lg:w-[110%]">
-        <svg className="h-full w-full" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <div
+      className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[min(56vw,720px)] overflow-hidden lg:block"
+      aria-hidden="true"
+    >
+      <div className="bond-hero-ribbon absolute -right-[18%] top-1/2 h-[135%] w-[135%] -translate-y-1/2">
+        <svg
+          className="h-full w-full"
+          viewBox="0 0 800 900"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid slice"
+        >
           <defs>
-            <linearGradient id="bondRibbonA" x1="120" y1="80" x2="780" y2="820" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#7dd3fc" />
-              <stop offset="22%" stopColor="#818cf8" />
-              <stop offset="48%" stopColor="#e879f9" />
-              <stop offset="72%" stopColor="#fb7185" />
-              <stop offset="100%" stopColor="#fb923c" />
+            {/* Graphite body */}
+            <linearGradient id="bondMonoBody" x1="80" y1="40" x2="720" y2="860" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#1a1a1a" />
+              <stop offset="35%" stopColor="#0a0a0a" />
+              <stop offset="70%" stopColor="#141414" />
+              <stop offset="100%" stopColor="#050505" />
             </linearGradient>
-            <linearGradient id="bondRibbonB" x1="80" y1="700" x2="820" y2="120" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.95" />
-              <stop offset="35%" stopColor="#a78bfa" stopOpacity="0.9" />
-              <stop offset="65%" stopColor="#f472b6" stopOpacity="0.92" />
-              <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.88" />
+            <linearGradient id="bondMonoBody2" x1="700" y1="100" x2="120" y2="800" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#222222" />
+              <stop offset="45%" stopColor="#0c0c0c" />
+              <stop offset="100%" stopColor="#1c1c1c" />
             </linearGradient>
-            <filter id="bondRibbonBlur" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="18" />
+
+            {/* Specular sweep — the “highlight” that sells the spin */}
+            <linearGradient id="bondMonoSheen" x1="0" y1="0" x2="800" y2="900" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+              <stop offset="38%" stopColor="#ffffff" stopOpacity="0.04" />
+              <stop offset="48%" stopColor="#ffffff" stopOpacity="0.42" />
+              <stop offset="58%" stopColor="#ffffff" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="bondMonoEdge" x1="200" y1="100" x2="600" y2="780" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+              <stop offset="40%" stopColor="#ffffff" stopOpacity="0.22" />
+              <stop offset="55%" stopColor="#ffffff" stopOpacity="0.55" />
+              <stop offset="70%" stopColor="#ffffff" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+            </linearGradient>
+
+            <filter id="bondMonoBlur" x="-25%" y="-25%" width="150%" height="150%">
+              <feGaussianBlur stdDeviation="22" />
             </filter>
-            <filter id="bondRibbonSoft" x="-10%" y="-10%" width="120%" height="120%">
-              <feGaussianBlur stdDeviation="6" />
+            <filter id="bondMonoSoft" x="-15%" y="-15%" width="130%" height="130%">
+              <feGaussianBlur stdDeviation="10" />
+            </filter>
+            <filter id="bondMonoTight" x="-8%" y="-8%" width="116%" height="116%">
+              <feGaussianBlur stdDeviation="3.5" />
             </filter>
           </defs>
 
-          <g className="bond-hero-ribbon-spin" style={{ transformOrigin: '460px 420px' }}>
+          <g className="bond-hero-ribbon-spin">
+            {/* Wide soft plate */}
             <path
-              d="M760 -40 C620 80 560 180 520 300 C470 460 540 560 640 640 C760 740 820 820 780 980 C700 900 520 860 380 780 C220 680 140 540 160 380 C180 220 300 120 460 40 C580 -20 700 -60 760 -40Z"
-              fill="url(#bondRibbonA)"
-              filter="url(#bondRibbonBlur)"
-              opacity="0.88"
+              d="M620 -80
+                 C480 40 400 160 360 300
+                 C310 480 380 600 500 700
+                 C640 820 720 920 680 1040
+                 C560 940 340 900 180 780
+                 C20 660 -20 480 40 300
+                 C100 120 260 20 440 -40
+                 C520 -70 580 -90 620 -80Z"
+              fill="url(#bondMonoBody)"
+              filter="url(#bondMonoBlur)"
+              opacity="0.92"
             />
+
+            {/* Mid ribbon sheet — longer S curve, closer to Stripe cloth */}
             <path
-              d="M820 40 C700 140 640 230 600 340 C550 490 610 590 700 670 C790 740 860 820 840 960 C760 900 600 870 470 800 C300 710 210 560 230 400 C250 250 380 150 540 80 C650 35 760 10 820 40Z"
-              fill="url(#bondRibbonB)"
-              filter="url(#bondRibbonSoft)"
-              opacity="0.78"
+              d="M680 20
+                 C560 120 500 220 470 340
+                 C430 500 500 610 600 700
+                 C690 780 760 870 740 1000
+                 C660 930 500 900 360 820
+                 C200 720 120 560 150 400
+                 C180 250 320 150 480 80
+                 C560 45 630 25 680 20Z"
+              fill="url(#bondMonoBody2)"
+              filter="url(#bondMonoSoft)"
+              opacity="0.96"
             />
+
+            {/* Inner hard ribbon band */}
             <path
-              d="M700 120 C620 200 580 280 560 370 C530 500 590 580 670 640 C740 690 790 760 770 860 C720 820 620 800 520 760 C390 700 320 600 330 480 C340 360 430 280 540 220 C620 180 670 150 700 120Z"
-              fill="url(#bondRibbonA)"
-              opacity="0.55"
+              d="M640 120
+                 C560 190 520 270 500 360
+                 C475 490 535 575 615 640
+                 C685 695 735 770 720 870
+                 C670 820 575 800 480 760
+                 C360 705 300 610 315 500
+                 C330 390 420 310 520 250
+                 C580 215 620 160 640 120Z"
+              fill="#0a0a0a"
+              filter="url(#bondMonoTight)"
+              opacity="0.9"
             />
+
+            {/* Moving sheen layers */}
+            <g className="bond-hero-ribbon-sheen">
+              <path
+                d="M680 20
+                   C560 120 500 220 470 340
+                   C430 500 500 610 600 700
+                   C690 780 760 870 740 1000
+                   C660 930 500 900 360 820
+                   C200 720 120 560 150 400
+                   C180 250 320 150 480 80
+                   C560 45 630 25 680 20Z"
+                fill="url(#bondMonoSheen)"
+                opacity="0.85"
+              />
+              <path
+                d="M640 120
+                   C560 190 520 270 500 360
+                   C475 490 535 575 615 640
+                   C685 695 735 770 720 870
+                   C670 820 575 800 480 760
+                   C360 705 300 610 315 500
+                   C330 390 420 310 520 250
+                   C580 215 620 160 640 120Z"
+                fill="url(#bondMonoEdge)"
+                opacity="0.75"
+              />
+              {/* thin highlight ridge */}
+              <path
+                d="M560 160 C520 250 500 340 495 430 C490 540 540 620 610 680"
+                stroke="url(#bondMonoEdge)"
+                strokeWidth="18"
+                strokeLinecap="round"
+                opacity="0.55"
+                filter="url(#bondMonoSoft)"
+              />
+            </g>
           </g>
         </svg>
       </div>
 
-      {/* soft white wash so copy stays readable on the left */}
-      <div className="absolute inset-y-0 left-0 w-[42%] bg-gradient-to-r from-[#fafafa] via-[#fafafa]/88 to-transparent lg:w-[28%]" />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#fafafa] to-transparent" />
-      <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#fafafa]/80 to-transparent" />
+      {/* Keep left column clean — wash only the seam, not the whole hero */}
+      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#fafafa] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#fafafa] to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-[#fafafa]/90 to-transparent" />
     </div>
   )
 }
