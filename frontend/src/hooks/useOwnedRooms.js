@@ -1,9 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ethers } from 'ethers'
 import { getContract, STATE_NAMES, parseRoom, ARC_READ_PROVIDER } from '../utils/contract'
-import { fetchMyRoomIds, backfillRoomIds } from '../lib/roomIndexApi'
+import { trackRoomId, backfillRoomIds } from '../lib/roomIndexApi'
 
-const LEGACY_SCAN_CAP = 200
+/** Soft cap for one-time chain discovery when no local index exists. */
+const LEGACY_SCAN_CAP = 80
+/** Parallel eth_call batch size — keeps RPC happy without serial waterfall. */
+const READ_BATCH = 12
+const INDEX_KEY = (addr) => `bond_room_ids_${String(addr).toLowerCase()}`
+
+function readLocalIds(address) {
+  if (!address || typeof window === 'undefined') return []
+  try {
+    const raw = window.localStorage.getItem(INDEX_KEY(address))
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return [...new Set(parsed.map(Number).filter((n) => Number.isFinite(n) && n > 0))].sort((a, b) => b - a)
+  } catch {
+    return []
+  }
+}
+
+function writeLocalIds(address, ids) {
+  if (!address || typeof window === 'undefined') return
+  const clean = [...new Set(ids.map(Number).filter((n) => Number.isFinite(n) && n > 0))].sort((a, b) => b - a)
+  window.localStorage.setItem(INDEX_KEY(address), JSON.stringify(clean))
+  return clean
+}
+
+function mergeLocalIds(address, extraIds) {
+  const merged = writeLocalIds(address, [...readLocalIds(address), ...extraIds])
+  return merged
+}
 
 function shapeOwnedRoom(i, room, addr) {
   const isCreator = room.creator.toLowerCase() === addr
@@ -22,109 +51,151 @@ function shapeOwnedRoom(i, room, addr) {
     createdAt: Number(room.createdAt),
     joinedAt: Number(room.joinedAt),
     isCreator,
-    role: isCreator ? (creatorIsSeller ? 'Seller' : 'Buyer') : (creatorIsSeller ? 'Buyer' : 'Seller'),
+    role: isCreator ? (creatorIsSeller ? 'Seller' : 'Buyer') : creatorIsSeller ? 'Buyer' : 'Seller',
     counter: isCreator ? room.counterparty : room.creator,
   }
 }
 
-async function loadRoomsByIds(ids, addr) {
-  const contract = getContract(ARC_READ_PROVIDER)
-  const myRooms = []
-  for (const i of ids) {
-    try {
-      const room = parseRoom(await contract.rooms(i))
-      const shaped = shapeOwnedRoom(i, room, addr)
-      if (shaped) myRooms.push(shaped)
-    } catch {
-      /* skip */
+async function mapPool(items, concurrency, worker) {
+  const results = new Array(items.length)
+  let next = 0
+  async function run() {
+    while (next < items.length) {
+      const idx = next++
+      results[idx] = await worker(items[idx], idx)
     }
   }
-  return myRooms
+  const runners = Array.from({ length: Math.min(concurrency, items.length) }, () => run())
+  await Promise.all(runners)
+  return results
+}
+
+async function loadRoomsByIds(ids, addr) {
+  if (!ids.length) return []
+  const contract = getContract(ARC_READ_PROVIDER)
+  const shaped = await mapPool(ids, READ_BATCH, async (i) => {
+    try {
+      const room = parseRoom(await contract.rooms(i))
+      return shapeOwnedRoom(i, room, addr)
+    } catch {
+      return null
+    }
+  })
+  return shaped.filter(Boolean)
 }
 
 async function legacyScan(addr) {
   const contract = getContract(ARC_READ_PROVIDER)
   const total = Number(await contract.roomCount())
-  const myRooms = []
+  if (!Number.isFinite(total) || total <= 0) return []
   const start = Math.max(1, total - LEGACY_SCAN_CAP + 1)
-  for (let i = total; i >= start; i--) {
-    try {
-      const room = parseRoom(await contract.rooms(i))
-      const shaped = shapeOwnedRoom(i, room, addr)
-      if (shaped) myRooms.push(shaped)
-    } catch {
-      /* skip */
-    }
-  }
-  return myRooms
+  const ids = []
+  for (let i = total; i >= start; i--) ids.push(i)
+  return loadRoomsByIds(ids, addr)
 }
 
-export default function useOwnedRooms(wallet, { pollMs = 30000 } = {}) {
+/**
+ * Owned rooms with local-first index.
+ * Never prompts wallet signature on read path (home / my rooms).
+ * Server room-index is write-through only after create/join (optional).
+ */
+export default function useOwnedRooms(wallet, { pollMs = 60000 } = {}) {
+  const address = wallet?.address || null
   const [rooms, setRooms] = useState([])
-  const [loading, setLoading] = useState(Boolean(wallet))
+  const [loading, setLoading] = useState(Boolean(address))
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const loadedOnce = useRef(false)
+  const [error, setError] = useState(null)
+  const loadedFor = useRef(null)
+  const inflight = useRef(null)
+  const walletRef = useRef(wallet)
+  walletRef.current = wallet
 
   const loadRooms = useCallback(async (background = false) => {
-    if (!wallet?.address) {
+    const w = walletRef.current
+    const addr = w?.address?.toLowerCase()
+    if (!addr) {
       setRooms([])
       setLoading(false)
       setIsRefreshing(false)
+      loadedFor.current = null
       return
     }
 
-    const initialLoad = !loadedOnce.current && !background
-    if (initialLoad) setLoading(true)
+    // Coalesce concurrent loads (StrictMode double-mount, poll overlap)
+    if (inflight.current) return inflight.current
+
+    const isFirstForAddr = loadedFor.current !== addr
+    if (isFirstForAddr && !background) setLoading(true)
     else setIsRefreshing(true)
+    setError(null)
 
-    try {
-      const addr = wallet.address.toLowerCase()
-      let ids = []
+    const job = (async () => {
       try {
-        ids = await fetchMyRoomIds(wallet)
-      } catch (error) {
-        console.warn('room-index fetch failed, falling back to scan', error)
-      }
+        let ids = readLocalIds(addr)
+        let myRooms
 
-      let myRooms
-      if (ids.length > 0) {
-        myRooms = await loadRoomsByIds(ids, addr)
-      } else {
-        myRooms = await legacyScan(addr)
-        if (myRooms.length > 0) {
-          try {
-            await backfillRoomIds(wallet, myRooms.map((r) => r.id))
-          } catch (error) {
-            console.warn('room-index backfill failed', error)
+        if (ids.length > 0) {
+          myRooms = await loadRoomsByIds(ids, addr)
+        } else {
+          // One-time discovery — parallel, capped. No wallet popup.
+          myRooms = await legacyScan(addr)
+          if (myRooms.length > 0) {
+            ids = writeLocalIds(addr, myRooms.map((r) => r.id))
+            // Best-effort server backfill — may prompt once if no auth cache; ignore failure
+            const liveWallet = walletRef.current
+            if (liveWallet?.address) {
+              backfillRoomIds(liveWallet, ids).catch(() => {})
+            }
           }
         }
-      }
 
-      setRooms(myRooms)
-    } catch (error) {
-      console.error('Load rooms error:', error)
-    } finally {
-      loadedOnce.current = true
-      if (initialLoad) setLoading(false)
-      setIsRefreshing(false)
-    }
-  }, [wallet])
+        setRooms(myRooms)
+        loadedFor.current = addr
+      } catch (err) {
+        console.error('Load rooms error:', err)
+        setError(err.message || 'Failed to load rooms')
+        // Keep previous rooms on refresh failure — avoids empty flash
+        if (isFirstForAddr) setRooms([])
+      } finally {
+        setLoading(false)
+        setIsRefreshing(false)
+        inflight.current = null
+      }
+    })()
+
+    inflight.current = job
+    return job
+  }, [])
 
   useEffect(() => {
-    loadedOnce.current = false
-    if (!wallet?.address) {
+    if (!address) {
       setRooms([])
       setLoading(false)
+      setIsRefreshing(false)
+      loadedFor.current = null
       return undefined
     }
 
+    // Warm from local ids instantly if we already shaped nothing yet
     loadRooms(false)
+
     if (!pollMs) return undefined
     const interval = setInterval(() => {
       loadRooms(true)
     }, pollMs)
     return () => clearInterval(interval)
-  }, [wallet?.address, loadRooms, pollMs])
+  }, [address, loadRooms, pollMs])
 
-  return { rooms, loading, isRefreshing, reload: loadRooms }
+  return { rooms, loading, isRefreshing, error, reload: loadRooms }
 }
+
+/** Call after createRoom / joinRoom success — local first, server optional. */
+export function rememberOwnedRoom(address, roomId, wallet) {
+  if (!address || !roomId) return
+  mergeLocalIds(address, [Number(roomId)])
+  if (wallet) {
+    trackRoomId(wallet, roomId).catch(() => {})
+  }
+}
+
+export { readLocalIds, writeLocalIds, mergeLocalIds }

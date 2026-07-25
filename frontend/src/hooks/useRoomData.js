@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ethers } from 'ethers'
 import {
   ARC_READ_PROVIDER,
@@ -32,6 +32,7 @@ function mapRoom(data) {
 }
 
 export function useRoomData(id, wallet) {
+  const address = wallet?.address || null
   const [room, setRoom] = useState(null)
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState(null)
@@ -47,50 +48,65 @@ export function useRoomData(id, wallet) {
     counterpartyApproved: false,
   })
 
+  const walletRef = useRef(wallet)
+  walletRef.current = wallet
+  const requestGen = useRef(0)
+
   const loadRoom = useCallback(async () => {
+    const gen = ++requestGen.current
+    const w = walletRef.current
     try {
-      if (!wallet || !id) {
-        setRoom(null)
-        setLoading(false)
+      if (!w || !id) {
+        if (gen === requestGen.current) {
+          setRoom(null)
+          setLoading(false)
+        }
         return
       }
       const contract = getContract(ARC_READ_PROVIDER)
       const data = parseRoom(await contract.rooms(id))
+      if (gen !== requestGen.current) return
+
       setRoom(mapRoom(data))
-      try {
-        setArbiterName(await contract.arbiterName())
-      } catch { /* ignore */ }
-      try {
-        setArbiterAddr(await contract.arbiter())
-      } catch { /* ignore */ }
-      try {
-        setOwnerAddr(await contract.owner())
-      } catch { /* ignore */ }
-      try {
-        setIsActiveArbiter(wallet?.address ? await contract.isArbiter(wallet.address) : false)
-      } catch {
-        setIsActiveArbiter(false)
-      }
-      try {
-        const mc = await contract.getMutualCancelStatus(id)
-        setMutualCancelStatus({ creatorApproved: mc[0], counterpartyApproved: mc[1] })
-      } catch { /* ignore */ }
-      try {
-        const [cRep, cpRep] = await Promise.all([
+      await Promise.all([
+        contract.arbiterName().then((v) => gen === requestGen.current && setArbiterName(v)).catch(() => {}),
+        contract.arbiter().then((v) => gen === requestGen.current && setArbiterAddr(v)).catch(() => {}),
+        contract.owner().then((v) => gen === requestGen.current && setOwnerAddr(v)).catch(() => {}),
+        w.address
+          ? contract.isArbiter(w.address).then((v) => gen === requestGen.current && setIsActiveArbiter(v)).catch(() => {
+            if (gen === requestGen.current) setIsActiveArbiter(false)
+          })
+          : Promise.resolve(),
+        contract
+          .getMutualCancelStatus(id)
+          .then((mc) => {
+            if (gen === requestGen.current) {
+              setMutualCancelStatus({ creatorApproved: mc[0], counterpartyApproved: mc[1] })
+            }
+          })
+          .catch(() => {}),
+        Promise.all([
           fetchReputation(ARC_READ_PROVIDER, data.creator),
           fetchReputation(ARC_READ_PROVIDER, data.counterparty),
         ])
-        setCreatorRep(cRep)
-        setCounterpartyRep(cpRep)
-      } catch { /* ignore */ }
+          .then(([cRep, cpRep]) => {
+            if (gen === requestGen.current) {
+              setCreatorRep(cRep)
+              setCounterpartyRep(cpRep)
+            }
+          })
+          .catch(() => {}),
+      ])
     } catch (err) {
       console.error(err)
-      setRoom(null)
-      setStatus({ type: 'err', msg: 'Room not found' })
+      if (gen === requestGen.current) {
+        setRoom(null)
+        setStatus({ type: 'err', msg: 'Room not found' })
+      }
     } finally {
-      setLoading(false)
+      if (gen === requestGen.current) setLoading(false)
     }
-  }, [id, wallet])
+  }, [id])
 
   const loadEvidence = useCallback(async () => {
     try {
@@ -139,7 +155,7 @@ export function useRoomData(id, wallet) {
   }, [loadRoom, loadEvidence])
 
   const scheduleRoomRefresh = useCallback(() => {
-    ;[1200, 3000, 6000, 10000].forEach((delay) => {
+    ;[1200, 3000, 6000].forEach((delay) => {
       window.setTimeout(() => {
         loadRoom()
         loadEvidence()
@@ -149,14 +165,16 @@ export function useRoomData(id, wallet) {
 
   useEffect(() => {
     setLoading(true)
+    setRoom(null)
+    setEvidence([])
     loadRoom()
     loadEvidence()
-  }, [loadRoom, loadEvidence])
+  }, [id, address, loadRoom, loadEvidence])
 
   const isTerminal = ['Released', 'Refunded', 'Expired', 'Cancelled'].includes(room?.state)
-  useSmartPolling(refresh, [id, wallet?.address], {
-    interval: 4000,
-    enabled: Boolean(wallet && id && !isTerminal),
+  useSmartPolling(refresh, [id, address], {
+    interval: 10000,
+    enabled: Boolean(address && id && !isTerminal && !loading),
   })
 
   return {

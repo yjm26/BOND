@@ -2,8 +2,19 @@ import DisputeCard from './DisputeCard'
 
 export default function DisputeQueue({ disputes, selectedId, onSelect, loading, error }) {
   if (loading) {
-    return <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-6 text-[13px] text-[var(--a-muted)]">Scanning rooms…</div>
-  }
+      return (
+        <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-6">
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--a-muted)]">Loading queue</div>
+          <div className="mt-4 space-y-3">
+            {[0, 1, 2].map((k) => (
+              <div key={k} className="h-16 border border-[var(--a-line)] bg-[var(--a-panel)]">
+                <div className="h-full w-full animate-pulse bg-[var(--a-ink)]/[0.04]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
   if (error) {
     return <div className="border border-[#b87333]/35 bg-[#b87333]/10 p-5 text-[13px] text-[#b87333]">{error}</div>
   }

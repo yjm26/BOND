@@ -14,7 +14,7 @@ import {
 import { deliveryProofHash } from '../utils/deliveryProof'
 import { postEvidence } from '../lib/evidenceApi'
 import { registerDispute } from '../lib/disputesApi'
-import { trackRoomId } from '../lib/roomIndexApi'
+import { rememberOwnedRoom } from './useOwnedRooms'
 import { useToast } from './useToast'
 
 const MAX_REASON_BYTES = 500
@@ -135,10 +135,10 @@ export function useRoomActions({
         const tx = await contract.joinRoom(id, ethers.toUtf8Bytes(joinCode), { ...ARC_GAS, nonce: nonce++ })
         await waitForTx(wallet.provider, tx.hash, 180000)
         try {
-          await trackRoomId(wallet, id)
-        } catch (e) {
-          console.warn('room-index track failed', e)
-        }
+                  rememberOwnedRoom(wallet.address, id, wallet)
+                } catch (e) {
+                  console.warn('room-index track failed', e)
+                }
         setStatus({ type: 'ok', msg: 'Joined!' })
         scheduleRoomRefresh()
       } catch (e) {

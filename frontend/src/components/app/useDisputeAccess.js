@@ -1,34 +1,40 @@
 import { useEffect, useState } from 'react'
-import { getContract } from '../../utils/contract'
+import { ARC_READ_PROVIDER, getContract } from '../../utils/contract'
 
+/**
+ * Whether the connected wallet may open the disputes desk (owner or arbiter).
+ * Uses public RPC (stable) and does not flash false on every re-render.
+ */
 export default function useDisputeAccess(wallet) {
   const [canAccessDisputes, setCanAccessDisputes] = useState(false)
 
   useEffect(() => {
-    if (!wallet?.address || !wallet?.provider) {
+    if (!wallet?.address) {
       setCanAccessDisputes(false)
       return
     }
 
     let stale = false
-    setCanAccessDisputes(false)
 
     ;(async () => {
       try {
-        const contract = getContract(wallet.provider)
+        const contract = getContract(ARC_READ_PROVIDER)
         const [owner, activeArbiter] = await Promise.all([
           contract.owner().catch(() => ''),
           contract.isArbiter(wallet.address).catch(() => false),
         ])
         if (stale) return
-        setCanAccessDisputes(Boolean(owner && wallet.address.toLowerCase() === owner.toLowerCase()) || Boolean(activeArbiter))
+        const isOwner = Boolean(owner && wallet.address.toLowerCase() === String(owner).toLowerCase())
+        setCanAccessDisputes(isOwner || Boolean(activeArbiter))
       } catch {
         if (!stale) setCanAccessDisputes(false)
       }
     })()
 
-    return () => { stale = true }
-  }, [wallet?.address, wallet?.provider])
+    return () => {
+      stale = true
+    }
+  }, [wallet?.address])
 
   return canAccessDisputes
 }

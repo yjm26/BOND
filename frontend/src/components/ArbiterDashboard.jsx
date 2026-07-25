@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ethers } from 'ethers'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppGate from './app/AppGate'
 import ArbiterGate from './arbiter/ArbiterGate'
 import ArbiterHeader from './arbiter/ArbiterHeader'
@@ -18,6 +17,9 @@ import { DISPUTED_STATE, normalizeEvidence, shapeRoom } from './arbiter/arbiterU
 import { fetchOpenDisputes, resolveDisputeRecord } from '../lib/disputesApi'
 import { fetchRoomEvidence } from '../lib/evidenceApi'
 
+const SCAN_CAP = 60
+const READ_BATCH = 10
+
 function getRole(wallet, owner, isArbiter) {
   if (!wallet?.address) return 'User'
   if (owner && wallet.address.toLowerCase() === owner.toLowerCase()) return 'Owner'
@@ -25,9 +27,22 @@ function getRole(wallet, owner, isArbiter) {
   return 'User'
 }
 
+async function mapPool(items, concurrency, worker) {
+  const results = new Array(items.length)
+  let next = 0
+  async function run() {
+    while (next < items.length) {
+      const idx = next++
+      results[idx] = await worker(items[idx], idx)
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, Math.max(items.length, 1)) }, () => run()))
+  return results
+}
+
 /**
  * Merge API dispute cases with on-chain Disputed rooms.
- * Prefer chain state for money truth; API supplies reason + off-chain evidence.
+ * Parallel reads; evidence only for rooms that are actually Disputed.
  */
 async function loadDeskCases() {
   let apiCases = []
@@ -39,62 +54,59 @@ async function loadDeskCases() {
 
   const contract = getContract(ARC_READ_PROVIDER)
   const total = Number(await contract.roomCount())
-  const byId = new Map()
+  const apiById = new Map()
 
-  // Seed from API open cases first (may include reason before chain read)
   for (const row of apiCases || []) {
     const id = Number(row.roomId)
-    if (!Number.isFinite(id)) continue
-    byId.set(id, {
-      api: row,
-      id,
-    })
+    if (!Number.isFinite(id) || id <= 0) continue
+    apiById.set(id, row)
   }
 
-  // Scan chain for Disputed — authoritative queue
-  // Cap scan window for responsiveness; API ids always included
-  const apiIds = [...byId.keys()]
-  const scanStart = Math.max(1, total - 150)
-  const candidateIds = new Set([
-    ...apiIds,
-    ...Array.from({ length: Math.max(0, total - scanStart + 1) }, (_, i) => scanStart + i),
-  ])
+  const scanStart = Math.max(1, total - SCAN_CAP + 1)
+  const candidateIds = [
+    ...new Set([
+      ...apiById.keys(),
+      ...Array.from({ length: Math.max(0, total - scanStart + 1) }, (_, i) => scanStart + i),
+    ]),
+  ].sort((a, b) => b - a)
 
-  const loaded = []
-  for (const id of candidateIds) {
+  const roomRows = await mapPool(candidateIds, READ_BATCH, async (id) => {
     try {
       const roomData = parseRoom(await contract.rooms(id))
-      if (Number(roomData.state) !== DISPUTED_STATE) {
-        // keep API-only only if still open and chain not readable — skip non-disputed
-        continue
-      }
-      const chainEvidence = await contract
+      if (Number(roomData.state) !== DISPUTED_STATE) return null
+      return { id, roomData }
+    } catch {
+      return null
+    }
+  })
+
+  const disputed = roomRows.filter(Boolean)
+
+  const loaded = await mapPool(disputed, 6, async ({ id, roomData }) => {
+    const [chainEvidence, backend] = await Promise.all([
+      contract
         .getAllEvidence(id)
         .then((items) => items.map(normalizeEvidence))
-        .catch(() => [])
-      let apiEvidence = []
-      try {
-        const backend = await fetchRoomEvidence(id)
-        apiEvidence = (Array.isArray(backend) ? backend : []).map((e) => ({
-          submitter: e.submitter,
-          evidenceType: e.evidenceType,
-          description: e.description,
-          evidenceRef: e.evidenceRef,
-          timestamp: Math.floor(Number(e.timestamp || Date.now()) / 1000),
-        }))
-      } catch { /* ignore */ }
+        .catch(() => []),
+      fetchRoomEvidence(id).catch(() => []),
+    ])
 
-      const shaped = shapeRoom(id, roomData, [...chainEvidence, ...apiEvidence])
-      const api = byId.get(id)?.api
-      if (api?.reason) {
-        shaped.apiReason = api.reason
-        shaped.disputedBy = api.disputedBy
-      }
-      loaded.push(shaped)
-    } catch (err) {
-      console.warn(`Failed to read room ${id}`, err)
+    const apiEvidence = (Array.isArray(backend) ? backend : []).map((e) => ({
+      submitter: e.submitter,
+      evidenceType: e.evidenceType,
+      description: e.description,
+      evidenceRef: e.evidenceRef,
+      timestamp: Math.floor(Number(e.timestamp || Date.now()) / 1000),
+    }))
+
+    const shaped = shapeRoom(id, roomData, [...chainEvidence, ...apiEvidence])
+    const api = apiById.get(id)
+    if (api?.reason) {
+      shaped.apiReason = api.reason
+      shaped.disputedBy = api.disputedBy
     }
-  }
+    return shaped
+  })
 
   loaded.sort((a, b) => (b.disputedAt || b.createdAt) - (a.disputedAt || a.createdAt))
   return loaded
@@ -111,6 +123,8 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
   const [queueError, setQueueError] = useState('')
   const [resolving, setResolving] = useState(false)
   const [txStatus, setTxStatus] = useState(null)
+  const hasLoadedQueue = useRef(false)
+  const inflightQueue = useRef(null)
 
   const role = useMemo(() => getRole(wallet, owner, isActiveArbiter), [wallet, owner, isActiveArbiter])
   const canUseDesk = role === 'Owner' || role === 'Arbiter'
@@ -136,17 +150,28 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
   }, [wallet?.address, wallet?.provider])
 
   const loadDisputes = useCallback(async () => {
-    setQueueLoading(true)
+    if (inflightQueue.current) return inflightQueue.current
+
+    // Only full-screen/queue skeleton on first load — later refreshes stay quiet
+    if (!hasLoadedQueue.current) setQueueLoading(true)
     setQueueError('')
-    try {
-      const loaded = await loadDeskCases()
-      setDisputes(loaded)
-      setSelectedId((current) => (loaded.some((room) => room.id === current) ? current : loaded[0]?.id || null))
-    } catch (err) {
-      setQueueError(err.message || 'Failed to load dispute desk.')
-    } finally {
-      setQueueLoading(false)
-    }
+
+    const job = (async () => {
+      try {
+        const loaded = await loadDeskCases()
+        setDisputes(loaded)
+        setSelectedId((current) => (loaded.some((room) => room.id === current) ? current : loaded[0]?.id || null))
+        hasLoadedQueue.current = true
+      } catch (err) {
+        setQueueError(err.message || 'Failed to load dispute desk.')
+      } finally {
+        setQueueLoading(false)
+        inflightQueue.current = null
+      }
+    })()
+
+    inflightQueue.current = job
+    return job
   }, [])
 
   useEffect(() => {
@@ -157,7 +182,7 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
   useEffect(() => {
     if (!wallet || !canUseDesk) return
     loadDisputes()
-  }, [wallet, canUseDesk, loadDisputes])
+  }, [wallet?.address, canUseDesk, loadDisputes])
 
   const runDecision = async (label, action, resolutionTag) => {
     if (!selectedRoom || resolving) return
@@ -200,7 +225,7 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
   return (
     <section className="min-h-screen bg-[var(--a-bg)] px-4 pt-[88px] text-[var(--a-ink)] sm:px-6 lg:px-8">
       <div className="pb-4">
-        <main className="overflow-hidden border border-[var(--a-line)] bg-[var(--a-panel)] animate-[bondDeskIn_180ms_cubic-bezier(0.23,1,0.32,1)]">
+        <main className="overflow-hidden border border-[var(--a-line)] bg-[var(--a-panel)]">
           <div className="p-4 sm:p-5 lg:p-6">
             {roleLoading || !canUseDesk ? (
               <ArbiterGate role={role} loadingRole={roleLoading} error={roleError} />
@@ -219,7 +244,7 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
                       setSelectedId(room.id)
                       setTxStatus(null)
                     }}
-                    loading={queueLoading}
+                    loading={queueLoading && disputes.length === 0}
                     error={queueError}
                   />
                   <DisputeDetailPanel
