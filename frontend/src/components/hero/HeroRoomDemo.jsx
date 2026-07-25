@@ -159,23 +159,27 @@ export default function HeroRoomDemo() {
                 <Party label="Seller" address={room.seller} you={room.state === 'Funded'} />
               </div>
 
-              <div className="border border-[#fafafa]/10 bg-[#111111] p-4">
-                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">Evidence</div>
-                {room.evidence.length ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {room.evidence.map((item) => (
-                      <span
-                        key={item.label}
-                        className="border border-[#fafafa]/12 bg-[#0a0a0a] px-3 py-2 font-mono text-[11px] text-[#fafafa]/75"
-                      >
-                        {item.label}
-                      </span>
-                    ))}
+              {room.showEvidence && (
+                <div className="border border-[#fafafa]/10 bg-[#111111] p-4">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">
+                    Evidence
                   </div>
-                ) : (
-                  <p className="mt-3 text-[13px] text-[#737373]">No delivery proof yet.</p>
-                )}
-              </div>
+                  {room.evidence.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {room.evidence.map((item) => (
+                        <span
+                          key={item.label}
+                          className="border border-[#fafafa]/12 bg-[#0a0a0a] px-3 py-2 font-mono text-[11px] text-[#fafafa]/75"
+                        >
+                          {item.label}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-[13px] text-[#737373]">No evidence filed.</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <aside className={`border border-[#fafafa]/10 bg-[#111111] p-4 transition duration-160 sm:p-5 ${ring(activeId, 'actions')}`}>
