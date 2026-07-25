@@ -1,10 +1,20 @@
 export const CONTRACT_ADDRESS = '0x1A3ea0d24ff15a90417508F38ABD8E173921082A'
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'
 export const CHAIN_ID = 5042002
+export const CHAIN_ID_HEX = '0x4cef52'
 export const EXPLORER_URL = `https://testnet.arcscan.app/address/${CONTRACT_ADDRESS}`
+export const EXPLORER_HOME = 'https://testnet.arcscan.app'
+export const ARC_DOCS_BUILD = 'https://docs.arc.io/build'
+export const ARC_DOCS_CONNECT = 'https://docs.arc.io/arc/references/connect-to-arc'
+export const ARC_DOCS_GAS = 'https://docs.arc.io/arc/references/gas-and-fees'
+export const ARC_DOCS_USDC = 'https://docs.arc.io/arc/references/contract-addresses'
+export const ARC_FAUCET = 'https://faucet.circle.com'
+export const ARC_RPC_PRIMARY = 'https://rpc.blockdaemon.testnet.arc.network'
+export const ARC_RPC_BACKUP = 'https://rpc.drpc.testnet.arc.network'
 
 export const DOC_SECTIONS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'on-arc', label: 'On Arc' },
   { id: 'rooms', label: 'Rooms' },
   { id: 'market', label: 'Market' },
   { id: 'settlement', label: 'Settlement' },
@@ -14,12 +24,53 @@ export const DOC_SECTIONS = [
   { id: 'faq', label: 'FAQ' },
 ]
 
-/** On-chain room states (Bond contract). */
+/** Network facts — aligned with docs.arc.io (testnet). */
+export const ARC_NETWORK_FACTS = [
+  ['Chain', `Arc Testnet · chainId ${CHAIN_ID} (${CHAIN_ID_HEX}).`],
+  ['Gas token', 'USDC is native gas. Wallet/network config uses 18 decimals for gas accounting.'],
+  [
+    'Escrow token',
+    `USDC ERC-20 precompile ${USDC_ADDRESS.slice(0, 10)}… — 6 decimals for approve / transferFrom / room amounts.`,
+  ],
+  [
+    'Same asset',
+    'Native gas USDC and the ERC-20 interface share one balance. Do not mix 18dp and 6dp in app math.',
+  ],
+  [
+    'Finality',
+    'Arc targets fast deterministic finality. The app polls receipts tightly; long multi-block waits are unnecessary.',
+  ],
+  [
+    'Scope',
+    'BOND is room escrow on Arc. It does not integrate Circle App Kit bridge/swap or ERC-8183 job escrow.',
+  ],
+]
+
+export const ARC_LINK_ROWS = [
+  ['Build docs', 'docs.arc.io/build', ARC_DOCS_BUILD],
+  ['Connect / RPC', 'Connect to Arc', ARC_DOCS_CONNECT],
+  ['Gas & fees', 'Gas reference', ARC_DOCS_GAS],
+  ['Addresses', 'USDC & contracts', ARC_DOCS_USDC],
+  ['Faucet', 'Circle faucet (test USDC)', ARC_FAUCET],
+  ['Explorer', 'ArcScan testnet', EXPLORER_HOME],
+]
+
+export const ARC_RPC_ROWS = [
+  ['Primary RPC', ARC_RPC_PRIMARY],
+  ['Backup RPC', ARC_RPC_BACKUP],
+  ['Min base fee (testnet)', '~20 gwei floor — far lower maxFee can stay pending.'],
+  ['App fees', 'BOND sets explicit maxFee / priorityFee above the floor for inclusion.'],
+]
+
+/** On-chain room states (BOND contract). */
 export const ROOM_STATES = [
   ['Created', 'Room exists with terms and join-code hash. Waiting for the counterparty.'],
   ['Joined', 'Both parties are set. Buyer can fund within 30 minutes.'],
   ['Funded', 'Price + 1% fee locked. Seller must deliver by the delivery deadline.'],
-  ['Delivered', 'Seller marked delivery. Buyer can release or dispute. 12h buffer starts for seller escalate.'],
+  [
+    'Delivered',
+    'Seller marked delivery. Buyer can release or dispute. 12h buffer starts for seller escalate.',
+  ],
   ['Released', 'Seller paid. Room terminal.'],
   ['Disputed', 'Funds frozen for owner/active arbiter.'],
   ['Refunded', 'Buyer refunded after missed delivery (or related refund path).'],
@@ -29,7 +80,7 @@ export const ROOM_STATES = [
 
 export const ROOM_FACTS = [
   ['Parties', 'Buyer, seller, and creator are wallet addresses stored on-chain.'],
-  ['Amounts', 'Price and optional seller collateral use USDC 6-decimal units.'],
+  ['Amounts', 'Price and optional seller collateral use USDC 6-decimal units (ERC-20 interface).'],
   ['Join code', 'Plain code is off-chain. The contract stores keccak256(code).'],
   ['Proof', 'Delivery proof hash and dispute fields attach to the room.'],
   ['Timers', 'Join 1 day · fund 30 min · delivery 1–90 days · response buffer 12h.'],
@@ -53,6 +104,7 @@ export const FEE_ROWS = [
   ['Delivery window', '1–90 days, set at create; becomes deliveryDeadline.'],
   ['Response buffer', '12 hours after markDelivered (RESPONSE_BUFFER). Seller escalate only after this.'],
   ['Listing expiry', '30 days for active market listings (API). Separate from escrow timers.'],
+  ['Network gas', 'Separate from platform fee. Paid in USDC (native gas) on every transaction.'],
 ]
 
 export const SETTLEMENT_ROWS = [
@@ -72,12 +124,15 @@ export const DISPUTE_ROWS = [
 ]
 
 export const SECURITY_FACTS = [
-  ['Money path', 'USDC moves only via Bond contract functions. Market API cannot transfer funds.'],
+  ['Money path', 'USDC moves only via BOND contract functions. Market API cannot transfer funds.'],
   ['Keys', 'App never asks for a private key or seed. SIWE is for API writes only.'],
   ['SIWE scope', 'Listings, offers, profiles, room-index, evidence notes — not room fund/release.'],
   ['Arbiter power', 'Owner/active arbiter resolve disputed rooms only. Paths are fixed (buyer/seller/split).'],
-  ['USDC decimals', '6 decimals on Arc Testnet precompile. Do not use float math.'],
-  ['Testnet', 'Arc Testnet chainId 5042002. Not mainnet. No production-value funds.'],
+  [
+    'USDC decimals',
+    'Escrow amounts: 6dp ERC-20 interface. Gas: native USDC 18dp in wallet config. Do not mix.',
+  ],
+  ['Testnet', `Arc Testnet chainId ${CHAIN_ID}. Not mainnet. No production-value funds.`],
 ]
 
 export const FAQ_ITEMS = [
@@ -114,7 +169,15 @@ export const FAQ_ITEMS = [
     a: 'At most 3 non-terminal rooms per wallet (Created through Disputed count; Released/Refunded/Expired/Cancelled do not).',
   },
   {
+    q: 'What network is this?',
+    a: `Arc Testnet only (chainId ${CHAIN_ID}). Gas and settlement use USDC. Get test USDC from the Circle faucet, then switch your wallet to Arc Testnet.`,
+  },
+  {
+    q: 'Why do I need USDC for gas and for the room?',
+    a: 'On Arc, gas is paid in native USDC. Room fund/approve uses the USDC ERC-20 interface (6 decimals). Same asset, two meters — keep balance for gas plus price + 1%.',
+  },
+  {
     q: 'Is this mainnet?',
-    a: 'No. Bond on Arc Testnet only. Treat funds as test value.',
+    a: 'No. BOND runs on Arc Testnet only. Treat all funds as test value.',
   },
 ]

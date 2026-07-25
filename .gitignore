@@ -17,8 +17,8 @@ frontend/full_test.mjs
 .hermes/
 screenshots/
 sketches/
-docs/
-docs/superpowers/
+# Root-only agent plans (do NOT ignore frontend/src/components/docs)
+/docs/
 .superpowers/
 *.plan.md
 

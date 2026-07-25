@@ -3,6 +3,7 @@ import { DOC_SECTIONS } from './docs/docsData'
 import { NavPill, SideLink } from './docs/DocsUi'
 import {
   OverviewSection,
+  OnArcSection,
   RoomsSection,
   MarketSection,
   SettlementSection,
@@ -14,6 +15,7 @@ import {
 
 const SECTION_MAP = {
   overview: OverviewSection,
+  'on-arc': OnArcSection,
   rooms: RoomsSection,
   market: MarketSection,
   settlement: SettlementSection,
@@ -42,9 +44,8 @@ export default function Docs() {
               Room mechanics, fees, and settlement.
             </h1>
             <p className="max-w-[380px] text-[15px] leading-[1.7] tracking-[-0.01em] text-[#525252] lg:justify-self-end">
-              Bond on Arc Testnet: states, who locks USDC, timers, dispute paths, and what the market API does
-              not do.
-            </p>
+                          BOND on Arc Testnet: room mechanics, USDC gas and settlement, fees, disputes, and network setup.
+                        </p>
           </div>
         </header>
 

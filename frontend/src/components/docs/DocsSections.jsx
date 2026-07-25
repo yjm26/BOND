@@ -2,7 +2,14 @@ import {
   CONTRACT_ADDRESS,
   USDC_ADDRESS,
   EXPLORER_URL,
+  EXPLORER_HOME,
   CHAIN_ID,
+  CHAIN_ID_HEX,
+  ARC_NETWORK_FACTS,
+  ARC_LINK_ROWS,
+  ARC_RPC_ROWS,
+  ARC_FAUCET,
+  ARC_DOCS_BUILD,
   ROOM_STATES,
   ROOM_FACTS,
   MARKET_FACTS,
@@ -23,8 +30,11 @@ export function OverviewSection() {
     >
       <FactGrid
         items={[
-          ['Network', `Arc Testnet · chainId ${CHAIN_ID}. Gas accounting is USDC-native; escrow token is the Arc USDC precompile.`],
-          ['Contract', 'Bond escrow — create, join, fund, deliver, release, refund, dispute, arbiter resolve.'],
+          [
+            'Network',
+            `Arc Testnet · chainId ${CHAIN_ID}. Gas is USDC-native; room amounts use the Arc USDC ERC-20 precompile (6 decimals).`,
+          ],
+          ['Contract', 'BOND escrow — create, join, fund, deliver, release, refund, dispute, arbiter resolve.'],
           ['Roles', 'Buyer funds. Seller delivers. Owner or active arbiter only on Disputed rooms.'],
           ['Two layers', 'On-chain = money + state. API = listings, offers, profiles, room codes, case notes.'],
         ]}
@@ -51,16 +61,124 @@ export function OverviewSection() {
             </a>
           </div>
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">USDC</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">USDC precompile</span>
             <br />
             <Code>{USDC_ADDRESS}</Code>
-            <span className="ml-2 text-[13px] text-[#737373]">6 decimals</span>
+            <span className="ml-2 text-[13px] text-[#737373]">6 decimals (escrow)</span>
           </div>
         </div>
+        <p className="mt-4 text-[13px] leading-[1.6] text-[#737373]">
+          Network setup, faucet, and gas notes:{' '}
+          <a className="underline decoration-[#0a0a0a]/25 underline-offset-4 hover:decoration-[#0a0a0a]" href="/docs/on-arc">
+            On Arc
+          </a>
+          .
+        </p>
       </Card>
 
       <Callout title="Testnet" danger>
-        Bond is on Arc Testnet only. Do not send production-value funds.
+        BOND is on Arc Testnet only. Do not send production-value funds.
+      </Callout>
+    </Section>
+  )
+}
+
+export function OnArcSection() {
+  return (
+    <Section
+      eyebrow="On Arc"
+      title="Network rails BOND uses."
+      intro="BOND is an escrow product on Arc Testnet: EVM contracts, USDC gas, and the official USDC precompile for room balances. This section is network setup — not a product pivot."
+    >
+      <FactGrid items={ARC_NETWORK_FACTS} />
+
+      <Card>
+        <H3>Get test USDC</H3>
+        <P>
+          You need USDC on Arc Testnet for gas and for room fund/approve. Request test tokens from the Circle faucet,
+          then connect your wallet to Arc Testnet (chainId {CHAIN_ID}).
+        </P>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <a
+            href={ARC_FAUCET}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 items-center justify-center border border-[#0a0a0a] bg-[#0a0a0a] px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#fafafa] transition duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97]"
+          >
+            Circle faucet
+          </a>
+          <a
+            href={EXPLORER_HOME}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 items-center justify-center border border-[#0a0a0a]/18 px-5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#0a0a0a] transition duration-160 ease-out hover:border-[#0a0a0a] active:scale-[0.97]"
+          >
+            ArcScan
+          </a>
+          <a
+            href={ARC_DOCS_BUILD}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 items-center justify-center border border-[#0a0a0a]/18 px-5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#0a0a0a] transition duration-160 ease-out hover:border-[#0a0a0a] active:scale-[0.97]"
+          >
+            docs.arc.io/build
+          </a>
+        </div>
+      </Card>
+
+      <Card>
+        <H3>RPC</H3>
+        <Table
+          headers={['Item', 'Value']}
+          rows={ARC_RPC_ROWS.map(([k, v]) => [
+            <span key={k} className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#0a0a0a]">
+              {k}
+            </span>,
+            <span key={`${k}-v`} className="break-all font-mono text-[12px] text-[#262626]">
+              {v}
+            </span>,
+          ])}
+        />
+        <p className="mt-4 text-[13px] leading-[1.6] text-[#737373]">
+          Wallet add-chain uses chainId {CHAIN_ID_HEX}, name Arc Testnet, native currency USDC (18 decimals for gas
+          metadata).
+        </p>
+      </Card>
+
+      <Card>
+        <H3>Decimals (read once)</H3>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <SmallFact label="Room amounts" value="6 dp" />
+          <SmallFact label="Gas metering" value="18 dp" />
+        </div>
+        <P>
+          Escrow price, collateral, and <Code>fundRoom</Code> pulls use the USDC ERC-20 interface at 6 decimals. Gas is
+          priced in native USDC with 18-decimal wallet accounting. One balance underneath — two unit scales in tooling.
+        </P>
+      </Card>
+
+      <Card>
+        <H3>Official references</H3>
+        <Table
+          headers={['Topic', 'Link']}
+          rows={ARC_LINK_ROWS.map(([topic, label, href]) => [
+            topic,
+            <a
+              key={href}
+              className="underline decoration-[#0a0a0a]/25 underline-offset-4 hover:decoration-[#0a0a0a]"
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {label}
+            </a>,
+          ])}
+        />
+      </Card>
+
+      <Callout title="Not in BOND (yet)">
+        Circle App Kit bridge/swap, CCTP unified balance UI, account abstraction paymasters, and ERC-8183 agent jobs are
+        optional Arc platform paths. BOND stays a human deal-room escrow on Arc rails.
       </Callout>
     </Section>
   )
@@ -118,7 +236,7 @@ export function MarketSection() {
     <Section
       eyebrow="Market"
       title="Market finds counterparties. Rooms hold money."
-      intro="Listings and offers live in the API. When both sides agree, someone creates a Bond room. Until fundRoom succeeds, no escrow USDC is locked."
+      intro="Listings and offers live in the API. When both sides agree, someone creates a BOND room. Until fundRoom succeeds, no escrow USDC is locked."
     >
       <FactGrid items={MARKET_FACTS} />
 
@@ -152,7 +270,7 @@ export function SettlementSection() {
 
       <Callout title="RESPONSE_BUFFER">
         Fixed <Code>12 hours</Code> after <Code>markDelivered</Code>. Used only for seller escalate. Not a market listing
-        timer and not a selectable “review days” preset.
+        timer and not a selectable review-days preset.
       </Callout>
 
       <Card>
@@ -195,7 +313,7 @@ export function FeesTimersSection() {
     <Section
       eyebrow="Fees & timers"
       title="Fees and clocks as enforced by the contract."
-      intro="Buyer sees total to fund (price + 1%) before fundRoom. Timers are block timestamps, not UI-only countdowns."
+      intro="Buyer sees total to fund (price + 1%) before fundRoom. Timers are block timestamps. Network gas in USDC is separate from the 1% platform fee."
     >
       <Table headers={['Item', 'Rule']} rows={FEE_ROWS} />
     </Section>
@@ -224,7 +342,7 @@ export function FaqSection() {
     <Section
       eyebrow="FAQ"
       title="Common questions."
-      intro="Short answers tied to Bond behavior on Arc Testnet."
+      intro="Short answers for BOND on Arc Testnet — rooms, fees, and network setup."
     >
       <div className="grid gap-3">
         {FAQ_ITEMS.map((item) => (
