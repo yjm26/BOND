@@ -9,9 +9,6 @@ export default function BondHero() {
         <div className="mt-12 sm:mt-14 lg:mt-16">
           <HeroRoomDemo />
         </div>
-        <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">
-          Hover labels · tap to pin
-        </p>
       </div>
     </section>
   )
