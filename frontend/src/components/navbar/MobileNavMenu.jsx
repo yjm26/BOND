@@ -69,6 +69,9 @@ export default function MobileNavMenu({
             >
               Market
             </a>
+            <a href="#endings" className={linkClass} onClick={onClose}>
+              Endings
+            </a>
             <Link to="/docs" className={linkClass} onClick={onClose}>
               Docs
             </Link>

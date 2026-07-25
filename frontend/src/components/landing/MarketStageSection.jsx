@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom'
 import { STAGE_LISTINGS } from './marketDemoData'
 
 /**
- * Production landing §3 — Market product surface.
- * Same craft language as hero room chrome. No fake depth layers.
- * Selection explains the surface; CTA goes to live /market.
+ * Market chapter — product chrome, numbered like Linear chapters.
  */
 export default function MarketStageSection() {
   const [filter, setFilter] = useState('all')
@@ -23,41 +21,36 @@ export default function MarketStageSection() {
   }, [filter])
 
   const active = rows.find((item) => item.id === activeId) || rows[0] || STAGE_LISTINGS[0]
-
-  // Keep selection valid when filter changes
   const selected = rows.some((item) => item.id === active?.id) ? active : rows[0]
 
   return (
-    <section id="market" className="bg-[#fafafa] px-6 pb-20 pt-4 text-[#0a0a0a] sm:px-10 sm:pb-28 sm:pt-6 lg:px-14">
+    <section id="market" className="bg-[#fafafa] px-6 py-16 text-[#0a0a0a] sm:px-10 sm:py-24 lg:px-14 lg:py-28">
       <div className="mx-auto max-w-[1080px]">
-        {/* Header — short, Linear density, BOND mono */}
-        <div className="flex flex-col gap-5 border-y border-[#0a0a0a]/12 py-8 sm:flex-row sm:items-end sm:justify-between sm:gap-10 sm:py-9">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
           <div className="min-w-0">
-            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Market</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">01 · Market</div>
             <h2 className="mt-3 max-w-[14ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
               Open deals. One board.
             </h2>
           </div>
           <div className="flex shrink-0 flex-col gap-3 sm:items-end">
-            <p className="max-w-[280px] text-[14px] leading-[1.55] tracking-[-0.01em] text-[#525252] sm:text-right">
+            <p className="max-w-[260px] text-[14px] leading-[1.55] tracking-[-0.01em] text-[#525252] sm:text-right">
               Browse free. Connect only to open a room.
             </p>
             <Link
               to="/market"
               className="inline-flex h-10 w-fit items-center justify-center border border-[#0a0a0a] bg-[#0a0a0a] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#fafafa] transition duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97]"
             >
-              Browse market
+              Browse market →
             </Link>
           </div>
         </div>
 
-        {/* Product frame — peer to hero room */}
-        <div className="relative mt-8 sm:mt-10">
+        <div className="relative mt-10 sm:mt-12">
           <div className="pointer-events-none absolute -inset-x-6 -bottom-10 -top-4 hidden rounded-[42%] bg-[radial-gradient(ellipse_at_center,rgba(10,10,10,0.1),transparent_70%)] sm:block" />
 
           <div className="relative rounded-[2px] border border-[#0a0a0a]/30 bg-[#000000] p-[3px] shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_18px_50px_rgba(0,0,0,0.14)]">
             <div className="overflow-hidden border border-[#fafafa]/12 bg-[#000000] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              {/* Chrome bar */}
               <div className="flex items-center justify-between border-b border-[#fafafa]/10 bg-[#111111] px-3 py-2.5 sm:px-4">
                 <div className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/18" />
@@ -72,7 +65,6 @@ export default function MarketStageSection() {
                 </span>
               </div>
 
-              {/* Filters */}
               <div className="flex flex-wrap gap-2 border-b border-[#fafafa]/10 px-3 py-3 sm:px-4">
                 {filters.map((item) => {
                   const on = filter === item.key
@@ -82,7 +74,8 @@ export default function MarketStageSection() {
                       type="button"
                       onClick={() => {
                         setFilter(item.key)
-                        const next = item.key === 'all' ? STAGE_LISTINGS : STAGE_LISTINGS.filter((l) => l.role === item.key)
+                        const next =
+                          item.key === 'all' ? STAGE_LISTINGS : STAGE_LISTINGS.filter((l) => l.role === item.key)
                         if (next[0]) setActiveId(next[0].id)
                       }}
                       className={`h-8 border px-3 font-mono text-[10px] uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] ${
@@ -97,7 +90,6 @@ export default function MarketStageSection() {
                 })}
               </div>
 
-              {/* Board */}
               <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.85fr)]">
                 <ul className="divide-y divide-[#fafafa]/8 border-b border-[#fafafa]/10 lg:border-b-0 lg:border-r">
                   {rows.map((item) => {
@@ -118,7 +110,11 @@ export default function MarketStageSection() {
                           >
                             {item.role}
                           </span>
-                          <span className={`truncate text-[13px] tracking-[-0.015em] sm:text-[14px] ${on ? 'text-[#fafafa]' : 'text-[#fafafa]/78'}`}>
+                          <span
+                            className={`truncate text-[13px] tracking-[-0.015em] sm:text-[14px] ${
+                              on ? 'text-[#fafafa]' : 'text-[#fafafa]/78'
+                            }`}
+                          >
                             {item.title}
                           </span>
                           <span className="shrink-0 font-mono text-[12px] tabular-nums text-[#fafafa]/70">
@@ -133,10 +129,7 @@ export default function MarketStageSection() {
 
                 <aside className="flex flex-col bg-[#0a0a0a] p-4 sm:p-5">
                   <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#737373]">Listing</div>
-                  <div
-                    key={selected?.id}
-                    className="mt-3 bond-market-detail-in"
-                  >
+                  <div key={selected?.id} className="mt-3 bond-market-detail-in">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="border border-[#fafafa]/16 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#fafafa]/70">
                         {selected?.role}

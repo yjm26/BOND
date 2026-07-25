@@ -10,28 +10,55 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
     if (!wallet) {
       return (
         <div className="hidden items-center gap-6 md:flex">
-          <Link to="/" className={navLink}>Back to home</Link>
+          <Link to="/" className={navLink}>
+            Back to home
+          </Link>
         </div>
       )
     }
 
     return (
       <div className="hidden items-center gap-6 md:flex">
-        <Link to="/market" className={navLink}>Market</Link>
-        <Link to="/rooms" className={navLink}>My rooms</Link>
-        <Link to="/create" className={navLink}>Create room</Link>
-        {isAdmin && <Link to="/arbiter" className={navLink}>Disputes</Link>}
-        <Link to="/profile" className={navLink}>Profile</Link>
+        <Link to="/market" className={navLink}>
+          Market
+        </Link>
+        <Link to="/rooms" className={navLink}>
+          My rooms
+        </Link>
+        <Link to="/create" className={navLink}>
+          Create room
+        </Link>
+        {isAdmin && (
+          <Link to="/arbiter" className={navLink}>
+            Disputes
+          </Link>
+        )}
+        <Link to="/profile" className={navLink}>
+          Profile
+        </Link>
       </div>
     )
   }
 
   return (
     <div className="hidden items-center gap-6 md:flex">
-      <a href="#market" onClick={onMarketClick} className={navLink}>Market</a>
-      <Link to="/docs" className={navLink}>Docs</Link>
-      <Link to="/app" className={navLink}>App</Link>
-      {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#b87333] transition hover:text-[#a3a3a3]">Disputes</Link>}
+      <a href="#market" onClick={onMarketClick} className={navLink}>
+        Market
+      </a>
+      <a href="#endings" className={navLink}>
+        Endings
+      </a>
+      <Link to="/docs" className={navLink}>
+        Docs
+      </Link>
+      <Link to="/app" className={navLink}>
+        App
+      </Link>
+      {isAdmin && (
+        <Link to="/arbiter" className="text-[13px] font-medium text-[#b87333] transition hover:text-[#a3a3a3]">
+          Disputes
+        </Link>
+      )}
     </div>
   )
 }
