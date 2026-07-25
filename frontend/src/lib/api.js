@@ -210,8 +210,23 @@ export async function apiGet(path) {
 }
 
 /**
- * Warm auth once (optional) so later parallel writes don't race the first sign.
- * Call after connect if you know writes are coming — safe no-op if already cached.
+ * True if a valid SIWE session already exists for this address (no popup needed).
+ * Use before optional background writes so we never surprise-sign on landing.
+ */
+export function hasCachedApiAuth(address) {
+  if (!address) return false
+  hydrateCacheFromStorage()
+  const now = Date.now()
+  return (
+    authCache.address?.toLowerCase() === String(address).toLowerCase() &&
+    Boolean(authCache.signature) &&
+    authCache.expires > now
+  )
+}
+
+/**
+ * Warm auth once — ONLY call from explicit user write flows if needed.
+ * Never call on bare wallet connect / landing browse.
  */
 export async function ensureApiAuth(wallet) {
   if (!wallet?.address) return null

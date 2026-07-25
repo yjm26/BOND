@@ -29,14 +29,16 @@ export default function NotificationBell({ wallet, tone = 'dark' }) {
   }, [wallet])
 
   async function markAllRead() {
-    if (!wallet) return
-    try {
-      await authFetch(`/api/notifications/${wallet.address.toLowerCase()}/read`, { method: 'POST' }, wallet)
-      fetchNotifs()
-    } catch {
-      /* ignore */
+      if (!wallet) return
+      // Only mark-read when user opens the tray — and only if they already have API auth
+      // or they explicitly click (this is an intentional write). Still single-flight.
+      try {
+        await authFetch(`/api/notifications/${wallet.address.toLowerCase()}/read`, { method: 'POST' }, wallet)
+        fetchNotifs()
+      } catch {
+        /* ignore */
+      }
     }
-  }
 
   if (!wallet) return null
 

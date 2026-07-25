@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ethers } from 'ethers'
 import { getContract, STATE_NAMES, parseRoom, ARC_READ_PROVIDER } from '../utils/contract'
 import { trackRoomId, backfillRoomIds } from '../lib/roomIndexApi'
+import { hasCachedApiAuth } from '../lib/api'
 
 /** Soft cap for one-time chain discovery when no local index exists. */
 const LEGACY_SCAN_CAP = 80
@@ -140,13 +141,13 @@ export default function useOwnedRooms(wallet, { pollMs = 60000 } = {}) {
           // One-time discovery — parallel, capped. No wallet popup.
           myRooms = await legacyScan(addr)
           if (myRooms.length > 0) {
-            ids = writeLocalIds(addr, myRooms.map((r) => r.id))
-            // Best-effort server backfill — may prompt once if no auth cache; ignore failure
-            const liveWallet = walletRef.current
-            if (liveWallet?.address) {
-              backfillRoomIds(liveWallet, ids).catch(() => {})
-            }
-          }
+                      ids = writeLocalIds(addr, myRooms.map((r) => r.id))
+                      // Never prompt sign from a background room scan
+                      const liveWallet = walletRef.current
+                      if (liveWallet?.address && hasCachedApiAuth(liveWallet.address)) {
+                        backfillRoomIds(liveWallet, ids).catch(() => {})
+                      }
+                    }
         }
 
         setRooms(myRooms)
@@ -189,12 +190,12 @@ export default function useOwnedRooms(wallet, { pollMs = 60000 } = {}) {
   return { rooms, loading, isRefreshing, error, reload: loadRooms }
 }
 
-/** Call after createRoom / joinRoom success — local first; server index is best-effort and silent. */
+/** Call after createRoom / joinRoom success — local first; server only if already signed-in. */
 export function rememberOwnedRoom(address, roomId, wallet) {
   if (!address || !roomId) return
   mergeLocalIds(address, [Number(roomId)])
-  // Do not await / force a sign here — only write server index if session already authenticated
-  if (wallet) {
+  // Never open a wallet popup from this helper — landing/browse must stay quiet
+  if (wallet?.address && hasCachedApiAuth(wallet.address)) {
     trackRoomId(wallet, roomId).catch(() => {})
   }
 }

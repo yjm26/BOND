@@ -22,7 +22,7 @@ import RoomsIndexPage from './pages/RoomsIndexPage'
 import { ToastProvider } from './contexts/ToastContext'
 import { useAppThemeRouteSync } from './contexts/ThemeContext'
 import { reconnectWallet } from './lib/wallet'
-import { resetAuthCache, ensureApiAuth } from './lib/api'
+import { resetAuthCache } from './lib/api'
 import { ARC_RPC_URLS } from './utils/contract'
 
 const ARC_TESTNET = {
@@ -178,8 +178,8 @@ export default function App() {
                   w.walletProvider = walletProvider // raw provider for SIWE signing
                   setWallet(w)
                   localStorage.setItem('bond_wallet_connected', '1')
-                  // Warm API auth once — later parallel authFetch share this signature (no 13× popups)
-                  ensureApiAuth(w).catch((err) => console.warn('API auth warm skipped:', err?.message || err))
+                  // Do NOT warm SIWE here — landing/browse must stay sign-free.
+                  // authFetch signs once, lazily, only on real write actions.
                 }
       } catch (e) {
         console.error('Wallet build failed:', e)
