@@ -6,7 +6,7 @@ import HeaderNavLinks from './navbar/HeaderNavLinks'
 import HeaderWalletActions from './navbar/HeaderWalletActions'
 import MobileNavMenu from './navbar/MobileNavMenu'
 
-export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) {
+export default function Navbar({ onConnect, wallet, connecting, onDisconnect, profileReady }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [isAdmin, setIsAdmin] = useState(false)
@@ -14,6 +14,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
   const isAppRoute = ['/app', '/market', '/rooms', '/room', '/offers', '/create', '/profile', '/settings', '/arbiter'].some((route) => pathname === route || pathname.startsWith(`${route}/`))
   const isDarkHeader = isAppRoute
   const isDisconnectedAppRoute = isAppRoute && !wallet
+  const isProfileSetupLocked = isAppRoute && Boolean(wallet?.address) && profileReady === false
 
   useEffect(() => {
     if (!wallet?.address || !wallet?.provider) { setIsAdmin(false); return }
@@ -31,6 +32,16 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect }) 
     })
     return () => { stale = true }
   }, [wallet?.address, wallet?.provider])
+
+  if (isProfileSetupLocked) {
+    return (
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#ede9df]/12 bg-[#20201f] px-4 py-3 sm:px-6 lg:px-10">
+        <div className="flex items-center justify-between">
+          <HeaderBrand tone="dark" to="/" hideSubtitle bareMark />
+        </div>
+      </nav>
+    )
+  }
 
   const scrollToSection = (event, sectionId) => {
     event.preventDefault()

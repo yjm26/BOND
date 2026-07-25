@@ -3,11 +3,9 @@ import AppGate from './AppGate'
 import AppHome from './AppHome'
 import ProfileSetup from './ProfileSetup'
 import WorkspaceLoading from './WorkspaceLoading'
-import { saveProfile } from './profile/profileStorage'
+import { loadProfile, saveProfile } from './profile/profileStorage'
 
-const profileKey = (address) => `bond_profile_${address.toLowerCase()}`
-
-export default function AppWorkspace({ wallet, connecting, connectError, onConnect }) {
+export default function AppWorkspace({ wallet, connecting, connectError, onConnect, onProfileStateChange }) {
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(null)
   const [needsSetup, setNeedsSetup] = useState(false)
@@ -17,29 +15,27 @@ export default function AppWorkspace({ wallet, connecting, connectError, onConne
       setLoading(false)
       setProfile(null)
       setNeedsSetup(false)
+      onProfileStateChange?.(null)
       return
     }
 
     setLoading(true)
     const timer = window.setTimeout(() => {
-      const stored = window.localStorage.getItem(profileKey(wallet.address))
-      if (stored) {
-        try {
-          setProfile(JSON.parse(stored))
-          setNeedsSetup(false)
-        } catch {
-          setProfile(null)
-          setNeedsSetup(true)
-        }
+      const storedProfile = loadProfile(wallet.address)
+      if (storedProfile?.displayName) {
+        setProfile(storedProfile)
+        setNeedsSetup(false)
+        onProfileStateChange?.(true)
       } else {
         setProfile(null)
         setNeedsSetup(true)
+        onProfileStateChange?.(false)
       }
       setLoading(false)
     }, 900)
 
     return () => window.clearTimeout(timer)
-  }, [wallet?.address])
+  }, [wallet?.address, onProfileStateChange])
 
   const completeSetup = (nextProfile) => {
     if (!wallet?.address) return
@@ -48,6 +44,7 @@ export default function AppWorkspace({ wallet, connecting, connectError, onConne
     window.setTimeout(() => {
       setProfile(nextProfile)
       setNeedsSetup(false)
+      onProfileStateChange?.(true)
       setLoading(false)
     }, 850)
   }

@@ -2,9 +2,9 @@ export const SETUP_STEPS = [
   {
     key: 'displayName',
     label: 'Display name',
-    title: 'What should BOND call you?',
+    title: 'Choose your display name.',
     placeholder: 'e.g. yjm26',
-    helper: 'Shown inside your local workspace. Keep it short and recognizable.',
+    helper: 'Shown to counterparties in rooms, market offers, and profile cards.',
     required: true,
   },
   {
@@ -12,15 +12,15 @@ export const SETUP_STEPS = [
     label: 'X profile',
     title: 'Add your X profile.',
     placeholder: 'e.g. @yjm26',
-    helper: 'Optional for now. Useful later when counterparties need off-chain context.',
-    note: 'For now this is self-reported. Verified X connection will replace manual handles later.',
+    helper: 'Optional. Add it if counterparties should have off-chain context before a deal.',
+    note: 'Manual handle for testnet. Do not treat it as verified identity.',
   },
   {
     key: 'discord',
     label: 'Discord',
     title: 'Add your Discord handle.',
     placeholder: 'e.g. yjm26',
-    helper: 'Optional for now. This stays local until real profile storage exists.',
+    helper: 'Optional. Useful when a room needs quick off-chain coordination.',
   },
 ]
 

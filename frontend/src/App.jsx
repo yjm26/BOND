@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Navigate, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { createAppKit } from '@reown/appkit/react'
 import { useAppKit, useAppKitAccount, useAppKitProvider, useDisconnect } from '@reown/appkit/react'
 import { EthersAdapter } from '@reown/appkit-adapter-ethers'
@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
 import ToastContainer from './components/ToastContainer'
+import { loadProfile } from './components/app/profile/profileStorage'
 import AppPage from './pages/AppPage'
 import ArbiterPage from './pages/ArbiterPage'
 import CreateRoomPage from './pages/CreateRoomPage'
@@ -68,6 +69,11 @@ function DisconnectOverlay({ active }) {
   )
 }
 
+function ProfileRequiredRoute({ wallet, profileReady, children }) {
+  if (wallet?.address && profileReady === false) return <Navigate to="/app" replace />
+  return children
+}
+
 createAppKit({
   projectId: 'af815ce51d40ec33de9699ee550f21a8',
   adapters: [new EthersAdapter()],
@@ -92,10 +98,19 @@ export default function App() {
   const [disconnecting, setDisconnecting] = useState(false)
   const [disconnectRedirectTick, setDisconnectRedirectTick] = useState(0)
   const [connectError, setConnectError] = useState(null)
+  const [profileReady, setProfileReady] = useState(null)
   const manualDisconnect = useRef(false)
   const walletRef = useRef(null)
 
   useEffect(() => { walletRef.current = wallet }, [wallet])
+
+  useEffect(() => {
+    if (!wallet?.address) {
+      setProfileReady(null)
+      return
+    }
+    setProfileReady(Boolean(loadProfile(wallet.address)?.displayName))
+  }, [wallet?.address])
 
   useEffect(() => {
     if (!isConnected || !address) {
@@ -171,20 +186,20 @@ export default function App() {
     <ToastProvider>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <DisconnectRedirect tick={disconnectRedirectTick} />
-      <Navbar onConnect={handleConnect} onDisconnect={handleDisconnect} wallet={wallet} connecting={connecting} />
+      <Navbar onConnect={handleConnect} onDisconnect={handleDisconnect} wallet={wallet} connecting={connecting} profileReady={profileReady} />
       <ErrorBoundary>
       <PageTransition>
       <Routes>
         <Route path="/" element={<LandingPage wallet={wallet} onConnect={handleConnect} />} />
-        <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
-        <Route path="/create" element={<CreateRoomPage wallet={wallet} />} />
-        <Route path="/rooms" element={<RoomsIndexPage wallet={wallet} />} />
-        <Route path="/room/:id" element={<RoomDetailPage wallet={wallet} />} />
+        <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} onProfileStateChange={setProfileReady} />} />
+        <Route path="/create" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><CreateRoomPage wallet={wallet} /></ProfileRequiredRoute>} />
+        <Route path="/rooms" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomsIndexPage wallet={wallet} /></ProfileRequiredRoute>} />
+        <Route path="/room/:id" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomDetailPage wallet={wallet} /></ProfileRequiredRoute>} />
         <Route path="/docs/:section?" element={<DocsPage />} />
-        <Route path="/market" element={<MarketPage wallet={wallet} />} />
-        <Route path="/offers" element={<OffersRedirectPage />} />
-        <Route path="/profile" element={<ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
-        <Route path="/arbiter" element={<ArbiterPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} />} />
+        <Route path="/market" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><MarketPage wallet={wallet} /></ProfileRequiredRoute>} />
+        <Route path="/offers" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><OffersRedirectPage /></ProfileRequiredRoute>} />
+        <Route path="/profile" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} /></ProfileRequiredRoute>} />
+        <Route path="/arbiter" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><ArbiterPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} /></ProfileRequiredRoute>} />
       </Routes>
       </PageTransition>
       </ErrorBoundary>
