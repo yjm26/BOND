@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { authFetch, API_URL } from '../lib/api'
 
-export default function NotificationBell({ wallet }) {
+export default function NotificationBell({ wallet, tone = 'dark' }) {
   const [notifs, setNotifs] = useState([])
   const [open, setOpen] = useState(false)
-  const unread = notifs.filter(n => !n.read).length
+  const unread = notifs.filter((n) => !n.read).length
+  const dark = tone === 'dark'
 
   async function fetchNotifs() {
     if (!wallet) return
@@ -12,12 +13,17 @@ export default function NotificationBell({ wallet }) {
       const res = await fetch(`${API_URL}/api/notifications/${wallet.address.toLowerCase()}`)
       const data = await res.json()
       setNotifs(Array.isArray(data) ? data : [])
-    } catch { setNotifs([]) }
+    } catch {
+      setNotifs([])
+    }
   }
 
-  useEffect(() => { fetchNotifs() }, [wallet])
   useEffect(() => {
-    if (!wallet) return
+    fetchNotifs()
+  }, [wallet])
+
+  useEffect(() => {
+    if (!wallet) return undefined
     const interval = setInterval(() => fetchNotifs(), 10000)
     return () => clearInterval(interval)
   }, [wallet])
@@ -27,54 +33,72 @@ export default function NotificationBell({ wallet }) {
     try {
       await authFetch(`/api/notifications/${wallet.address.toLowerCase()}/read`, { method: 'POST' }, wallet)
       fetchNotifs()
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   }
 
   if (!wallet) return null
 
+  const triggerClass = dark
+    ? 'text-[#fafafa]/50 hover:text-[#fafafa]'
+    : 'text-[#0a0a0a]/50 hover:text-[#0a0a0a]'
+  const panelClass = dark
+    ? 'border-[#fafafa]/12 bg-[#111111] text-[#fafafa]'
+    : 'border-[#0a0a0a]/12 bg-[#fafafa] text-[#0a0a0a]'
+  const borderClass = dark ? 'border-[#fafafa]/10' : 'border-[#0a0a0a]/10'
+  const muted = dark ? 'text-[#a3a3a3]' : 'text-[#737373]'
+  const rowUnread = dark ? 'bg-[#fafafa]/4' : 'bg-[#0a0a0a]/[0.03]'
+  const rowText = dark ? 'text-[#fafafa]/88' : 'text-[#0a0a0a]/80'
+
   return (
     <div className="relative">
       <button
-        onClick={() => { setOpen(!open); if (!open) markAllRead() }}
-        className="relative p-1.5 text-zinc-500 hover:text-zinc-800 transition"
+        onClick={() => {
+          setOpen(!open)
+          if (!open) markAllRead()
+        }}
+        className={`relative p-1.5 transition duration-160 ease-out active:scale-[0.97] ${triggerClass}`}
+        aria-label="Notifications"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center border border-[#0a0a0a] bg-[#fafafa] font-mono text-[9px] font-bold text-[#0a0a0a]">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-8 w-80 bg-white dark:bg-white/[0.03] border border-zinc-200 rounded-lg shadow-lg z-50 overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-zinc-100 flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-[2px] text-zinc-400">notifications</span>
-            {unread > 0 && (
-              <button onClick={markAllRead} className="text-[11px] text-zinc-500 hover:text-zinc-800">
-                mark all read
-              </button>
-            )}
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {notifs.length === 0 ? (
-              <div className="px-4 py-6 text-center text-[13px] text-zinc-400">
-                No notifications yet
-              </div>
-            ) : (
-              notifs.slice(0, 10).map((n) => (
-                <div key={n.id} className={`px-4 py-3 border-b border-zinc-50 ${!n.read ? 'bg-blue-50/50' : ''}`}>
-                  <div className="text-[12px] text-zinc-700">{n.message}</div>
-                  <div className="text-[10px] text-zinc-400 font-mono mt-1">
-                    {new Date(n.createdAt).toLocaleString()}
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className={`absolute right-0 top-8 z-50 w-80 overflow-hidden border shadow-[0_18px_60px_rgba(0,0,0,0.35)] ${panelClass}`}>
+            <div className={`flex items-center justify-between border-b px-4 py-2.5 ${borderClass}`}>
+              <span className={`font-mono text-[10px] uppercase tracking-[0.2em] ${muted}`}>Notifications</span>
+              {unread > 0 && (
+                <button onClick={markAllRead} className={`text-[11px] transition hover:opacity-100 ${muted} opacity-80`}>
+                  Mark all read
+                </button>
+              )}
+            </div>
+            <div className="max-h-64 overflow-y-auto">
+              {notifs.length === 0 ? (
+                <div className={`px-4 py-6 text-center text-[13px] ${muted}`}>No notifications yet</div>
+              ) : (
+                notifs.slice(0, 10).map((n) => (
+                  <div key={n.id} className={`border-b px-4 py-3 ${borderClass} ${!n.read ? rowUnread : ''}`}>
+                    <div className={`text-[12px] leading-[1.45] ${rowText}`}>{n.message}</div>
+                    <div className={`mt-1 font-mono text-[10px] ${muted}`}>
+                      {new Date(n.createdAt).toLocaleString()}
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

@@ -12,10 +12,11 @@ const ICONS = {
   ),
 }
 
+// Stark mono toasts — no clay/gold/blue chrome
 const STYLES = {
-  ok:   'border-[#8f9a88]/32 bg-[#0a0a0a]/96 text-[#8f9a88]',
-  err:  'border-[#b87333]/38 bg-[#0a0a0a]/96 text-[#b87333]',
-  info: 'border-[#a3a3a3]/30 bg-[#0a0a0a]/96 text-[#a3a3a3]',
+  ok: 'border-[#fafafa]/18 bg-[#111111]/96 text-[#fafafa]',
+  err: 'border-[#fafafa]/28 bg-[#111111]/96 text-[#fafafa]',
+  info: 'border-[#fafafa]/14 bg-[#111111]/96 text-[#a3a3a3]',
 }
 
 export default function ToastContainer() {
@@ -24,28 +25,34 @@ export default function ToastContainer() {
 
   return (
     <div className="fixed bottom-6 right-6 z-[100] flex w-full max-w-sm flex-col gap-2 px-4 pointer-events-none sm:px-0">
-      {toasts.map(t => (
+      {toasts.map((t) => (
         <div
           key={t.id}
-          className={`pointer-events-auto flex items-start gap-3 border px-4 py-3 text-[13px] font-medium shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur animate-[slideIn_0.2s_ease-out] ${STYLES[t.type]}`}
+          className={`pointer-events-auto flex items-start gap-3 border px-4 py-3 text-[13px] font-medium shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur ${STYLES[t.type] || STYLES.info}`}
           style={{
-            animation: 'slideIn 0.25s ease-out',
+            animation: 'bondToastIn 0.2s cubic-bezier(0.23, 1, 0.32, 1)',
           }}
         >
-          <span className="mt-0.5 shrink-0 opacity-80">{ICONS[t.type]}</span>
+          <span className="mt-0.5 shrink-0 opacity-80">{ICONS[t.type] || ICONS.info}</span>
           <span className="flex-1 leading-snug tracking-[-0.01em]">{t.message}</span>
           <button
             onClick={() => removeToast(t.id)}
-            className="shrink-0 opacity-50 hover:opacity-100 transition"
+            className="shrink-0 opacity-50 transition duration-160 ease-out hover:opacity-100 active:scale-[0.97]"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
         </div>
       ))}
       <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.96); }
+        @keyframes bondToastIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.97); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes bondToastIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
         }
       `}</style>
     </div>
