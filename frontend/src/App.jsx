@@ -16,6 +16,7 @@ import LandingPage from './pages/LandingPage'
 import MarketPage from './pages/MarketPage'
 import OffersRedirectPage from './pages/OffersRedirectPage'
 import ProfilePage from './pages/ProfilePage'
+import PublicListingsPage from './pages/PublicListingsPage'
 import RoomDetailPage from './pages/RoomDetailPage'
 import RoomsIndexPage from './pages/RoomsIndexPage'
 import { ToastProvider } from './contexts/ToastContext'
@@ -44,7 +45,7 @@ function PageTransition({ children }) {
 
 function RouteFooter() {
   const { pathname } = useLocation()
-  const showFooter = pathname === '/' || pathname.startsWith('/docs')
+  const showFooter = pathname === '/' || pathname.startsWith('/docs') || pathname === '/listings'
   return showFooter ? <Footer /> : null
 }
 
@@ -197,6 +198,7 @@ export default function App() {
       <PageTransition>
       <Routes>
         <Route path="/" element={<LandingPage wallet={wallet} onConnect={handleConnect} />} />
+        <Route path="/listings" element={<PublicListingsPage />} />
         <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} onProfileStateChange={setProfileReady} />} />
         <Route path="/create" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><CreateRoomPage wallet={wallet} /></ProfileRequiredRoute>} />
         <Route path="/rooms" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomsIndexPage wallet={wallet} /></ProfileRequiredRoute>} />

@@ -30,6 +30,7 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
     <div className="hidden items-center gap-6 md:flex">
       <a href="#how" onClick={onHowClick} className={navLink}>Room states</a>
       <a href="#use-cases" onClick={onUseCasesClick} className={navLink}>Where it fits</a>
+      <Link to="/listings" className={navLink}>Market</Link>
       <Link to="/docs" className={navLink}>Docs</Link>
       {isAdmin && <Link to="/arbiter" className="text-[13px] font-medium text-[#b87333] transition hover:text-[#a3a3a3]">Disputes</Link>}
     </div>

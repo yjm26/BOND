@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 const PRODUCT_LINKS = [
   { label: 'Create room', to: '/create' },
-  { label: 'Market', to: '/market' },
+  { label: 'Market', to: '/listings' },
   { label: 'Docs', to: '/docs' },
 ]
 
