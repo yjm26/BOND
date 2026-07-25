@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BOND — Landing prototype (Who + States)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #fafafa;
+      --ink: #0a0a0a;
+      --muted: #a3a3a3;
+      --faint: #737373;
+      --body: #525252;
+      --line: rgba(10, 10, 10, 0.12);
+      --line-strong: rgba(10, 10, 10, 0.22);
+      --panel-dark: #111111;
+      --surface-dark: #0a0a0a;
+      --success: #8f9a88;
+      --danger: #b87333;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 40px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(250, 250, 250, 0.92);
+      backdrop-filter: blur(10px);
+    }
+    .nav-brand { display: flex; flex-direction: column; gap: 2px; }
+    .nav-brand strong { font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }
+    .nav-brand span { color: var(--faint); letter-spacing: 0.18em; }
+    .nav-links { display: flex; gap: 28px; align-items: center; font-size: 13px; color: var(--body); }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta {
+      display: inline-flex;
+      height: 36px;
+      align-items: center;
+      padding: 0 16px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: transform 140ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out);
+    }
+    .nav-cta:hover { background: transparent; color: var(--ink); }
+    .nav-cta:active { transform: scale(0.97); }
+
+    /* Hero */
+    .hero {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 88px 40px 56px;
+    }
+    .hero h1 {
+      max-width: 16ch;
+      font-size: clamp(40px, 5.8vw, 64px);
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+    }
+    .hero p {
+      margin-top: 20px;
+      max-width: 42ch;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--body);
+      letter-spacing: -0.01em;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .btn-primary, .btn-ghost {
+      display: inline-flex;
+      height: 44px;
+      align-items: center;
+      padding: 0 20px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border: 1px solid var(--ink);
+      transition: transform 140ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out);
+    }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: transparent; color: var(--ink); }
+    .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+    .btn-ghost:hover { border-color: var(--ink); background: rgba(10,10,10,0.03); }
+    .btn-primary:active, .btn-ghost:active { transform: scale(0.97); }
+
+    /* Room demo shell (simplified) */
+    .demo {
+      margin-top: 48px;
+      border: 1px solid var(--line);
+      background: var(--surface-dark);
+      color: var(--paper);
+      overflow: hidden;
+    }
+    .demo-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(250,250,250,0.1);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(250,250,250,0.45);
+    }
+    .demo-body { padding: 28px 24px 32px; }
+    .demo-body h2 {
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 500;
+      letter-spacing: -0.05em;
+      line-height: 1.05;
+    }
+    .demo-meta { margin-top: 8px; color: rgba(250,250,250,0.5); font-size: 13px; }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      margin-top: 28px;
+      background: rgba(250,250,250,0.08);
+      border: 1px solid rgba(250,250,250,0.08);
+    }
+    .demo-card {
+      background: #111;
+      padding: 16px;
+    }
+    .demo-card .l {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(250,250,250,0.38);
+    }
+    .demo-card .v {
+      margin-top: 10px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+    .demo-card .s { margin-top: 6px; font-size: 12px; color: rgba(250,250,250,0.45); }
+
+    /* Manifesto */
+    .manifesto {
+      border-block: 1px solid var(--line);
+      padding: 56px 40px;
+    }
+    .manifesto-inner { max-width: 880px; margin: 0 auto; }
+    .manifesto p {
+      font-size: clamp(22px, 3.4vw, 34px);
+      font-weight: 500;
+      line-height: 1.22;
+      letter-spacing: -0.04em;
+    }
+    .manifesto .dim { color: var(--faint); }
+
+    /* WHO — NEW */
+    .who {
+      padding: 72px 40px 64px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .sec-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .sec-head h2 {
+      margin-top: 10px;
+      max-width: 16ch;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 500;
+      letter-spacing: -0.05em;
+      line-height: 1.05;
+    }
+    .sec-head .aside {
+      max-width: 240px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--body);
+    }
+    .who-list { margin-top: 8px; }
+    .who-row {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 0.9fr) minmax(0, 1.3fr);
+      gap: 24px;
+      align-items: baseline;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line);
+      /* occasional enter — first paint only via @starting-style */
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+    }
+    @starting-style {
+      .who-row {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+    }
+    .who-row:nth-child(1) { transition-delay: 0ms; }
+    .who-row:nth-child(2) { transition-delay: 40ms; }
+    .who-row:nth-child(3) { transition-delay: 80ms; }
+    .who-row:nth-child(4) { transition-delay: 120ms; }
+    .who-row .idx { color: var(--faint); }
+    .who-row .title {
+      font-size: clamp(20px, 2.4vw, 26px);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+    }
+    .who-row .body { font-size: 15px; line-height: 1.5; color: var(--body); }
+    .who-not {
+      margin-top: 28px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--body);
+    }
+    .who-not strong { color: var(--ink); font-weight: 500; }
+
+    /* LIFECYCLE — NEW */
+    .life {
+      background: var(--surface-dark);
+      color: var(--paper);
+      padding: 72px 40px 80px;
+    }
+    .life-inner { max-width: 1180px; margin: 0 auto; }
+    .life .sec-head { border-bottom-color: rgba(250,250,250,0.1); }
+    .life .sec-head h2 { color: var(--paper); }
+    .life .sec-head .aside { color: var(--muted); }
+    .life .mono { color: var(--faint); }
+
+    .life-rail {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin-top: 36px;
+      border: 1px solid rgba(250,250,250,0.1);
+    }
+    .life-step {
+      padding: 22px 18px 24px;
+      border-right: 1px solid rgba(250,250,250,0.1);
+      min-height: 168px;
+      display: flex;
+      flex-direction: column;
+      transition: background 160ms var(--ease-out);
+      cursor: default;
+    }
+    .life-step:last-child { border-right: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .life-step:hover { background: rgba(250,250,250,0.04); }
+    }
+    .life-step.is-active {
+      background: rgba(250,250,250,0.06);
+      outline: 1px solid rgba(250,250,250,0.18);
+      outline-offset: -1px;
+    }
+    .life-step .num {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(250,250,250,0.35);
+    }
+    .life-step .name {
+      margin-top: 14px;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+    .life-step .next {
+      margin-top: auto;
+      padding-top: 20px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    .life-step .next em {
+      font-style: normal;
+      color: var(--paper);
+      font-weight: 500;
+    }
+    .life-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: rgba(250,250,250,0.45);
+      max-width: 52ch;
+    }
+
+    /* Endings compact */
+    .endings {
+      background: var(--paper);
+      padding: 64px 40px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .end-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 1.4fr;
+      gap: 20px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: baseline;
+    }
+    .end-row .lab { font-size: 22px; font-weight: 500; letter-spacing: -0.03em; }
+    .end-row .lab.release { color: var(--success); }
+    .end-row .lab.dispute { color: var(--danger); }
+    .end-row .txt { color: var(--body); font-size: 14px; line-height: 1.5; }
+
+    /* Close */
+    .close {
+      border-top: 1px solid var(--line);
+      padding: 56px 40px 72px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .close h2 {
+      margin-top: 10px;
+      font-size: clamp(26px, 3.5vw, 36px);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+    }
+    .doors {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .door {
+      border: 1px solid var(--line-strong);
+      padding: 24px;
+      background: #fff;
+      transition: transform 140ms var(--ease-out), border-color 160ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out);
+    }
+    .door:active { transform: scale(0.995); }
+    .door.dark {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+    .door.dark:hover { background: transparent; color: var(--ink); }
+    .door .t { margin-top: 8px; font-size: 20px; font-weight: 500; letter-spacing: -0.03em; }
+    .door .go { margin-top: 28px; color: var(--faint); }
+    .door.dark .go { color: rgba(250,250,250,0.45); }
+    .door.dark:hover .go { color: var(--ink); }
+
+    .proto-tag {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 50;
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+      padding: 8px 12px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--faint);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 900px) {
+      .nav { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .hero, .who, .life, .endings, .close, .manifesto { padding-left: 20px; padding-right: 20px; }
+      .demo-grid { grid-template-columns: 1fr 1fr; }
+      .who-row { grid-template-columns: 48px 1fr; }
+      .who-row .body { grid-column: 2; }
+      .life-rail { grid-template-columns: 1fr; }
+      .life-step { border-right: none; border-bottom: 1px solid rgba(250,250,250,0.1); min-height: 0; }
+      .end-row { grid-template-columns: 1fr; gap: 6px; }
+      .doors { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .who-row, .btn-primary, .btn-ghost, .nav-cta, .door, .life-step {
+        transition: none !important;
+      }
+      @starting-style {
+        .who-row { opacity: 1; transform: none; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-brand">
+      <strong>BOND</strong>
+      <span class="mono">USDC rooms on Arc</span>
+    </div>
+    <div class="nav-links">
+      <a href="#who">Who</a>
+      <a href="#lifecycle">States</a>
+      <a href="#endings">Endings</a>
+      <a href="#start" class="nav-cta">Go to app</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Lock USDC.<br />Settle the deal.</h1>
+    <p>Terms, parties, and the next action stay in one room.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#start">Go to app</a>
+      <a class="btn-ghost" href="#who">Who uses this</a>
+    </div>
+
+    <div class="demo" aria-hidden="true">
+      <div class="demo-bar">
+        <span>Bond · Room</span>
+        <span>State · Funded</span>
+      </div>
+      <div class="demo-body">
+        <div class="mono" style="color:rgba(250,250,250,0.4)">Room #1842</div>
+        <h2>Brand kit + landing package</h2>
+        <div class="demo-meta">Buyer view · Delivery window 5 days</div>
+        <div class="demo-grid">
+          <div class="demo-card"><div class="l">Item price</div><div class="v">420 USDC</div><div class="s">Fixed at create</div></div>
+          <div class="demo-card"><div class="l">Total to fund</div><div class="v">424.2</div><div class="s">+1% platform fee</div></div>
+          <div class="demo-card"><div class="l">Locked escrow</div><div class="v">424.2</div><div class="s">Until release / refund / dispute</div></div>
+          <div class="demo-card"><div class="l">Next action</div><div class="v" style="font-size:15px;margin-top:14px">Await delivery</div><div class="s">Seller marks delivered</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="manifesto">
+    <div class="manifesto-inner">
+      <p>
+        <span>Two products.</span>
+        <span class="dim"> Rooms hold escrow. Market lists open work. Release, refund, or dispute ends the room.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- NEW: Who it's for -->
+  <section class="who" id="who">
+    <div class="sec-head">
+      <div>
+        <div class="mono" style="color:var(--faint)">Use</div>
+        <h2>For deals you already make in chat.</h2>
+      </div>
+      <p class="aside">Private escrow when Discord middlemen are the alternative.</p>
+    </div>
+
+    <div class="who-list">
+      <div class="who-row">
+        <div class="mono idx">01</div>
+        <div class="title">Digital delivery</div>
+        <div class="body">Allowlists, files, account handoffs. Seller marks delivered. Buyer releases or disputes.</div>
+      </div>
+      <div class="who-row">
+        <div class="mono idx">02</div>
+        <div class="title">Paid work</div>
+        <div class="body">Design, audits, freelance. Buyer funds first. Seller delivers. Buyer confirms.</div>
+      </div>
+      <div class="who-row">
+        <div class="mono idx">03</div>
+        <div class="title">Small USDC trades</div>
+        <div class="body">Price in USDC on Arc. The 1% fee shows at fund time.</div>
+      </div>
+      <div class="who-row">
+        <div class="mono idx">04</div>
+        <div class="title">Skip it when</div>
+        <div class="body">You already trust the other person. No need for escrow process.</div>
+      </div>
+    </div>
+
+    <div class="who-not">
+      <strong>Note:</strong> BOND does not create trust. It shows room state, locked USDC, and the next on-chain action — including disputes.
+    </div>
+  </section>
+
+  <!-- NEW: States -->
+  <section class="life" id="lifecycle">
+    <div class="life-inner">
+      <div class="sec-head">
+        <div>
+          <div class="mono">States</div>
+          <h2>Each state has one next action.</h2>
+        </div>
+        <p class="aside">Hover a step for the detail line.</p>
+      </div>
+
+      <div class="life-rail" id="life-rail">
+        <div class="life-step is-active" data-step="0">
+          <div class="num">01 · Created</div>
+          <div class="name">Created</div>
+          <div class="next"><em>Next:</em> Share the invite, or wait</div>
+        </div>
+        <div class="life-step" data-step="1">
+          <div class="num">02 · Joined</div>
+          <div class="name">Joined</div>
+          <div class="next"><em>Next:</em> Buyer funds price + 1% fee</div>
+        </div>
+        <div class="life-step" data-step="2">
+          <div class="num">03 · Funded</div>
+          <div class="name">Funded</div>
+          <div class="next"><em>Next:</em> Seller marks delivered</div>
+        </div>
+        <div class="life-step" data-step="3">
+          <div class="num">04 · Delivered</div>
+          <div class="name">Delivered</div>
+          <div class="next"><em>Next:</em> Buyer releases or disputes</div>
+        </div>
+        <div class="life-step" data-step="4">
+          <div class="num">05 · Closed</div>
+          <div class="name">Closed</div>
+          <div class="next"><em>Ends:</em> Released, refunded, or disputed</div>
+        </div>
+      </div>
+      <p class="life-note" id="life-detail">
+        Created: terms and join code on-chain. No USDC moved. Creator can cancel before join.
+      </p>
+    </div>
+  </section>
+
+  <section class="endings" id="endings">
+    <div class="sec-head" style="border:none;padding:0;margin-bottom:8px">
+      <div>
+        <div class="mono" style="color:var(--faint)">Endings</div>
+        <h2 style="margin-top:10px;font-size:clamp(26px,3.5vw,36px);font-weight:500;letter-spacing:-0.045em">How a room ends.</h2>
+      </div>
+    </div>
+    <div class="end-row">
+      <div class="mono" style="color:var(--faint)">01</div>
+      <div class="lab release">Release</div>
+      <div class="txt">Buyer confirms. Seller is paid the locked USDC (and any collateral rules).</div>
+    </div>
+    <div class="end-row">
+      <div class="mono" style="color:var(--faint)">02</div>
+      <div class="lab">Refund</div>
+      <div class="txt">Delivery missed or both sides cancel. Buyer is refunded per contract.</div>
+    </div>
+    <div class="end-row">
+      <div class="mono" style="color:var(--faint)">03</div>
+      <div class="lab dispute">Dispute</div>
+      <div class="txt">Buyer disputes after delivery. After 12h the seller can escalate. Arbiter settles on-chain.</div>
+    </div>
+  </section>
+
+  <section class="close" id="start">
+    <div class="mono" style="color:var(--faint)">Start</div>
+    <h2>Start here.</h2>
+    <div class="doors">
+      <a class="door" href="#">
+        <div class="mono" style="color:var(--faint)">Room</div>
+        <div class="t">Open a room</div>
+        <div class="go mono">App →</div>
+      </a>
+      <a class="door dark" href="#">
+        <div class="mono">Market</div>
+        <div class="t">Open market</div>
+        <div class="go mono">Market →</div>
+      </a>
+    </div>
+  </section>
+
+  <div class="proto-tag">Prototype · dry copy</div>
+
+  <script>
+    const details = [
+      'Created: terms and join code on-chain. No USDC moved. Creator can cancel before join.',
+      'Joined: both parties set. Buyer has 30 minutes to fund or the room can expire.',
+      'Funded: price + 1% fee locked. Seller has until the delivery deadline.',
+      'Delivered: seller posted delivery (optional proof hash). Buyer can release or dispute now.',
+      'Closed: release pays the seller; refund returns the buyer; dispute freezes funds for the arbiter.',
+    ];
+    const steps = document.querySelectorAll('.life-step');
+    const detail = document.getElementById('life-detail');
+    steps.forEach((step) => {
+      step.addEventListener('mouseenter', () => {
+        steps.forEach((s) => s.classList.remove('is-active'));
+        step.classList.add('is-active');
+        detail.textContent = details[Number(step.dataset.step)] || details[0];
+      });
+      step.addEventListener('focus', () => step.dispatchEvent(new Event('mouseenter')));
+      step.tabIndex = 0;
+    });
+  </script>
+</body>
+</html>

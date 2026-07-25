@@ -4,19 +4,19 @@ const ENDINGS = [
   {
     key: 'release',
     label: 'Release',
-    line: 'Buyer accepts delivery. Seller receives locked USDC.',
+    line: 'Buyer confirms delivery. Seller receives the locked USDC.',
     tone: 'success',
   },
   {
     key: 'refund',
     label: 'Refund',
-    line: 'Deal cancelled under terms. Buyer gets USDC back.',
+    line: 'Delivery missed or both sides cancel. Buyer is refunded per contract.',
     tone: 'neutral',
   },
   {
     key: 'dispute',
     label: 'Dispute',
-    line: 'Parties disagree. Evidence + arbiter after the 12h buffer.',
+    line: 'Buyer disputes after delivery. After 12 hours the seller can escalate. Arbiter settles on-chain.',
     tone: 'danger',
   },
 ]
@@ -32,11 +32,11 @@ export default function LandingEndingsSection() {
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Endings</div>
             <h2 className="mt-3 max-w-[16ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
-              Three ways a room closes.
+              How a room ends.
             </h2>
           </div>
           <p className="max-w-[240px] text-[14px] leading-[1.5] text-[#a3a3a3] sm:text-right">
-            No off-platform “we’ll settle later.”
+            Settlement stays on-chain — not “we’ll sort it in DMs.”
           </p>
         </div>
 
