@@ -1,10 +1,26 @@
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { formatAddress, listingExpiryLabel, timeAgo } from '../market/marketUtils'
 
 export default function PublicListingDetail({ listing, onClose }) {
+  useEffect(() => {
+    if (!listing) return undefined
+    const onKey = (event) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [listing, onClose])
+
   if (!listing) return null
 
-  return (
+  const node = (
     <div className="fixed inset-0 z-[80] flex items-end justify-center px-4 py-4 sm:items-center sm:py-8" role="dialog" aria-modal="true">
       <button
         type="button"
@@ -26,7 +42,7 @@ export default function PublicListingDetail({ listing, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#0a0a0a]/14 text-[20px] leading-none text-[#0a0a0a]/55 transition hover:border-[#0a0a0a]/34 hover:text-[#0a0a0a] active:scale-[0.97]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#0a0a0a]/14 text-[20px] leading-none text-[#0a0a0a]/55 transition duration-160 ease-out hover:border-[#0a0a0a]/34 hover:text-[#0a0a0a] active:scale-[0.97]"
             aria-label="Close"
           >
             ×
@@ -37,11 +53,15 @@ export default function PublicListingDetail({ listing, onClose }) {
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="border border-[#0a0a0a]/10 bg-white p-4">
               <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#737373]">Price</div>
-              <div className="mt-2 font-mono text-[28px] tracking-[-0.04em]">{listing.price} <span className="text-[12px] text-[#737373]">USDC</span></div>
+              <div className="mt-2 font-mono text-[28px] tracking-[-0.04em]">
+                {listing.price} <span className="text-[12px] text-[#737373]">USDC</span>
+              </div>
             </div>
             <div className="border border-[#0a0a0a]/10 bg-white p-4">
               <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#737373]">Role</div>
-              <div className="mt-2 text-[18px] font-medium tracking-[-0.03em]">{listing.role === 'buyer' ? 'Buyer' : 'Seller'}</div>
+              <div className="mt-2 text-[18px] font-medium tracking-[-0.03em]">
+                {listing.role === 'buyer' ? 'Buyer' : 'Seller'}
+              </div>
             </div>
             <div className="border border-[#0a0a0a]/10 bg-white p-4">
               <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#737373]">Window</div>
@@ -52,7 +72,7 @@ export default function PublicListingDetail({ listing, onClose }) {
           <div className="mt-5 border border-[#0a0a0a]/10 bg-white p-4 sm:p-5">
             <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#737373]">Description</div>
             <p className="mt-3 whitespace-pre-wrap text-[14px] leading-[1.65] text-[#525252]">
-              {listing.description?.trim() || 'No description provided.'}
+              {listing.description?.trim() || 'No description.'}
             </p>
           </div>
 
@@ -82,4 +102,6 @@ export default function PublicListingDetail({ listing, onClose }) {
       </div>
     </div>
   )
+
+  return createPortal(node, document.body)
 }

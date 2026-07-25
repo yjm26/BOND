@@ -13,10 +13,9 @@ import ArbiterPage from './pages/ArbiterPage'
 import CreateRoomPage from './pages/CreateRoomPage'
 import DocsPage from './pages/DocsPage'
 import LandingPage from './pages/LandingPage'
-import MarketPage from './pages/MarketPage'
+import MarketPage, { ListingsRedirect } from './pages/MarketPage'
 import OffersRedirectPage from './pages/OffersRedirectPage'
 import ProfilePage from './pages/ProfilePage'
-import PublicListingsPage from './pages/PublicListingsPage'
 import RoomDetailPage from './pages/RoomDetailPage'
 import RoomsIndexPage from './pages/RoomsIndexPage'
 import { ToastProvider } from './contexts/ToastContext'
@@ -43,9 +42,13 @@ function PageTransition({ children }) {
   )
 }
 
-function RouteFooter() {
+function RouteFooter({ wallet, profileReady }) {
   const { pathname } = useLocation()
-  const showFooter = pathname === '/' || pathname.startsWith('/docs') || pathname === '/listings'
+  const workspaceMarket = pathname === '/market' && Boolean(wallet?.address && profileReady)
+  const showFooter =
+    pathname === '/' ||
+    pathname.startsWith('/docs') ||
+    (pathname === '/market' && !workspaceMarket)
   return showFooter ? <Footer /> : null
 }
 
@@ -198,20 +201,20 @@ export default function App() {
       <PageTransition>
       <Routes>
         <Route path="/" element={<LandingPage wallet={wallet} onConnect={handleConnect} />} />
-        <Route path="/listings" element={<PublicListingsPage />} />
+        <Route path="/listings" element={<ListingsRedirect />} />
         <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} onProfileStateChange={setProfileReady} />} />
         <Route path="/create" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><CreateRoomPage wallet={wallet} /></ProfileRequiredRoute>} />
         <Route path="/rooms" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomsIndexPage wallet={wallet} /></ProfileRequiredRoute>} />
         <Route path="/room/:id" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomDetailPage wallet={wallet} /></ProfileRequiredRoute>} />
         <Route path="/docs/:section?" element={<DocsPage />} />
-        <Route path="/market" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><MarketPage wallet={wallet} /></ProfileRequiredRoute>} />
+        <Route path="/market" element={<MarketPage wallet={wallet} profileReady={profileReady} />} />
         <Route path="/offers" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><OffersRedirectPage /></ProfileRequiredRoute>} />
         <Route path="/profile" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} /></ProfileRequiredRoute>} />
         <Route path="/arbiter" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><ArbiterPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} /></ProfileRequiredRoute>} />
       </Routes>
       </PageTransition>
       </ErrorBoundary>
-      <RouteFooter />
+      <RouteFooter wallet={wallet} profileReady={profileReady} />
       <ToastContainer />
       <DisconnectOverlay active={disconnecting} />
     </BrowserRouter>

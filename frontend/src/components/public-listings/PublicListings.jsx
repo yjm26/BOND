@@ -57,7 +57,12 @@ export default function PublicListings() {
           onFilterChange={view.setFilter}
         />
 
-        <PublicListingsGrid loading={loading} listings={view.listings} onOpen={setSelected} />
+        <PublicListingsGrid
+          loading={loading}
+          listings={view.listings}
+          totalCount={rawListings.length}
+          onOpen={setSelected}
+        />
       </div>
 
       {selected && <PublicListingDetail listing={selected} onClose={() => setSelected(null)} />}

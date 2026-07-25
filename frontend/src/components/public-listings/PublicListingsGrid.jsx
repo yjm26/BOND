@@ -14,7 +14,7 @@ function SkeletonGrid() {
   )
 }
 
-export default function PublicListingsGrid({ loading, listings, onOpen }) {
+export default function PublicListingsGrid({ loading, listings, totalCount, onOpen }) {
   if (loading) return <SkeletonGrid />
 
   if (!listings.length) {
@@ -29,10 +29,16 @@ export default function PublicListingsGrid({ loading, listings, onOpen }) {
   }
 
   return (
-    <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {listings.map((listing) => (
-        <PublicListingCard key={listing.id} listing={listing} onOpen={() => onOpen(listing)} />
-      ))}
+    <div className="mt-8">
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">
+        {listings.length} shown
+        {typeof totalCount === 'number' && totalCount !== listings.length ? ` · ${totalCount} total` : ''}
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {listings.map((listing) => (
+          <PublicListingCard key={listing.id} listing={listing} onOpen={() => onOpen(listing)} />
+        ))}
+      </div>
     </div>
   )
 }
