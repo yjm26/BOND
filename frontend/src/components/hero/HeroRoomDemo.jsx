@@ -87,9 +87,9 @@ export default function HeroRoomDemo() {
         </div>
       </div>
 
-      <div className="relative bg-[#fafafa] p-[1px] shadow-[0_1px_0_rgba(255,255,255,0.65)_inset,0_24px_80px_rgba(0,0,0,0.18)]">
-        <div className="relative border border-[#0a0a0a]/20 bg-[#000000] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-        <div className="flex items-center border-b border-[#fafafa]/10 bg-[#111111] px-3 py-2.5 sm:px-4">
+      <div className="relative rounded-[2px] border border-[#0a0a0a]/35 bg-[#000000] p-[3px] shadow-[0_1px_0_rgba(255,255,255,0.75)_inset,0_18px_50px_rgba(0,0,0,0.16),0_2px_0_rgba(10,10,10,0.04)]">
+        <div className="relative overflow-hidden border border-[#fafafa]/14 bg-[#000000] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <div className="flex items-center border-b border-[#fafafa]/12 bg-[#111111] px-3 py-2.5 sm:px-4">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/18" />
             <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/12" />
