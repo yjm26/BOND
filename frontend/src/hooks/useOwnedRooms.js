@@ -189,10 +189,11 @@ export default function useOwnedRooms(wallet, { pollMs = 60000 } = {}) {
   return { rooms, loading, isRefreshing, error, reload: loadRooms }
 }
 
-/** Call after createRoom / joinRoom success — local first, server optional. */
+/** Call after createRoom / joinRoom success — local first; server index is best-effort and silent. */
 export function rememberOwnedRoom(address, roomId, wallet) {
   if (!address || !roomId) return
   mergeLocalIds(address, [Number(roomId)])
+  // Do not await / force a sign here — only write server index if session already authenticated
   if (wallet) {
     trackRoomId(wallet, roomId).catch(() => {})
   }

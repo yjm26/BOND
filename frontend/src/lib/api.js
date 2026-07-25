@@ -4,6 +4,10 @@ import { ethers } from 'ethers'
 // like Render Web Service serving frontend/dist and /api from server.js.
 const API_URL = import.meta.env.VITE_API_URL || ''
 
+const AUTH_STORAGE_KEY = 'bond_api_auth_v1'
+/** Client session length — must stay ≤ server NONCE_TTL */
+const AUTH_TTL_MS = 4 * 60 * 1000
+
 /**
  * Build SIWE-like message matching server's expected format.
  */
@@ -16,58 +20,144 @@ function buildMessage(domain, address, nonce) {
   return `${domain} wants you to sign in with your Ethereum account:\n${address}\n\nNonce: ${nonce}`
 }
 
-/**
- * Auth cache to avoid re-signing on every request.
- * Nonces expire after 5 min on server, cache for 4 min.
- */
-let authCache = { address: null, domain: null, nonce: null, signature: null, expires: 0 }
+function emptyCache() {
+  return { address: null, domain: null, nonce: null, signature: null, expires: 0 }
+}
+
+/** In-memory + sessionStorage so reloads / multi-tab don't re-spam sign. */
+let authCache = emptyCache()
+
+/** Single-flight: parallel authFetch must share ONE signMessage prompt. */
+let authInflight = null
+
+function readStoredAuth() {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.sessionStorage.getItem(AUTH_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed?.address || !parsed?.signature || !parsed?.nonce || !parsed?.expires) return null
+    if (parsed.expires <= Date.now()) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function writeStoredAuth(entry) {
+  if (typeof window === 'undefined') return
+  try {
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(entry))
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+function clearStoredAuth() {
+  if (typeof window === 'undefined') return
+  try {
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
+function hydrateCacheFromStorage() {
+  if (authCache.expires > Date.now() && authCache.signature) return authCache
+  const stored = readStoredAuth()
+  if (stored) authCache = stored
+  return authCache
+}
+
+function cacheHeaders(entry) {
+  return {
+    'X-Wallet-Address': entry.address,
+    'X-Signature': entry.signature,
+    'X-Nonce': entry.nonce,
+    'X-Auth-Domain': entry.domain,
+  }
+}
 
 /**
  * Reset auth cache on disconnect or wallet switch.
  */
 export function resetAuthCache() {
-  authCache = { address: null, domain: null, nonce: null, signature: null, expires: 0 }
+  authCache = emptyCache()
+  authInflight = null
+  clearStoredAuth()
 }
 
 /**
- * Get auth headers — fetches nonce + signs with wallet signer.
- * Caches result for 4 minutes to avoid repeated signing prompts.
+ * Get auth headers — fetches nonce + signs with wallet signer ONCE.
+ * Concurrent callers await the same inflight promise (no 13× MetaMask popups).
  */
-export async function getAuthHeaders(wallet) {
-  if (!wallet?.address || (!wallet?.signer && !wallet?.provider)) throw new Error('Wallet not connected')
+export async function getAuthHeaders(wallet, { force = false } = {}) {
+  if (!wallet?.address || (!wallet?.signer && !wallet?.provider)) {
+    throw new Error('Wallet not connected')
+  }
 
-  const now = Date.now()
   const domain = getAuthDomain()
-
   const signer = wallet.provider?.getSigner ? await wallet.provider.getSigner() : wallet.signer
   const signerAddress = await signer.getAddress()
+  const now = Date.now()
 
-  if (authCache.address === signerAddress && authCache.domain === domain && authCache.expires > now) {
-    return {
-      'X-Wallet-Address': signerAddress,
-      'X-Signature': authCache.signature,
-      'X-Nonce': authCache.nonce,
-      'X-Auth-Domain': domain,
+  if (!force) {
+    hydrateCacheFromStorage()
+    if (
+      authCache.address === signerAddress &&
+      authCache.domain === domain &&
+      authCache.signature &&
+      authCache.nonce &&
+      authCache.expires > now
+    ) {
+      return cacheHeaders(authCache)
     }
   }
 
-  // Fetch fresh nonce
-  const nonceRes = await fetch(`${API_URL}/api/auth/nonce?address=${signerAddress}`)
-  if (!nonceRes.ok) throw new Error('Failed to get auth nonce')
-  const { nonce } = await nonceRes.json()
-
-  // Sign with wallet
-  const msg = buildMessage(domain, signerAddress, nonce)
-  const signature = await signer.signMessage(msg)
-
-  authCache = { address: signerAddress, domain, nonce, signature, expires: now + 4 * 60 * 1000 }
-
-  return {
-    'X-Wallet-Address': signerAddress,
-    'X-Signature': signature,
-    'X-Nonce': nonce,
-    'X-Auth-Domain': domain,
+  // Another caller already prompting — join that flight
+  if (authInflight) {
+    return authInflight
   }
+
+  authInflight = (async () => {
+    try {
+      // Re-check after awaiting signer (another flight may have finished)
+      const freshNow = Date.now()
+      hydrateCacheFromStorage()
+      if (
+        !force &&
+        authCache.address === signerAddress &&
+        authCache.domain === domain &&
+        authCache.signature &&
+        authCache.expires > freshNow
+      ) {
+        return cacheHeaders(authCache)
+      }
+
+      const nonceRes = await fetch(`${API_URL}/api/auth/nonce?address=${encodeURIComponent(signerAddress)}`)
+      if (!nonceRes.ok) throw new Error('Failed to get auth nonce')
+      const { nonce } = await nonceRes.json()
+      if (!nonce) throw new Error('Auth nonce missing')
+
+      const msg = buildMessage(domain, signerAddress, nonce)
+      // ONE wallet popup for the whole app session window
+      const signature = await signer.signMessage(msg)
+
+      authCache = {
+        address: signerAddress,
+        domain,
+        nonce,
+        signature,
+        expires: Date.now() + AUTH_TTL_MS,
+      }
+      writeStoredAuth(authCache)
+      return cacheHeaders(authCache)
+    } finally {
+      authInflight = null
+    }
+  })()
+
+  return authInflight
 }
 
 /**
@@ -86,10 +176,10 @@ export async function authFetch(path, options = {}, wallet) {
     },
   })
 
-  // Retry once if auth failed (e.g., nonce expired)
+  // Retry once if auth failed (e.g., nonce expired) — still single-flight re-sign
   if (res.status === 401 && !options._retry) {
     resetAuthCache()
-    const freshHeaders = await getAuthHeaders(wallet)
+    const freshHeaders = await getAuthHeaders(wallet, { force: true })
     res = await fetch(`${API_URL}${path}`, {
       ...options,
       _retry: true,
@@ -117,6 +207,15 @@ export async function apiGet(path) {
   const res = await fetch(`${API_URL}${path}`)
   if (!res.ok) throw new Error(`GET ${path}: ${res.status}`)
   return res.json()
+}
+
+/**
+ * Warm auth once (optional) so later parallel writes don't race the first sign.
+ * Call after connect if you know writes are coming — safe no-op if already cached.
+ */
+export async function ensureApiAuth(wallet) {
+  if (!wallet?.address) return null
+  return getAuthHeaders(wallet)
 }
 
 export { API_URL }

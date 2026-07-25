@@ -1,11 +1,13 @@
 const { ethers } = require('ethers')
 
 const nonces = new Map()
-const NONCE_TTL = 5 * 60 * 1000
+/** Keep aligned with frontend AUTH_TTL (~4m use) — allow reuse of same signed nonce. */
+const NONCE_TTL = 30 * 60 * 1000 // 30 minutes
 
 function getNonce(address) {
-  const a = address.toLowerCase()
+  const a = String(address).toLowerCase()
   const existing = nonces.get(a)
+  // Reuse active nonce so parallel /api/auth/nonce callers get the same challenge
   if (existing && existing.expires > Date.now()) return existing
   const nonce = Math.random().toString(36).slice(2) + Date.now().toString(36)
   const entry = { nonce, expires: Date.now() + NONCE_TTL }
@@ -16,12 +18,16 @@ function getNonce(address) {
 /**
  * Verify wallet ownership via signed SIWE-like message.
  * Returns the verified address (lowercase) on success, null on failure.
+ *
+ * Important: does NOT burn the nonce on success — same signature may authenticate
+ * many API calls until NONCE_TTL elapses (stops 13× MetaMask popups).
  */
 async function verifySignature({ address, signature, nonce, domain }) {
   try {
     if (!ethers.isAddress(address) || !signature || !nonce) return null
 
-    const stored = nonces.get(address.toLowerCase())
+    const a = address.toLowerCase()
+    const stored = nonces.get(a)
     if (!stored || stored.expires <= Date.now() || stored.nonce !== nonce) return null
 
     const domainCandidates = [
@@ -33,12 +39,13 @@ async function verifySignature({ address, signature, nonce, domain }) {
       'localhost:5173',
       'localhost:4100',
       'localhost:3001',
+      'localhost:3000',
     ].filter(Boolean)
 
     for (const d of [...new Set(domainCandidates)]) {
       const msg = `${d} wants you to sign in with your Ethereum account:\n${address}\n\nNonce: ${nonce}`
       const verified = ethers.verifyMessage(msg, signature)
-      if (verified.toLowerCase() === address.toLowerCase()) return address.toLowerCase()
+      if (verified.toLowerCase() === a) return a
     }
 
     return null
@@ -60,7 +67,9 @@ function parseAuth(req) {
 
 async function requireAuth(req) {
   const auth = parseAuth(req)
-  if (!auth.wallet || !auth.signature || !auth.nonce) return { error: 'Wallet authentication required', status: 401 }
+  if (!auth.wallet || !auth.signature || !auth.nonce) {
+    return { error: 'Wallet authentication required', status: 401 }
+  }
   const verified = await verifySignature(auth)
   if (!verified) return { error: 'Invalid signature', status: 401 }
   return { verified }
