@@ -352,34 +352,38 @@
   .listing-card-enter:nth-child(11) { animation-delay: 0.50s; }
   .listing-card-enter:nth-child(12) { animation-delay: 0.55s; }
 
-  /* Stripe-like landing hero ribbon — mono field, readable spin */
+  /* Landing hero ribbon — large mono field, continuous readable spin */
   @keyframes bondRibbonDrift {
-    0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-    50% { transform: translate3d(-1.5%, 1.2%, 0) scale(1.03) rotate(6deg); }
-    100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(-1.2%, 1%, 0) scale(1.035); }
+    100% { transform: translate3d(0, 0, 0) scale(1); }
   }
   @keyframes bondRibbonSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
   @keyframes bondRibbonSheen {
-    0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
-    50% { transform: rotate(180deg) scale(1.04); opacity: 1; }
-    100% { transform: rotate(360deg) scale(1); opacity: 0.7; }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+  .bond-hero-stage {
+    mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 100%);
   }
   .bond-hero-ribbon {
-    animation: bondRibbonDrift 16s ease-in-out infinite;
+    animation: bondRibbonDrift 20s ease-in-out infinite;
     will-change: transform;
   }
   .bond-hero-ribbon-spin {
-    animation: bondRibbonSpin 48s linear infinite;
+    animation: bondRibbonSpin 56s linear infinite;
     transform-box: fill-box;
-    transform-origin: 52% 48%;
+    transform-origin: 55% 48%;
+    will-change: transform;
   }
   .bond-hero-ribbon-sheen {
-    animation: bondRibbonSheen 14s linear infinite;
+    animation: bondRibbonSheen 18s linear infinite;
     transform-box: fill-box;
-    transform-origin: 52% 48%;
+    transform-origin: 55% 48%;
+    will-change: transform;
   }
 
   @keyframes skeletonShimmer {
