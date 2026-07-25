@@ -11,16 +11,15 @@ export default function AppWorkspace({ wallet, connecting, connectError, onConne
   const [needsSetup, setNeedsSetup] = useState(false)
 
   useEffect(() => {
-    if (!wallet?.address) {
-      setLoading(false)
-      setProfile(null)
-      setNeedsSetup(false)
-      onProfileStateChange?.(null)
-      return
-    }
+      if (!wallet?.address) {
+        setLoading(false)
+        setProfile(null)
+        setNeedsSetup(false)
+        onProfileStateChange?.(null)
+        return
+      }
 
-    setLoading(true)
-    const timer = window.setTimeout(() => {
+      // Instant local profile — no fake 900ms spinner (felt like stuck Connecting)
       const storedProfile = loadProfile(wallet.address)
       if (storedProfile?.displayName) {
         setProfile(storedProfile)
@@ -32,10 +31,7 @@ export default function AppWorkspace({ wallet, connecting, connectError, onConne
         onProfileStateChange?.(false)
       }
       setLoading(false)
-    }, 900)
-
-    return () => window.clearTimeout(timer)
-  }, [wallet?.address, onProfileStateChange])
+    }, [wallet?.address, onProfileStateChange])
 
   const completeSetup = (nextProfile) => {
     if (!wallet?.address) return

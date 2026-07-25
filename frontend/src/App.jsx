@@ -121,10 +121,8 @@ export default function App() {
   const [profileReady, setProfileReady] = useState(null)
   const manualDisconnect = useRef(false)
   const walletRef = useRef(null)
-  const providerRef = useRef(walletProvider)
-  const buildingRef = useRef(false)
-
-  providerRef.current = walletProvider
+  /** Monotonic build id — stale async results never win. */
+  const buildIdRef = useRef(0)
 
   useEffect(() => {
     walletRef.current = wallet
@@ -139,27 +137,92 @@ export default function App() {
   }, [wallet?.address])
 
   /**
-   * Session lifecycle — ONLY keyed on isConnected + address.
-   * AppKit often churns walletProvider identity; rebuilding the whole wallet
-   * object on every churn re-mounted pages (profile/disputes/home) and felt like flicker.
+   * Single session effect.
+   * - Keyed on isConnected + address + walletProvider readiness
+   * - Never leaves connecting=true after cancel (StrictMode / multi-tab safe)
+   * - Does not force chain-switch on restore (that hung tab-2 "Connecting…")
    */
   useEffect(() => {
-    if (!isConnected || !address) {
-      if (walletRef.current && !manualDisconnect.current && localStorage.getItem('bond_wallet_connected') === '1') {
-        // Brief grace for AppKit reconnect blips — don't blank the UI instantly
+    const buildId = ++buildIdRef.current
+    let graceTimer = null
+
+    const stillCurrent = () => buildIdRef.current === buildId && !manualDisconnect.current
+
+    async function attachSession(provider, addr) {
+      if (!provider || !addr) return
+      const existing = walletRef.current
+      if (existing?.address?.toLowerCase() === addr.toLowerCase()) {
+        // Already sessioned — only refresh provider handle
+        if (stillCurrent()) {
+          setWallet((prev) => {
+            if (!prev || prev.address.toLowerCase() !== addr.toLowerCase()) return prev
+            if (prev.walletProvider === provider && prev.provider) return prev
+            return { ...prev, walletProvider: provider }
+          })
+          setConnecting(false)
+          setConnectError(null)
+        }
+        return
+      }
+
+      if (stillCurrent()) {
         setConnecting(true)
-        const grace = window.setTimeout(() => {
-          if (!manualDisconnect.current) {
+        setConnectError(null)
+      }
+
+      try {
+        const w = await reconnectWallet(provider)
+        if (!stillCurrent()) return
+        if (w.address.toLowerCase() !== addr.toLowerCase()) {
+          // Race: account changed mid-build
+          return
+        }
+        w.walletProvider = provider
+        setWallet(w)
+        localStorage.setItem('bond_wallet_connected', '1')
+        setConnectError(null)
+      } catch (e) {
+        console.error('Wallet build failed:', e)
+        if (stillCurrent()) {
+          setConnectError(e.message || 'Could not restore wallet session')
+          // Allow user to click Connect again — don't stay forever on Connecting…
+          setWallet(null)
+        }
+      } finally {
+        if (stillCurrent()) setConnecting(false)
+      }
+    }
+
+    // Disconnected path
+    if (!isConnected || !address) {
+      const hadSession =
+        Boolean(walletRef.current) || localStorage.getItem('bond_wallet_connected') === '1'
+
+      if (hadSession && !manualDisconnect.current) {
+        // Short grace for AppKit multi-tab restore blip
+        if (stillCurrent()) setConnecting(true)
+        graceTimer = window.setTimeout(() => {
+          if (!stillCurrent()) return
+          // Still no AppKit session after grace — clear and show Connect
+          if (!isConnected) {
             setWallet(null)
             setConnecting(false)
           }
-        }, 2500)
-        return () => window.clearTimeout(grace)
+        }, 2000)
+      } else {
+        if (!manualDisconnect.current && stillCurrent()) {
+          setWallet(null)
+          setConnecting(false)
+        }
       }
-      if (!manualDisconnect.current) setWallet(null)
-      setConnecting(false)
-      buildingRef.current = false
-      return undefined
+
+      return () => {
+        if (graceTimer) window.clearTimeout(graceTimer)
+        // Invalidate this generation so in-flight attach cannot stick connecting
+        if (buildIdRef.current === buildId) {
+          /* keep buildId; next effect bumps it */
+        }
+      }
     }
 
     if (manualDisconnect.current) {
@@ -170,7 +233,7 @@ export default function App() {
     const nextAddress = address.toLowerCase()
     const activeAddress = walletRef.current?.address?.toLowerCase()
 
-    // Wallet switched accounts
+    // Account switch
     if (activeAddress && activeAddress !== nextAddress) {
       setDisconnecting(true)
       setConnecting(false)
@@ -181,96 +244,48 @@ export default function App() {
       setDisconnectRedirectTick((tick) => tick + 1)
       disconnect().catch((e) => console.error('Wallet switch disconnect failed:', e))
       window.setTimeout(() => setDisconnecting(false), 650)
-      buildingRef.current = false
       return undefined
     }
 
-    // Same address already sessioned — attach latest provider quietly, NO connecting spinner
-    if (activeAddress === nextAddress && walletRef.current) {
-      const latest = providerRef.current
-      if (latest) {
-        setWallet((prev) => {
-          if (!prev || prev.address.toLowerCase() !== nextAddress) return prev
-          if (prev.walletProvider === latest) return prev
-          return { ...prev, walletProvider: latest }
-        })
+    // Need provider from AppKit — show restoring, not infinite hang
+    if (!walletProvider) {
+      if (stillCurrent()) setConnecting(true)
+      // Safety valve: if provider never arrives, unlock the gate
+      graceTimer = window.setTimeout(() => {
+        if (!stillCurrent()) return
+        if (!walletRef.current) {
+          setConnecting(false)
+          setConnectError('Wallet provider not ready. Click Connect wallet to continue.')
+        }
+      }, 8000)
+      return () => {
+        if (graceTimer) window.clearTimeout(graceTimer)
       }
-      setConnecting(false)
-      return undefined
     }
 
-    // Fresh session for this address — wait until provider is ready
-    const provider = providerRef.current
-    if (!provider) return undefined
-    if (buildingRef.current) return undefined
+    attachSession(walletProvider, address)
 
-    let cancelled = false
-    buildingRef.current = true
-    setConnecting(true)
+    return () => {
+      if (graceTimer) window.clearTimeout(graceTimer)
+      // Bumping is done by next effect; mark this run stale by buildId check inside attachSession
+    }
+  }, [isConnected, address, walletProvider, disconnect])
+
+  const handleConnect = useCallback(() => {
     setConnectError(null)
-
-    ;(async () => {
-      try {
-        const w = await reconnectWallet(provider)
-        if (cancelled) return
-        w.walletProvider = provider
-        setWallet(w)
-        localStorage.setItem('bond_wallet_connected', '1')
-        // No SIWE warm — landing/browse stay sign-free
-      } catch (e) {
-        console.error('Wallet build failed:', e)
-        if (!cancelled) setConnectError(e.message)
-      } finally {
-        buildingRef.current = false
-        if (!cancelled) setConnecting(false)
-      }
-    })()
-
-    return () => {
-      cancelled = true
-    }
-  }, [isConnected, address, disconnect])
-
-  // When provider arrives after address (common AppKit order), kick one build if needed
-  useEffect(() => {
-    if (!isConnected || !address || !walletProvider) return
-    if (walletRef.current?.address?.toLowerCase() === address.toLowerCase()) {
-      setWallet((prev) => {
-        if (!prev) return prev
-        if (prev.walletProvider === walletProvider) return prev
-        return { ...prev, walletProvider }
-      })
-      return
-    }
-    if (buildingRef.current) return
-
-    let cancelled = false
-    buildingRef.current = true
     setConnecting(true)
-    ;(async () => {
-      try {
-        const w = await reconnectWallet(walletProvider)
-        if (cancelled) return
-        w.walletProvider = walletProvider
-        setWallet(w)
-        localStorage.setItem('bond_wallet_connected', '1')
-      } catch (e) {
-        if (!cancelled) setConnectError(e.message)
-      } finally {
-        buildingRef.current = false
-        if (!cancelled) setConnecting(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [walletProvider, isConnected, address])
-
-  const handleConnect = useCallback(() => openAppKit(), [openAppKit])
+    openAppKit()
+    // If modal closes without connect, clear spinner after a beat
+    window.setTimeout(() => {
+      if (!walletRef.current) setConnecting(false)
+    }, 1200)
+  }, [openAppKit])
 
   const handleDisconnect = useCallback(async () => {
     manualDisconnect.current = true
+    buildIdRef.current += 1
     setDisconnecting(true)
+    setConnecting(false)
     localStorage.removeItem('bond_wallet_connected')
     resetAuthCache()
     try {
