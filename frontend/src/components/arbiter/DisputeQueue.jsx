@@ -2,7 +2,7 @@ import DisputeCard from './DisputeCard'
 
 export default function DisputeQueue({ disputes, selectedId, onSelect, loading, error }) {
   if (loading) {
-    return <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-6 text-[13px] text-[var(--a-muted)]">Scanning rooms on Arc Testnet…</div>
+    return <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-6 text-[13px] text-[var(--a-muted)]">Scanning rooms…</div>
   }
   if (error) {
     return <div className="border border-[#b87333]/35 bg-[#b87333]/10 p-5 text-[13px] text-[#b87333]">{error}</div>

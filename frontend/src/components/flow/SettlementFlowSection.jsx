@@ -21,7 +21,7 @@ export default function SettlementFlowSection() {
               <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#fafafa]/36">Possible endings</div>
               <p className="mt-2 max-w-[500px] text-[14px] leading-[1.6] text-[#fafafa]/60">Release when delivered. Refund when terms fail. Dispute when proof needs review.</p>
             </div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">Arc Testnet</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">Build on Arc</div>
           </div>
           <FlowStepList steps={FLOW_STEPS} />
         </div>
