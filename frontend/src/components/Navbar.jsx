@@ -33,15 +33,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
     return () => { stale = true }
   }, [wallet?.address, wallet?.provider])
 
-  if (isProfileSetupLocked) {
-    return (
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#ede9df]/12 bg-[#20201f] px-4 py-3 sm:px-6 lg:px-10">
-        <div className="flex items-center justify-between">
-          <HeaderBrand tone="dark" to="/" hideSubtitle bareMark />
-        </div>
-      </nav>
-    )
-  }
+  if (isProfileSetupLocked) return null
 
   const scrollToSection = (event, sectionId) => {
     event.preventDefault()
