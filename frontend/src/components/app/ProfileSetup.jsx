@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import ProfileSetupBackLink from './profile-setup/ProfileSetupBackLink'
+import AppBackToLanding from './AppBackToLanding'
 import ProfileSetupConfirm from './profile-setup/ProfileSetupConfirm'
 import ProfileSetupForm from './profile-setup/ProfileSetupForm'
 import ProfileSetupIntro from './profile-setup/ProfileSetupIntro'
@@ -39,7 +39,7 @@ export default function ProfileSetup({ wallet, onComplete }) {
   return (
     <section className="relative min-h-screen bg-[#20201f] px-6 pt-6 text-[#ede9df] sm:px-10 lg:px-14">
       <div className="mb-6 sm:mb-8">
-        <ProfileSetupBackLink />
+        <AppBackToLanding />
       </div>
       <div className="grid min-h-[calc(100vh-120px)] gap-10 py-6 lg:grid-cols-[44%_1fr] lg:items-center lg:py-10">
         <ProfileSetupIntro wallet={wallet} />

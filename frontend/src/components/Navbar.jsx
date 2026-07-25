@@ -15,6 +15,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
   const isDarkHeader = isAppRoute
   const isDisconnectedAppRoute = isAppRoute && !wallet
   const isProfileSetupLocked = isAppRoute && Boolean(wallet?.address) && profileReady === false
+  const hideAppChrome = isDisconnectedAppRoute || isProfileSetupLocked
 
   useEffect(() => {
     if (!wallet?.address || !wallet?.provider) { setIsAdmin(false); return }
@@ -33,7 +34,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
     return () => { stale = true }
   }, [wallet?.address, wallet?.provider])
 
-  if (isProfileSetupLocked) return null
+  if (hideAppChrome) return null
 
   const scrollToSection = (event, sectionId) => {
     event.preventDefault()
