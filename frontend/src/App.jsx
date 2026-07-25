@@ -35,12 +35,16 @@ const ARC_TESTNET = {
   testnet: true,
 }
 
-function AppThemeSync() {
+function AppThemeSync({ wallet, profileReady }) {
   const { pathname } = useLocation()
   const alwaysApp = ['/app', '/rooms', '/room', '/offers', '/create', '/profile', '/settings', '/arbiter'].some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   )
-  useAppThemeRouteSync(alwaysApp)
+  // Workspace market uses app tokens (dark/light). Guest market stays landing-light.
+  const workspaceMarket =
+    (pathname === '/market' || pathname.startsWith('/market/')) &&
+    Boolean(wallet?.address && profileReady === true)
+  useAppThemeRouteSync(alwaysApp || workspaceMarket)
   return null
 }
 
@@ -303,7 +307,7 @@ export default function App() {
   return (
     <ToastProvider>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <AppThemeSync />
+        <AppThemeSync wallet={wallet} profileReady={profileReady} />
         <DisconnectRedirect tick={disconnectRedirectTick} />
         <Navbar
           onConnect={handleConnect}
