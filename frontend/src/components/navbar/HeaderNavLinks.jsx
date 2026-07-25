@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode = 'landing', onMarketClick }) {
+export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode = 'landing' }) {
   const dark = tone === 'dark'
   const navLink = dark
     ? 'text-[13px] font-medium tracking-[-0.01em] !text-[#fafafa]/70 transition hover:!text-[#fafafa]'
@@ -42,12 +42,9 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
 
   return (
     <div className="hidden items-center gap-6 md:flex">
-      <a href="#market" onClick={onMarketClick} className={navLink}>
+      <Link to="/market" className={navLink}>
         Market
-      </a>
-      <a href="#endings" className={navLink}>
-        Endings
-      </a>
+      </Link>
       <Link to="/docs" className={navLink}>
         Docs
       </Link>

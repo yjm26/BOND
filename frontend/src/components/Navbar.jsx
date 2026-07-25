@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAppThemeRouteSync, useTheme } from '../contexts/ThemeContext'
 import { getContract } from '../utils/contract'
 import HeaderBrand from './navbar/HeaderBrand'
@@ -11,7 +11,6 @@ import ThemeToggle from './navbar/ThemeToggle'
 const APP_SHELL_PREFIXES = ['/app', '/rooms', '/room', '/offers', '/create', '/profile', '/settings', '/arbiter']
 
 export default function Navbar({ onConnect, wallet, connecting, onDisconnect, profileReady }) {
-  const navigate = useNavigate()
   const { pathname } = useLocation()
   const { isDark } = useTheme()
   const [isAdmin, setIsAdmin] = useState(false)
@@ -57,23 +56,6 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
 
   if (hideAppChrome) return null
 
-  const scrollToSection = (event, sectionId) => {
-    event.preventDefault()
-    const isHome = window.location.pathname === '/' || window.location.pathname === ''
-    if (!isHome) {
-      navigate('/')
-      setTimeout(() => {
-        const el = document.getElementById(sectionId)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 350)
-      return
-    }
-
-    const el = document.getElementById(sectionId)
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  const scrollToMarket = (event) => scrollToSection(event, 'market')
   const headerTone = isDarkHeader ? 'dark' : 'light'
   const navMode = isAppShellRoute ? 'app' : 'landing'
 
@@ -100,7 +82,6 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
               isAdmin={isAdmin}
               tone={headerTone}
               mode={navMode}
-              onMarketClick={scrollToMarket}
             />
             <div className="flex items-center gap-3">
               {isAppShellRoute && <ThemeToggle tone={headerTone} />}
@@ -149,7 +130,6 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
           isAdmin={isAdmin}
           connecting={connecting}
           onConnect={onConnect}
-          onMarketClick={scrollToMarket}
           onClose={() => setMobileOpen(false)}
           tone={headerTone}
           mode={navMode}

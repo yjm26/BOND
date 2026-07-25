@@ -204,13 +204,12 @@ Linear density, BOND stark. Not essay stacks.
 
 Dropped from landing body: Room clarity grid, use-case essays, long room-states section (docs + hero cover that).
 
-## Landing rhythm (Linear structure, BOND stark)
+## Landing rhythm
 
 1. Hero room demo (product)
-2. Manifesto one-liner (type)
-3. Pillars Room / Market / Exit (fig grid)
-4. 01 Market chapter (product chrome)
-5. 02 Endings dark chapter (type, not chrome clone)
-6. Dual-door close
+2. Manifesto
+3. Pillars Room / Market / Exit
+4. Endings (dark type chapter)
+5. Dual-door close
 
-Variety = surface + layout change. Not more essays.
+Market is **not** mocked on landing. Header + CTAs go to `/market` (real page).

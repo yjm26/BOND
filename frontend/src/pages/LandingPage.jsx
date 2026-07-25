@@ -3,11 +3,10 @@ import LandingCloseSection from '../components/landing/LandingCloseSection'
 import LandingEndingsSection from '../components/landing/LandingEndingsSection'
 import LandingManifesto from '../components/landing/LandingManifesto'
 import LandingPillars from '../components/landing/LandingPillars'
-import MarketStageSection from '../components/landing/MarketStageSection'
 
 /**
- * Landing rhythm (Linear structure, BOND stark):
- * Hero room → manifesto → pillars → market chapter → endings (dark) → dual door
+ * Landing: room hero + short system copy.
+ * Market lives on /market — header and CTAs route there, no fake market UI.
  */
 export default function LandingPage() {
   return (
@@ -15,7 +14,6 @@ export default function LandingPage() {
       <Hero />
       <LandingManifesto />
       <LandingPillars />
-      <MarketStageSection />
       <LandingEndingsSection />
       <LandingCloseSection />
     </>

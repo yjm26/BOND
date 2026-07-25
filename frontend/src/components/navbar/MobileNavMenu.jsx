@@ -7,7 +7,6 @@ export default function MobileNavMenu({
   mode = 'landing',
   connecting,
   onConnect,
-  onMarketClick,
   onClose,
 }) {
   const dark = tone === 'dark'
@@ -59,19 +58,9 @@ export default function MobileNavMenu({
           )
         ) : (
           <>
-            <a
-              href="#market"
-              onClick={(e) => {
-                onMarketClick?.(e)
-                onClose()
-              }}
-              className={linkClass}
-            >
+            <Link to="/market" className={linkClass} onClick={onClose}>
               Market
-            </a>
-            <a href="#endings" className={linkClass} onClick={onClose}>
-              Endings
-            </a>
+            </Link>
             <Link to="/docs" className={linkClass} onClick={onClose}>
               Docs
             </Link>
@@ -88,37 +77,30 @@ export default function MobileNavMenu({
         <div
           className={`mt-5 border px-4 py-3 font-mono text-[10px] uppercase tracking-[0.16em] ${
             dark
-              ? 'border-[#a3a3a3]/25 bg-[#a3a3a3]/[0.08] text-[#a3a3a3]'
-              : 'border-[#a3a3a3]/25 bg-[#a3a3a3]/[0.08] text-[#525252]'
+              ? 'border-[#fafafa]/14 bg-[#0a0a0a] text-[#fafafa]/55'
+              : 'border-[#0a0a0a]/12 bg-white text-[#0a0a0a]/55'
           }`}
         >
           Arc Testnet
         </div>
-        {wallet ? (
-          <Link
-            to="/create"
-            className={`mt-4 flex h-11 items-center justify-center border text-[14px] font-medium ${primaryClass}`}
-            onClick={onClose}
-          >
-            Create room
-          </Link>
-        ) : mode === 'app' ? (
-          <button
-            onClick={connectAndClose}
-            disabled={connecting}
-            className={`mt-4 h-11 w-full border text-[14px] font-medium disabled:opacity-50 ${primaryClass}`}
-          >
-            {connecting ? 'Connecting…' : 'Connect wallet'}
-          </button>
-        ) : (
+        {mode === 'landing' ? (
           <Link
             to="/app"
-            className={`mt-4 flex h-11 items-center justify-center border text-[14px] font-medium ${primaryClass}`}
             onClick={onClose}
+            className={`mt-3 flex w-full items-center justify-center border px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] transition duration-160 ease-out active:scale-[0.97] ${primaryClass}`}
           >
             Go to app
           </Link>
-        )}
+        ) : !wallet ? (
+          <button
+            type="button"
+            onClick={connectAndClose}
+            disabled={connecting}
+            className={`mt-3 flex w-full items-center justify-center border px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] transition duration-160 ease-out active:scale-[0.97] disabled:opacity-40 ${primaryClass}`}
+          >
+            {connecting ? 'Connecting…' : 'Connect wallet'}
+          </button>
+        ) : null}
       </div>
     </>
   )

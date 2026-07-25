@@ -19,12 +19,12 @@ export default function HeroIntro() {
         >
           Go to app
         </Link>
-        <a
-          href="#market"
+        <Link
+          to="/market"
           className="inline-flex h-11 items-center justify-center border border-[#0a0a0a]/18 bg-transparent px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0a0a0a] transition duration-160 ease-out hover:border-[#0a0a0a] hover:bg-[#0a0a0a]/[0.03] active:scale-[0.97]"
         >
           Market
-        </a>
+        </Link>
       </div>
     </div>
   )

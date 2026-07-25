@@ -30,7 +30,7 @@ export default function LandingEndingsSection() {
       <div className="mx-auto max-w-[1080px]">
         <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">02 · Endings</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Endings</div>
             <h2 className="mt-3 max-w-[16ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
               Three ways a room closes.
             </h2>
