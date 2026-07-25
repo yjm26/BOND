@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import AppHomeActionGrid from './home/AppHomeActionGrid'
 import AppHomeOpenRooms from './home/AppHomeOpenRooms'
 import AppHomeProfilePanel from './home/AppHomeProfilePanel'
@@ -18,20 +17,10 @@ export default function AppHome({ wallet, profile }) {
 
         <main className="flex flex-col overflow-hidden border border-[#ede9df]/10 bg-[#111110]">
           <div className="border-b border-[#ede9df]/10 p-5 sm:p-6 lg:p-7">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">Home</div>
-                <h1 className="mt-3 max-w-[780px] text-[clamp(36px,5.2vw,64px)] font-medium leading-[0.92] tracking-[-0.07em]">
-                  Good to see you, {name}.
-                </h1>
-              </div>
-              <Link
-                to="/create"
-                className="inline-flex h-11 w-fit items-center justify-center border border-[#ede9df] bg-[#ede9df] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#20201f] transition duration-160 ease-out hover:bg-transparent hover:text-[#ede9df] active:scale-[0.97]"
-              >
-                Create room
-              </Link>
-            </div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#d8b15f]">Home</div>
+            <h1 className="mt-3 max-w-[780px] text-[clamp(36px,5.2vw,64px)] font-medium leading-[0.92] tracking-[-0.07em]">
+              Good to see you, {name}.
+            </h1>
           </div>
 
           <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-2 lg:p-5">
