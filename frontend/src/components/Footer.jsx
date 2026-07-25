@@ -26,8 +26,8 @@ export default function Footer() {
             </span>
           </Link>
 
-          <p className="mt-6 max-w-[520px] text-[14px] leading-[1.65] tracking-[-0.01em] text-[#a3a3a3] sm:mt-8 sm:text-[15px] sm:leading-[1.7]">
-            Private rooms for internet deals that need more than a promise. Lock USDC on Arc, keep proof beside the money, and settle through release, refund, or dispute review.
+          <p className="mt-6 max-w-[420px] text-[14px] leading-[1.55] tracking-[-0.01em] text-[#a3a3a3] sm:mt-8">
+            Escrow rooms and a market for internet deals on Arc.
           </p>
 
           <div className="mt-6 max-w-[560px] border border-[#a3a3a3]/22 bg-[#a3a3a3]/[0.07] px-4 py-3 font-mono text-[9px] uppercase leading-[1.65] tracking-[0.14em] text-[#a3a3a3]/82 sm:mt-8 sm:text-[10px] sm:tracking-[0.16em]">

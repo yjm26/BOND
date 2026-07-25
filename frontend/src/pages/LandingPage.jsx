@@ -1,15 +1,17 @@
 import Hero from '../components/Hero'
-import HowItWorks from '../components/HowItWorks'
-import RoomClaritySection from '../components/room-clarity/RoomClaritySection'
-import UseCasesSection from '../components/use-cases/UseCasesSection'
+import LandingCloseSection from '../components/landing/LandingCloseSection'
+import MarketStageSection from '../components/landing/MarketStageSection'
 
-export default function LandingPage({ wallet, onConnect }) {
+/**
+ * Landing: Room hero → Market stage → dual door close.
+ * Linear density, BOND stark. No essay stacks.
+ */
+export default function LandingPage() {
   return (
     <>
-      <Hero wallet={wallet} onConnect={onConnect} />
-      <RoomClaritySection />
-      <UseCasesSection />
-      <HowItWorks />
+      <Hero />
+      <MarketStageSection />
+      <LandingCloseSection />
     </>
   )
 }

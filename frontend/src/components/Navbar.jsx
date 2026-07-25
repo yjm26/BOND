@@ -73,8 +73,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const scrollToHow = (event) => scrollToSection(event, 'how')
-  const scrollToUseCases = (event) => scrollToSection(event, 'use-cases')
+  const scrollToMarket = (event) => scrollToSection(event, 'market')
   const headerTone = isDarkHeader ? 'dark' : 'light'
   const navMode = isAppShellRoute ? 'app' : 'landing'
 
@@ -101,8 +100,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
               isAdmin={isAdmin}
               tone={headerTone}
               mode={navMode}
-              onHowClick={scrollToHow}
-              onUseCasesClick={scrollToUseCases}
+              onMarketClick={scrollToMarket}
             />
             <div className="flex items-center gap-3">
               {isAppShellRoute && <ThemeToggle tone={headerTone} />}
@@ -151,8 +149,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
           isAdmin={isAdmin}
           connecting={connecting}
           onConnect={onConnect}
-          onHowClick={scrollToHow}
-          onUseCasesClick={scrollToUseCases}
+          onMarketClick={scrollToMarket}
           onClose={() => setMobileOpen(false)}
           tone={headerTone}
           mode={navMode}

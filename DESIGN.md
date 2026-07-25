@@ -193,3 +193,13 @@ App workspace (`/app`, workspace market, rooms, create, profile, …):
 - Applied only via `html[data-app-theme]` CSS variables (`--a-bg`, `--a-ink`, …)
 
 Do not put a theme switch on the marketing landing.
+
+## Landing structure
+
+Linear density, BOND stark. Not essay stacks.
+
+1. **Hero** — interactive room demo (product surface)
+2. **Market stage** — static listing board + Browse market
+3. **Close** — dual doors: Room / Market
+
+Dropped from landing body: Room clarity grid, use-case essays, long room-states section (docs + hero cover that).
