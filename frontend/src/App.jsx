@@ -38,9 +38,8 @@ const ARC_TESTNET = {
 function AppThemeSync() {
   const { pathname } = useLocation()
   const alwaysApp = ['/app', '/rooms', '/room', '/offers', '/create', '/profile', '/settings', '/arbiter'].some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
   )
-  // Workspace market theme stays owned by Navbar (needs wallet+profile).
   useAppThemeRouteSync(alwaysApp)
   return null
 }
@@ -68,8 +67,7 @@ function DisconnectRedirect({ tick }) {
   const navigate = useNavigate()
   const handledTick = useRef(0)
   useEffect(() => {
-    // Only react to a new disconnect. Do not re-force /app when navigate identity changes
-    // or the user later leaves the gate for landing via ‹ back.
+    // After explicit disconnect, open app gate — not a forced re-login loop on landing.
     if (tick > 0 && tick !== handledTick.current) {
       handledTick.current = tick
       navigate('/app', { replace: true })
@@ -123,8 +121,14 @@ export default function App() {
   const [profileReady, setProfileReady] = useState(null)
   const manualDisconnect = useRef(false)
   const walletRef = useRef(null)
+  const providerRef = useRef(walletProvider)
+  const buildingRef = useRef(false)
 
-  useEffect(() => { walletRef.current = wallet }, [wallet])
+  providerRef.current = walletProvider
+
+  useEffect(() => {
+    walletRef.current = wallet
+  }, [wallet])
 
   useEffect(() => {
     if (!wallet?.address) {
@@ -134,28 +138,40 @@ export default function App() {
     setProfileReady(Boolean(loadProfile(wallet.address)?.displayName))
   }, [wallet?.address])
 
+  /**
+   * Session lifecycle — ONLY keyed on isConnected + address.
+   * AppKit often churns walletProvider identity; rebuilding the whole wallet
+   * object on every churn re-mounted pages (profile/disputes/home) and felt like flicker.
+   */
   useEffect(() => {
     if (!isConnected || !address) {
       if (walletRef.current && !manualDisconnect.current && localStorage.getItem('bond_wallet_connected') === '1') {
+        // Brief grace for AppKit reconnect blips — don't blank the UI instantly
         setConnecting(true)
         const grace = window.setTimeout(() => {
-          setWallet(null)
-          setConnecting(false)
-        }, 3000)
+          if (!manualDisconnect.current) {
+            setWallet(null)
+            setConnecting(false)
+          }
+        }, 2500)
         return () => window.clearTimeout(grace)
       }
       if (!manualDisconnect.current) setWallet(null)
       setConnecting(false)
-      return
-    }
-    if (manualDisconnect.current) {
-      manualDisconnect.current = false
-      return
+      buildingRef.current = false
+      return undefined
     }
 
-    const activeWalletAddress = walletRef.current?.address?.toLowerCase()
+    if (manualDisconnect.current) {
+      manualDisconnect.current = false
+      return undefined
+    }
+
     const nextAddress = address.toLowerCase()
-    if (activeWalletAddress && activeWalletAddress !== nextAddress) {
+    const activeAddress = walletRef.current?.address?.toLowerCase()
+
+    // Wallet switched accounts
+    if (activeAddress && activeAddress !== nextAddress) {
       setDisconnecting(true)
       setConnecting(false)
       setConnectError('Wallet changed. Connect again to open a clean BOND session.')
@@ -165,31 +181,90 @@ export default function App() {
       setDisconnectRedirectTick((tick) => tick + 1)
       disconnect().catch((e) => console.error('Wallet switch disconnect failed:', e))
       window.setTimeout(() => setDisconnecting(false), 650)
-      return
+      buildingRef.current = false
+      return undefined
     }
 
+    // Same address already sessioned — attach latest provider quietly, NO connecting spinner
+    if (activeAddress === nextAddress && walletRef.current) {
+      const latest = providerRef.current
+      if (latest) {
+        setWallet((prev) => {
+          if (!prev || prev.address.toLowerCase() !== nextAddress) return prev
+          if (prev.walletProvider === latest) return prev
+          return { ...prev, walletProvider: latest }
+        })
+      }
+      setConnecting(false)
+      return undefined
+    }
+
+    // Fresh session for this address — wait until provider is ready
+    const provider = providerRef.current
+    if (!provider) return undefined
+    if (buildingRef.current) return undefined
+
     let cancelled = false
+    buildingRef.current = true
+    setConnecting(true)
+    setConnectError(null)
+
     ;(async () => {
-      setConnecting(true)
-      setConnectError(null)
       try {
-        const w = await reconnectWallet(walletProvider)
-                if (!cancelled) {
-                  w.walletProvider = walletProvider // raw provider for SIWE signing
-                  setWallet(w)
-                  localStorage.setItem('bond_wallet_connected', '1')
-                  // Do NOT warm SIWE here — landing/browse must stay sign-free.
-                  // authFetch signs once, lazily, only on real write actions.
-                }
+        const w = await reconnectWallet(provider)
+        if (cancelled) return
+        w.walletProvider = provider
+        setWallet(w)
+        localStorage.setItem('bond_wallet_connected', '1')
+        // No SIWE warm — landing/browse stay sign-free
       } catch (e) {
         console.error('Wallet build failed:', e)
         if (!cancelled) setConnectError(e.message)
       } finally {
+        buildingRef.current = false
         if (!cancelled) setConnecting(false)
       }
     })()
-    return () => { cancelled = true }
-  }, [isConnected, address, walletProvider, disconnect])
+
+    return () => {
+      cancelled = true
+    }
+  }, [isConnected, address, disconnect])
+
+  // When provider arrives after address (common AppKit order), kick one build if needed
+  useEffect(() => {
+    if (!isConnected || !address || !walletProvider) return
+    if (walletRef.current?.address?.toLowerCase() === address.toLowerCase()) {
+      setWallet((prev) => {
+        if (!prev) return prev
+        if (prev.walletProvider === walletProvider) return prev
+        return { ...prev, walletProvider }
+      })
+      return
+    }
+    if (buildingRef.current) return
+
+    let cancelled = false
+    buildingRef.current = true
+    setConnecting(true)
+    ;(async () => {
+      try {
+        const w = await reconnectWallet(walletProvider)
+        if (cancelled) return
+        w.walletProvider = walletProvider
+        setWallet(w)
+        localStorage.setItem('bond_wallet_connected', '1')
+      } catch (e) {
+        if (!cancelled) setConnectError(e.message)
+      } finally {
+        buildingRef.current = false
+        if (!cancelled) setConnecting(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [walletProvider, isConnected, address])
 
   const handleConnect = useCallback(() => openAppKit(), [openAppKit])
 
@@ -198,7 +273,11 @@ export default function App() {
     setDisconnecting(true)
     localStorage.removeItem('bond_wallet_connected')
     resetAuthCache()
-    try { await disconnect() } catch (e) { console.error('Disconnect failed:', e) }
+    try {
+      await disconnect()
+    } catch (e) {
+      console.error('Disconnect failed:', e)
+    }
     window.setTimeout(() => {
       setWallet(null)
       setDisconnectRedirectTick((tick) => tick + 1)
@@ -208,32 +287,101 @@ export default function App() {
 
   return (
     <ToastProvider>
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <AppThemeSync />
-      <DisconnectRedirect tick={disconnectRedirectTick} />
-      <Navbar onConnect={handleConnect} onDisconnect={handleDisconnect} wallet={wallet} connecting={connecting} profileReady={profileReady} />
-      <ErrorBoundary>
-      <PageTransition>
-      <Routes>
-        <Route path="/" element={<LandingPage wallet={wallet} onConnect={handleConnect} />} />
-        <Route path="/dev/section-3" element={<LandingSectionPrototypesPage />} />
-        <Route path="/listings" element={<ListingsRedirect />} />
-        <Route path="/app" element={<AppPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} onProfileStateChange={setProfileReady} />} />
-        <Route path="/create" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><CreateRoomPage wallet={wallet} /></ProfileRequiredRoute>} />
-        <Route path="/rooms" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomsIndexPage wallet={wallet} /></ProfileRequiredRoute>} />
-        <Route path="/room/:id" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><RoomDetailPage wallet={wallet} /></ProfileRequiredRoute>} />
-        <Route path="/docs/:section?" element={<DocsPage />} />
-        <Route path="/market" element={<MarketPage wallet={wallet} profileReady={profileReady} />} />
-        <Route path="/offers" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><OffersRedirectPage /></ProfileRequiredRoute>} />
-        <Route path="/profile" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><ProfilePage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} /></ProfileRequiredRoute>} />
-        <Route path="/arbiter" element={<ProfileRequiredRoute wallet={wallet} profileReady={profileReady}><ArbiterPage wallet={wallet} connecting={connecting} connectError={connectError} onConnect={handleConnect} /></ProfileRequiredRoute>} />
-      </Routes>
-      </PageTransition>
-      </ErrorBoundary>
-      <RouteFooter wallet={wallet} profileReady={profileReady} />
-      <ToastContainer />
-      <DisconnectOverlay active={disconnecting} />
-    </BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <AppThemeSync />
+        <DisconnectRedirect tick={disconnectRedirectTick} />
+        <Navbar
+          onConnect={handleConnect}
+          onDisconnect={handleDisconnect}
+          wallet={wallet}
+          connecting={connecting}
+          profileReady={profileReady}
+        />
+        <ErrorBoundary>
+          <PageTransition>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/dev/section-3" element={<LandingSectionPrototypesPage />} />
+              <Route path="/listings" element={<ListingsRedirect />} />
+              <Route
+                path="/app"
+                element={
+                  <AppPage
+                    wallet={wallet}
+                    connecting={connecting}
+                    connectError={connectError}
+                    onConnect={handleConnect}
+                    onProfileStateChange={setProfileReady}
+                  />
+                }
+              />
+              <Route
+                path="/create"
+                element={
+                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                    <CreateRoomPage wallet={wallet} />
+                  </ProfileRequiredRoute>
+                }
+              />
+              <Route
+                path="/rooms"
+                element={
+                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                    <RoomsIndexPage wallet={wallet} />
+                  </ProfileRequiredRoute>
+                }
+              />
+              <Route
+                path="/room/:id"
+                element={
+                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                    <RoomDetailPage wallet={wallet} />
+                  </ProfileRequiredRoute>
+                }
+              />
+              <Route path="/docs/:section?" element={<DocsPage />} />
+              <Route path="/market" element={<MarketPage wallet={wallet} profileReady={profileReady} />} />
+              <Route
+                path="/offers"
+                element={
+                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                    <OffersRedirectPage />
+                  </ProfileRequiredRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                    <ProfilePage
+                      wallet={wallet}
+                      connecting={connecting}
+                      connectError={connectError}
+                      onConnect={handleConnect}
+                    />
+                  </ProfileRequiredRoute>
+                }
+              />
+              <Route
+                path="/arbiter"
+                element={
+                  <ProfileRequiredRoute wallet={wallet} profileReady={profileReady}>
+                    <ArbiterPage
+                      wallet={wallet}
+                      connecting={connecting}
+                      connectError={connectError}
+                      onConnect={handleConnect}
+                    />
+                  </ProfileRequiredRoute>
+                }
+              />
+            </Routes>
+          </PageTransition>
+        </ErrorBoundary>
+        <RouteFooter wallet={wallet} profileReady={profileReady} />
+        <ToastContainer />
+        <DisconnectOverlay active={disconnecting} />
+      </BrowserRouter>
     </ToastProvider>
   )
 }

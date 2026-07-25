@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { authFetch, API_URL } from '../lib/api'
 
 export default function NotificationBell({ wallet, tone = 'dark' }) {
@@ -6,39 +6,38 @@ export default function NotificationBell({ wallet, tone = 'dark' }) {
   const [open, setOpen] = useState(false)
   const unread = notifs.filter((n) => !n.read).length
   const dark = tone === 'dark'
+  const address = wallet?.address
 
-  async function fetchNotifs() {
-    if (!wallet) return
+  const fetchNotifs = useCallback(async () => {
+    if (!address) return
     try {
-      const res = await fetch(`${API_URL}/api/notifications/${wallet.address.toLowerCase()}`)
+      const res = await fetch(`${API_URL}/api/notifications/${address.toLowerCase()}`)
       const data = await res.json()
       setNotifs(Array.isArray(data) ? data : [])
     } catch {
       setNotifs([])
     }
-  }
+  }, [address])
 
   useEffect(() => {
     fetchNotifs()
-  }, [wallet])
+  }, [fetchNotifs])
 
   useEffect(() => {
-    if (!wallet) return undefined
-    const interval = setInterval(() => fetchNotifs(), 10000)
+    if (!address) return undefined
+    const interval = setInterval(() => fetchNotifs(), 15000)
     return () => clearInterval(interval)
-  }, [wallet])
+  }, [address, fetchNotifs])
 
   async function markAllRead() {
-      if (!wallet) return
-      // Only mark-read when user opens the tray — and only if they already have API auth
-      // or they explicitly click (this is an intentional write). Still single-flight.
-      try {
-        await authFetch(`/api/notifications/${wallet.address.toLowerCase()}/read`, { method: 'POST' }, wallet)
-        fetchNotifs()
-      } catch {
-        /* ignore */
-      }
+    if (!wallet) return
+    try {
+      await authFetch(`/api/notifications/${wallet.address.toLowerCase()}/read`, { method: 'POST' }, wallet)
+      fetchNotifs()
+    } catch {
+      /* ignore */
     }
+  }
 
   if (!wallet) return null
 
@@ -64,7 +63,13 @@ export default function NotificationBell({ wallet, tone = 'dark' }) {
         aria-label="Notifications"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
         {unread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center border border-[#0a0a0a] bg-[var(--a-inverse-bg)] font-mono text-[9px] font-bold text-[var(--a-inverse-ink)]">
@@ -76,11 +81,16 @@ export default function NotificationBell({ wallet, tone = 'dark' }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className={`absolute right-0 top-8 z-50 w-80 overflow-hidden border shadow-[0_18px_60px_rgba(0,0,0,0.35)] ${panelClass}`}>
+          <div
+            className={`absolute right-0 top-8 z-50 w-80 overflow-hidden border shadow-[0_18px_60px_rgba(0,0,0,0.35)] ${panelClass}`}
+          >
             <div className={`flex items-center justify-between border-b px-4 py-2.5 ${borderClass}`}>
               <span className={`font-mono text-[10px] uppercase tracking-[0.2em] ${muted}`}>Notifications</span>
               {unread > 0 && (
-                <button onClick={markAllRead} className={`text-[11px] transition hover:opacity-100 ${muted} opacity-80`}>
+                <button
+                  onClick={markAllRead}
+                  className={`text-[11px] transition hover:opacity-100 ${muted} opacity-80`}
+                >
                   Mark all read
                 </button>
               )}

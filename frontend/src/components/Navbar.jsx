@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAppThemeRouteSync, useTheme } from '../contexts/ThemeContext'
-import { getContract } from '../utils/contract'
+import { ARC_READ_PROVIDER, getContract } from '../utils/contract'
 import HeaderBrand from './navbar/HeaderBrand'
 import HeaderNavLinks from './navbar/HeaderNavLinks'
 import HeaderWalletActions from './navbar/HeaderWalletActions'
@@ -24,27 +24,27 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
 
   useAppThemeRouteSync(isAppShellRoute)
 
-  // Landing always light chrome. App chrome follows theme (light app = landing paper).
   const isDarkHeader = isAppShellRoute ? isDark : false
   const isDisconnectedAppRoute = isAppShellRoute && !wallet
   const isProfileSetupLocked = isAppShellRoute && Boolean(wallet?.address) && profileReady === false
   const hideAppChrome = isDisconnectedAppRoute || isProfileSetupLocked
 
   useEffect(() => {
-    if (!wallet?.address || !wallet?.provider) {
+    if (!wallet?.address) {
       setIsAdmin(false)
       return undefined
     }
-    const contract = getContract(wallet.provider)
+    const addr = wallet.address
     let stale = false
+    const contract = getContract(ARC_READ_PROVIDER)
     Promise.all([
       contract.owner().catch(() => ''),
-      contract.isArbiter(wallet.address).catch(() => false),
+      contract.isArbiter(addr).catch(() => false),
     ])
       .then(([owner, activeArbiter]) => {
         if (stale) return
-        const addr = wallet.address.toLowerCase()
-        setIsAdmin(addr === owner.toLowerCase() || activeArbiter)
+        const lower = addr.toLowerCase()
+        setIsAdmin((owner && lower === String(owner).toLowerCase()) || Boolean(activeArbiter))
       })
       .catch(() => {
         if (!stale) setIsAdmin(false)
@@ -52,7 +52,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
     return () => {
       stale = true
     }
-  }, [wallet?.address, wallet?.provider])
+  }, [wallet?.address])
 
   if (hideAppChrome) return null
 
@@ -77,12 +77,7 @@ export default function Navbar({ onConnect, wallet, connecting, onDisconnect, pr
 
         {!isDisconnectedAppRoute && (
           <div className="hidden items-center gap-8 md:flex">
-            <HeaderNavLinks
-              wallet={wallet}
-              isAdmin={isAdmin}
-              tone={headerTone}
-              mode={navMode}
-            />
+            <HeaderNavLinks wallet={wallet} isAdmin={isAdmin} tone={headerTone} mode={navMode} />
             <div className="flex items-center gap-3">
               {isAppShellRoute && <ThemeToggle tone={headerTone} />}
               <HeaderWalletActions
