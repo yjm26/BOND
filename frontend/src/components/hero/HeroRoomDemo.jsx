@@ -87,8 +87,9 @@ export default function HeroRoomDemo() {
         </div>
       </div>
 
-      <div className="relative overflow-hidden border border-[#0a0a0a]/12 bg-[#000000] shadow-[0_40px_120px_rgba(0,0,0,0.28)]">
-        <div className="flex items-center justify-between border-b border-[#fafafa]/10 bg-[#111111] px-3 py-2.5 sm:px-4">
+      <div className="relative bg-[#fafafa] p-[1px] shadow-[0_1px_0_rgba(255,255,255,0.65)_inset,0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className="relative border border-[#0a0a0a]/20 bg-[#000000] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="flex items-center border-b border-[#fafafa]/10 bg-[#111111] px-3 py-2.5 sm:px-4">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/18" />
             <span className="h-2.5 w-2.5 rounded-full bg-[#fafafa]/12" />
@@ -97,16 +98,13 @@ export default function HeroRoomDemo() {
               BOND · Room
             </span>
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#525252]">
-            Arc testnet · demo
-          </div>
         </div>
 
         <HeroHotspotBar hotspots={DEMO_HOTSPOTS} activeId={activeId} onSelect={setActiveId} />
 
         <div className="bg-[#000000] p-3 text-[#fafafa] sm:p-4 lg:p-5">
           <div
-            className={`mb-4 border border-[#fafafa]/10 bg-[#111111] p-4 transition duration-160 sm:mb-5 sm:p-5 ${ring(activeId, 'state')} ${ring(activeId, 'buffer')}`}
+            className={`mb-4 border border-[#fafafa]/12 bg-[#111111] p-4 transition duration-160 sm:mb-5 sm:p-5 ${ring(activeId, 'state')} ${ring(activeId, 'buffer')}`}
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="min-w-0">
@@ -117,14 +115,14 @@ export default function HeroRoomDemo() {
                   {room.item}
                 </h2>
                 <p className="mt-3 max-w-[480px] text-[13px] leading-[1.6] text-[#a3a3a3]">
-                  {room.roleHint}. Escrow terms, participants, proof, and fallback path stay visible in one room.
+                  {room.roleHint}. Escrow terms, participants, and the next action stay visible in one room.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <span className={`border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] ${stateTone(room.state)} ${activeId === 'state' ? 'bg-[#fafafa]/6' : ''}`}>
                   {room.state}
                 </span>
-                <span className={`border border-[#fafafa]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#737373] ${activeId === 'buffer' ? 'border-[#fafafa]/40 text-[#fafafa]/80' : ''}`}>
+                <span className={`border border-[#fafafa]/12 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#737373] ${activeId === 'buffer' ? 'border-[#fafafa]/40 text-[#fafafa]/80' : ''}`}>
                   12h arbiter buffer
                 </span>
               </div>
@@ -160,7 +158,7 @@ export default function HeroRoomDemo() {
               </div>
 
               {room.showEvidence && (
-                <div className="border border-[#fafafa]/10 bg-[#111111] p-4">
+                <div className="border border-[#fafafa]/12 bg-[#111111] p-4">
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">
                     Evidence
                   </div>
@@ -182,7 +180,7 @@ export default function HeroRoomDemo() {
               )}
             </div>
 
-            <aside className={`border border-[#fafafa]/10 bg-[#111111] p-4 transition duration-160 sm:p-5 ${ring(activeId, 'actions')}`}>
+            <aside className={`border border-[#fafafa]/12 bg-[#111111] p-4 transition duration-160 sm:p-5 ${ring(activeId, 'actions')}`}>
               <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[#fafafa]/40">
                 Room actions
               </div>
@@ -205,11 +203,9 @@ export default function HeroRoomDemo() {
                   </div>
                 )}
               </div>
-              <p className="mt-4 text-[12px] leading-[1.5] text-[#737373]">
-                Demo only — buttons are not live.
-              </p>
             </aside>
           </div>
+        </div>
         </div>
       </div>
     </div>
