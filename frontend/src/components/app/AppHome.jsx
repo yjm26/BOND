@@ -1,7 +1,6 @@
 import AppHomeActionGrid from './home/AppHomeActionGrid'
 import AppHomeOpenRooms from './home/AppHomeOpenRooms'
 import AppHomeProfilePanel from './home/AppHomeProfilePanel'
-import AppHomeSidebar from './home/AppHomeSidebar'
 import useDisputeAccess from './useDisputeAccess'
 import { visibleAppActions } from './appHomeData'
 
@@ -12,8 +11,7 @@ export default function AppHome({ wallet, profile }) {
 
   return (
     <section className="min-h-screen bg-[#000000] px-4 pt-[88px] pb-6 text-[#fafafa] sm:px-6 lg:px-8">
-      <div className="grid gap-4 lg:grid-cols-[260px_1fr] lg:items-start">
-        <AppHomeSidebar actions={actions} wallet={wallet} />
+      <div className="pb-0">
 
         <main className="flex flex-col overflow-hidden border border-[#fafafa]/10 bg-[#0a0a0a]">
           <div className="border-b border-[#fafafa]/10 p-5 sm:p-6 lg:p-7">

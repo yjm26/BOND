@@ -19,9 +19,9 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
       <div className="hidden items-center gap-6 md:flex">
         <Link to="/market" className={navLink}>Market</Link>
         <Link to="/rooms" className={navLink}>My rooms</Link>
+        <Link to="/create" className={navLink}>Create room</Link>
         {isAdmin && <Link to="/arbiter" className={navLink}>Disputes</Link>}
         <Link to="/profile" className={navLink}>Profile</Link>
-        <Link to="/profile" className={navLink}>Settings</Link>
       </div>
     )
   }

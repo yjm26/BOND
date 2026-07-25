@@ -6,7 +6,6 @@ import { authFetch } from '../lib/api'
 import CreateRoomConfirm from './create-room/CreateRoomConfirm'
 import CreateRoomForm from './create-room/CreateRoomForm'
 import CreateRoomHeader from './create-room/CreateRoomHeader'
-import CreateRoomSidebar from './create-room/CreateRoomSidebar'
 import CreateRoomSuccess from './create-room/CreateRoomSuccess'
 import CreateRoomSummary from './create-room/CreateRoomSummary'
 
@@ -215,8 +214,7 @@ export default function CreateRoom({ wallet }) {
 
   return (
     <section className="min-h-screen bg-[#000000] px-4 pt-[88px] text-[#fafafa] sm:px-6 lg:px-8">
-      <div className="grid min-h-[calc(100vh-88px)] gap-4 pb-4 lg:grid-cols-[260px_1fr]">
-        <CreateRoomSidebar wallet={wallet} />
+      <div className="pb-4">
         <main className="overflow-hidden border border-[#fafafa]/10 bg-[#0a0a0a]">
           <div className="p-4 sm:p-5 lg:p-6">
             <CreateRoomHeader fromMarket={fromMarket} creatorIsSeller={creatorIsSeller} />
