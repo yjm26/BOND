@@ -76,35 +76,37 @@ contract BoundTestnet {
 
     // ─── Structs ───
     struct Room {
-        address creator;
-        address counterparty;
-        bool creatorIsSeller;
-        string itemDescription;
-        uint256 priceUSD;
-        uint256 collateralAmount;
-        uint32 createdAt;
-        uint32 joinedAt;
-        uint32 deliveredAt;
-        uint32 disputedAt;
-        uint32 deliveryDeadline;
-        uint32 confirmDeadline; // arbiter fallback opens at this timestamp after delivery
-        State state;
-        uint256 fundedAmount;
-        uint256 platformFee;
-        bytes32 deliveryProofHash;
-        bytes32 joinCodeHash;
-    }
+            address creator;
+            address counterparty;
+            bool creatorIsSeller;
+            string itemDescription;
+            uint256 priceUSD;
+            uint256 collateralAmount;
+            uint32 createdAt;
+            uint32 joinedAt;
+            uint32 fundedAt;           // set on fundRoom
+            uint32 deliveredAt;
+            uint32 disputedAt;
+            uint32 deliveryDays;       // 1–90, chosen at create
+            uint32 deliveryDeadline;   // set on fund: fundedAt + deliveryDays
+            uint32 confirmDeadline;    // arbiter fallback opens at this timestamp after delivery
+            State state;
+            uint256 fundedAmount;
+            uint256 platformFee;
+            bytes32 deliveryProofHash;
+            bytes32 joinCodeHash;
+        }
 
-    // ─── Events ───
-    event RoomCreated(
-        uint256 indexed id,
-        address indexed creator,
-        string item,
-        uint256 price,
-        uint256 collateral,
-        bool creatorIsSeller,
-        uint32 deliveryDeadline
-    );
+        // ─── Events ───
+        event RoomCreated(
+            uint256 indexed id,
+            address indexed creator,
+            string item,
+            uint256 price,
+            uint256 collateral,
+            bool creatorIsSeller,
+            uint32 deliveryDays
+        );
     event RoomJoined(uint256 indexed id, address indexed who);
     event RoomLeft(uint256 indexed id, address indexed who);
     event RoomFunded(uint256 indexed id, uint256 amount, uint256 fee, uint256 totalPaid);
@@ -276,41 +278,43 @@ contract BoundTestnet {
         uint32 now32 = uint32(block.timestamp);
 
         rooms[id] = Room({
-            creator: msg.sender,
-            counterparty: address(0),
-            creatorIsSeller: _creatorIsSeller,
-            itemDescription: _item,
-            priceUSD: _price,
-            collateralAmount: _collateral,
-            createdAt: now32,
-            joinedAt: 0,
-            deliveredAt: 0,
-            disputedAt: 0,
-            deliveryDeadline: now32 + (_deliveryDays * 1 days),
-            confirmDeadline: 0,
-            state: State.Created,
-            fundedAmount: 0,
-            platformFee: 0,
-            deliveryProofHash: bytes32(0),
-            joinCodeHash: _joinCodeHash
-        });
+                    creator: msg.sender,
+                    counterparty: address(0),
+                    creatorIsSeller: _creatorIsSeller,
+                    itemDescription: _item,
+                    priceUSD: _price,
+                    collateralAmount: _collateral,
+                    createdAt: now32,
+                    joinedAt: 0,
+                    fundedAt: 0,
+                    deliveredAt: 0,
+                    disputedAt: 0,
+                    deliveryDays: _deliveryDays,
+                    deliveryDeadline: 0, // set when buyer funds
+                    confirmDeadline: 0,
+                    state: State.Created,
+                    fundedAmount: 0,
+                    platformFee: 0,
+                    deliveryProofHash: bytes32(0),
+                    joinCodeHash: _joinCodeHash
+                });
 
-        activeRooms[msg.sender]++;
+                activeRooms[msg.sender]++;
 
-        if (_creatorIsSeller && _collateral > 0) {
-            _safeTransferFrom(msg.sender, address(this), _collateral);
-        }
+                if (_creatorIsSeller && _collateral > 0) {
+                    _safeTransferFrom(msg.sender, address(this), _collateral);
+                }
 
-        emit RoomCreated(
-            id,
-            msg.sender,
-            _item,
-            _price,
-            _collateral,
-            _creatorIsSeller,
-            rooms[id].deliveryDeadline
-        );
-    }
+                emit RoomCreated(
+                    id,
+                    msg.sender,
+                    _item,
+                    _price,
+                    _collateral,
+                    _creatorIsSeller,
+                    _deliveryDays
+                );
+            }
 
     // ─── Join Room ───
     function joinRoom(uint256 _roomId, bytes calldata _joinCode) external nonReentrant {
@@ -361,39 +365,42 @@ contract BoundTestnet {
 
     // ─── Fund Room ───
     function fundRoom(uint256 _roomId) external nonReentrant {
-        Room storage r = rooms[_roomId];
-        require(r.state == State.Joined, "Not joinable");
-        require(block.timestamp <= r.joinedAt + FUND_DL, "Fund window expired");
+            Room storage r = rooms[_roomId];
+            require(r.state == State.Joined, "Not joinable");
+            require(block.timestamp <= r.joinedAt + FUND_DL, "Fund window expired");
 
-        address buyer = _buyer(r);
-        require(msg.sender == buyer, "Only buyer can fund");
+            address buyer = _buyer(r);
+            require(msg.sender == buyer, "Only buyer can fund");
 
-        uint256 fee = fundingFee(r.priceUSD);
-        uint256 totalPaid = r.priceUSD + fee;
+            uint256 fee = fundingFee(r.priceUSD);
+            uint256 totalPaid = r.priceUSD + fee;
 
-        _safeTransferFrom(msg.sender, address(this), totalPaid);
+            _safeTransferFrom(msg.sender, address(this), totalPaid);
 
-        r.fundedAmount = r.priceUSD;
-        r.platformFee = fee;
-        r.state = State.Funded;
+            uint32 now32 = uint32(block.timestamp);
+            r.fundedAmount = r.priceUSD;
+            r.platformFee = fee;
+            r.fundedAt = now32;
+            r.deliveryDeadline = now32 + (r.deliveryDays * 1 days);
+            r.state = State.Funded;
 
-        emit RoomFunded(_roomId, r.priceUSD, fee, totalPaid);
-    }
+            emit RoomFunded(_roomId, r.priceUSD, fee, totalPaid);
+        }
 
-    // ─── Mark Delivered ───
-    function markDelivered(uint256 _roomId, bytes32 _proofHash) external {
-        Room storage r = rooms[_roomId];
-        require(r.state == State.Funded, "Not funded");
-        require(block.timestamp <= r.deliveryDeadline, "Delivery deadline passed");
-        require(msg.sender == _seller(r), "Only seller");
+        // ─── Mark Delivered ───
+        function markDelivered(uint256 _roomId, bytes32 _proofHash) external nonReentrant {
+            Room storage r = rooms[_roomId];
+            require(r.state == State.Funded, "Not funded");
+            require(block.timestamp <= r.deliveryDeadline, "Delivery deadline passed");
+            require(msg.sender == _seller(r), "Only seller");
 
-        r.deliveryProofHash = _proofHash;
-        r.deliveredAt = uint32(block.timestamp);
-        r.confirmDeadline = uint32(block.timestamp + RESPONSE_BUFFER);
-        r.state = State.Delivered;
+            r.deliveryProofHash = _proofHash;
+            r.deliveredAt = uint32(block.timestamp);
+            r.confirmDeadline = uint32(block.timestamp + RESPONSE_BUFFER);
+            r.state = State.Delivered;
 
-        emit RoomDelivered(_roomId, _proofHash);
-    }
+            emit RoomDelivered(_roomId, _proofHash);
+        }
 
     // ─── Release Funds (buyer confirms) ───
     function releaseFunds(uint256 _roomId) external nonReentrant {
@@ -426,61 +433,61 @@ contract BoundTestnet {
     }
 
     // ─── Escalate No Response (seller calls when buyer ghosts) ───
-    function escalateNoResponse(uint256 _roomId) external {
-        Room storage r = rooms[_roomId];
-        require(r.state == State.Delivered, "Not delivered");
-        require(msg.sender == _seller(r), "Only seller");
-        require(block.timestamp > r.confirmDeadline, "Response buffer still open");
+    function escalateNoResponse(uint256 _roomId) external nonReentrant {
+            Room storage r = rooms[_roomId];
+            require(r.state == State.Delivered, "Not delivered");
+            require(msg.sender == _seller(r), "Only seller");
+            require(block.timestamp > r.confirmDeadline, "Response buffer still open");
 
-        r.state = State.Disputed;
-        r.disputedAt = uint32(block.timestamp);
+            r.state = State.Disputed;
+            r.disputedAt = uint32(block.timestamp);
 
-        disputeCount[_seller(r)]++;
-        disputeCount[_buyer(r)]++;
+            disputeCount[_seller(r)]++;
+            disputeCount[_buyer(r)]++;
 
-        emit RoomDisputed(_roomId, "Buyer did not settle or dispute after delivery");
-        emit EscalatedNoResponse(_roomId, r.confirmDeadline);
-    }
+            emit RoomDisputed(_roomId, "Buyer did not settle or dispute after delivery");
+            emit EscalatedNoResponse(_roomId, r.confirmDeadline);
+        }
 
-    // ─── Dispute (with reason & evidence) ───
-    function openDispute(
-        uint256 _roomId,
-        string calldata _reason,
-        string calldata _evidenceType,
-        string calldata _evidenceDesc,
-        string calldata _evidenceRef
-    ) external {
-        Room storage r = rooms[_roomId];
-        require(r.state == State.Delivered, "Not delivered");
-        require(msg.sender == _buyer(r), "Only buyer can dispute");
-        require(bytes(_reason).length > 0, "Reason required");
-        require(bytes(_reason).length <= MAX_REASON_BYTES, "Reason too long");
+        // ─── Dispute (with reason & evidence) ───
+        function openDispute(
+            uint256 _roomId,
+            string calldata _reason,
+            string calldata _evidenceType,
+            string calldata _evidenceDesc,
+            string calldata _evidenceRef
+        ) external nonReentrant {
+            Room storage r = rooms[_roomId];
+            require(r.state == State.Delivered, "Not delivered");
+            require(msg.sender == _buyer(r), "Only buyer can dispute");
+            require(bytes(_reason).length > 0, "Reason required");
+            require(bytes(_reason).length <= MAX_REASON_BYTES, "Reason too long");
 
-        r.state = State.Disputed;
-        r.disputedAt = uint32(block.timestamp);
+            r.state = State.Disputed;
+            r.disputedAt = uint32(block.timestamp);
 
-        disputeCount[_seller(r)]++;
-        disputeCount[_buyer(r)]++;
+            disputeCount[_seller(r)]++;
+            disputeCount[_buyer(r)]++;
 
-        _submitEvidence(_roomId, _evidenceType, _evidenceDesc, _evidenceRef);
+            _submitEvidence(_roomId, _evidenceType, _evidenceDesc, _evidenceRef);
 
-        emit RoomDisputed(_roomId, _reason);
-    }
+            emit RoomDisputed(_roomId, _reason);
+        }
 
-    // ─── Submit Evidence (after dispute, by either party) ───
-    function submitEvidence(
-        uint256 _roomId,
-        string calldata _evidenceType,
-        string calldata _description,
-        string calldata _evidenceRef
-    ) external {
-        Room storage r = rooms[_roomId];
-        require(r.state == State.Disputed, "Not disputed");
-        require(_isParticipant(r), "Only participant can submit evidence");
-        require(bytes(_evidenceRef).length > 0, "Evidence ref required");
+        // ─── Submit Evidence (after dispute, by either party) ───
+        function submitEvidence(
+            uint256 _roomId,
+            string calldata _evidenceType,
+            string calldata _description,
+            string calldata _evidenceRef
+        ) external nonReentrant {
+            Room storage r = rooms[_roomId];
+            require(r.state == State.Disputed, "Not disputed");
+            require(_isParticipant(r), "Only participant can submit evidence");
+            require(bytes(_evidenceRef).length > 0, "Evidence ref required");
 
-        _submitEvidence(_roomId, _evidenceType, _description, _evidenceRef);
-    }
+            _submitEvidence(_roomId, _evidenceType, _description, _evidenceRef);
+        }
 
     function _submitEvidence(
         uint256 _roomId,
@@ -649,28 +656,28 @@ contract BoundTestnet {
     }
 
     // ─── Mutual Cancel Request ───
-    function requestMutualCancel(uint256 _roomId) external {
-        Room storage r = rooms[_roomId];
-        require(_isParticipant(r), "Only participant");
-        require(
-            r.state == State.Joined || r.state == State.Funded || r.state == State.Delivered,
-            "Not cancellable"
-        );
-        require(!mutualCancelApproved[_roomId][msg.sender], "Already requested");
+    function requestMutualCancel(uint256 _roomId) external nonReentrant {
+            Room storage r = rooms[_roomId];
+            require(_isParticipant(r), "Only participant");
+            require(
+                r.state == State.Joined || r.state == State.Funded || r.state == State.Delivered,
+                "Not cancellable"
+            );
+            require(!mutualCancelApproved[_roomId][msg.sender], "Already requested");
 
-        mutualCancelApproved[_roomId][msg.sender] = true;
-        emit MutualCancelRequested(_roomId, msg.sender);
-    }
+            mutualCancelApproved[_roomId][msg.sender] = true;
+            emit MutualCancelRequested(_roomId, msg.sender);
+        }
 
-    // ─── Mutual Cancel Revoke ───
-    function revokeMutualCancel(uint256 _roomId) external {
-        Room storage r = rooms[_roomId];
-        require(_isParticipant(r), "Only participant");
-        require(mutualCancelApproved[_roomId][msg.sender], "Not requested");
+        // ─── Mutual Cancel Revoke ───
+        function revokeMutualCancel(uint256 _roomId) external nonReentrant {
+            Room storage r = rooms[_roomId];
+            require(_isParticipant(r), "Only participant");
+            require(mutualCancelApproved[_roomId][msg.sender], "Not requested");
 
-        mutualCancelApproved[_roomId][msg.sender] = false;
-        emit MutualCancelRevoked(_roomId, msg.sender);
-    }
+            mutualCancelApproved[_roomId][msg.sender] = false;
+            emit MutualCancelRevoked(_roomId, msg.sender);
+        }
 
     function getMutualCancelStatus(uint256 _roomId) external view returns (bool creatorApproved, bool counterpartyApproved) {
         Room storage r = rooms[_roomId];

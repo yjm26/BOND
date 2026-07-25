@@ -31,7 +31,7 @@ BOND currently runs on Arc Testnet.
 | Backup RPC | `https://rpc.drpc.testnet.arc.network` |
 | Explorer | `https://testnet.arcscan.app` |
 | USDC token | `0x3600000000000000000000000000000000000000` |
-| Contract | `0x1A3ea0d24ff15a90417508F38ABD8E173921082A` |
+| Contract | `0x57608180484B746F396851aE84f8f64F03Bb89dF` |
 
 Contract source: `contract/contracts/BoundTestnet.sol`.
 

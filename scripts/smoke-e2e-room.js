@@ -68,7 +68,7 @@ const BOND_ABI = [
   'function markDelivered(uint256 _roomId, bytes32 _proofHash)',
   'function releaseFunds(uint256 _roomId)',
   'function fundingFee(uint256 _price) view returns (uint256)',
-  'function rooms(uint256) view returns (address creator, address counterparty, bool creatorIsSeller, string itemDescription, uint256 priceUSD, uint256 collateralAmount, uint32 createdAt, uint32 joinedAt, uint32 deliveredAt, uint32 disputedAt, uint32 deliveryDeadline, uint32 confirmDeadline, uint8 state, uint256 fundedAmount, uint256 platformFee, bytes32 deliveryProofHash, bytes32 joinCodeHash)',
+  'function rooms(uint256) view returns (address creator, address counterparty, bool creatorIsSeller, string itemDescription, uint256 priceUSD, uint256 collateralAmount, uint32 createdAt, uint32 joinedAt, uint32 fundedAt, uint32 deliveredAt, uint32 disputedAt, uint32 deliveryDays, uint32 deliveryDeadline, uint32 confirmDeadline, uint8 state, uint256 fundedAmount, uint256 platformFee, bytes32 deliveryProofHash, bytes32 joinCodeHash)',
   'function roomCount() view returns (uint256)',
   'event RoomCreated(uint256 indexed id, address indexed creator, string item, uint256 price, uint256 collateral, bool creatorIsSeller, uint32 deliveryDeadline)',
 ]
@@ -206,9 +206,11 @@ async function main() {
   await waitTx(await bondB.releaseFunds(roomId, { ...ARC_GAS, gasLimit: 400000n }), 'releaseFunds')
 
   const room = await bondS.rooms(roomId)
-  const state = STATE[Number(room.state)] || room.state
+  const stateNum = Number(room.state)
+  const state = STATE[stateNum] || String(stateNum)
   console.log('\n=== DONE ===')
-  console.log('room', roomId.toString(), 'state', state)
+  console.log('room', roomId.toString(), 'state', state, 'fundedAt', room.fundedAt?.toString?.() || room.fundedAt)
+  console.log('deliveryDeadline', room.deliveryDeadline?.toString?.() || room.deliveryDeadline)
   console.log('explorer', `https://testnet.arcscan.app/address/${BOND}`)
   if (state !== 'Released') {
     console.error('Expected Released, got', state)

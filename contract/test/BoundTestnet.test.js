@@ -320,19 +320,67 @@ describe('BoundTestnet', function () {
   })
 
   it('emits admin change events and rejects no-op ownership transfers', async function () {
-    const { bond, owner, treasury, buyer } = await deployFixture()
+      const { bond, owner, treasury, buyer } = await deployFixture()
 
-    await expect(bond.connect(owner).transferOwnership(owner.address))
-      .to.be.revertedWith('Owner unchanged')
+      await expect(bond.connect(owner).transferOwnership(owner.address))
+        .to.be.revertedWith('Owner unchanged')
 
-    await expect(bond.connect(owner).setTreasury(buyer.address))
-      .to.emit(bond, 'TreasuryUpdated')
-      .withArgs(treasury.address, buyer.address)
+      await expect(bond.connect(owner).setTreasury(buyer.address))
+        .to.emit(bond, 'TreasuryUpdated')
+        .withArgs(treasury.address, buyer.address)
 
-    await expect(bond.connect(owner).transferOwnership(buyer.address))
-      .to.emit(bond, 'OwnershipTransferred')
-      .withArgs(owner.address, buyer.address)
+      await expect(bond.connect(owner).transferOwnership(buyer.address))
+        .to.emit(bond, 'OwnershipTransferred')
+        .withArgs(owner.address, buyer.address)
 
-    expect(await bond.owner()).to.equal(buyer.address)
-  })
-})
+      expect(await bond.owner()).to.equal(buyer.address)
+    })
+
+    it('sets delivery deadline from fund time, not create time', async function () {
+      const { bond, usdc, seller, buyer } = await deployFixture()
+      const price = parseUsdc(10)
+      const fee = await bond.fundingFee(price)
+      const deliveryDays = 5
+
+      await bond.connect(seller).createRoom('Deadline from fund', price, 0, joinHash, true, deliveryDays)
+      const roomId = await bond.roomCount()
+      let room = await bond.rooms(roomId)
+      expect(room.deliveryDeadline).to.equal(0n)
+      expect(room.fundedAt).to.equal(0n)
+      expect(room.deliveryDays).to.equal(BigInt(deliveryDays))
+
+      await bond.connect(buyer).joinRoom(roomId, ethers.toUtf8Bytes('JOINCODE'))
+
+            // Wait inside fund window (FUND_DL = 30 min) so join→fund still valid
+            await ethers.provider.send('evm_increaseTime', [10 * 60])
+            await ethers.provider.send('evm_mine')
+
+            await usdc.mint(buyer.address, price + fee)
+            await usdc.connect(buyer).approve(await bond.getAddress(), price + fee)
+            await bond.connect(buyer).fundRoom(roomId)
+
+            room = await bond.rooms(roomId)
+            expect(room.fundedAt).to.be.gt(0n)
+            expect(room.deliveryDeadline).to.equal(room.fundedAt + BigInt(deliveryDays * 24 * HOUR))
+
+            // 2 days after fund — still within 5-day delivery window
+            await ethers.provider.send('evm_increaseTime', [2 * 24 * HOUR])
+            await ethers.provider.send('evm_mine')
+            await expect(bond.connect(buyer).buyerRefund(roomId)).to.be.revertedWith('Deadline not passed')
+
+            // Full 5 days after fund
+            await ethers.provider.send('evm_increaseTime', [3 * 24 * HOUR + 1])
+            await ethers.provider.send('evm_mine')
+            await expect(bond.connect(buyer).buyerRefund(roomId)).to.emit(bond, 'RoomRefunded')
+          })
+
+          it('guards deliver and dispute paths with nonReentrant', async function () {
+            const ctx = await deployFixture()
+            const { bond, seller, buyer } = ctx
+            const { roomId } = await createJoinFundDeliver(ctx)
+            await expect(bond.connect(buyer).openDispute(roomId, 'bad item', 'text', 'desc', 'ref-1'))
+              .to.emit(bond, 'RoomDisputed')
+            await expect(bond.connect(seller).submitEvidence(roomId, 'text', 'seller note', 'ref-s'))
+              .to.emit(bond, 'EvidenceSubmitted')
+          })
+      })

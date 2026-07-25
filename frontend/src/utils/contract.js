@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x1A3ea0d24ff15a90417508F38ABD8E173921082A'; // Bond on Arc Testnet
+export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x57608180484B746F396851aE84f8f64F03Bb89dF'; // BOND Phase A on Arc Testnet
 export const USDC_ADDRESS = '0x3600000000000000000000000000000000000000'; // Arc USDC precompile
 export const ARC_RPC_URL = import.meta.env.VITE_ARC_RPC_URL || 'https://rpc.blockdaemon.testnet.arc.network'
 export const ARC_RPC_URLS = [
@@ -122,7 +122,7 @@ export const CONTRACT_ABI = [
   "function getEvidence(uint256 _roomId, uint256 _index) external view returns (tuple(address submitter, string evidenceType, string description, string evidenceRef, uint256 timestamp))",
   "function getAllEvidence(uint256 _roomId) external view returns (tuple(address submitter, string evidenceType, string description, string evidenceRef, uint256 timestamp)[])",
   // View
-  "function rooms(uint256 _roomId) external view returns (address creator, address counterparty, bool creatorIsSeller, string itemDescription, uint256 priceUSD, uint256 collateralAmount, uint32 createdAt, uint32 joinedAt, uint32 deliveredAt, uint32 disputedAt, uint32 deliveryDeadline, uint32 confirmDeadline, uint8 state, uint256 fundedAmount, uint256 platformFee, bytes32 deliveryProofHash, bytes32 joinCodeHash)",
+  "function rooms(uint256 _roomId) external view returns (address creator, address counterparty, bool creatorIsSeller, string itemDescription, uint256 priceUSD, uint256 collateralAmount, uint32 createdAt, uint32 joinedAt, uint32 fundedAt, uint32 deliveredAt, uint32 disputedAt, uint32 deliveryDays, uint32 deliveryDeadline, uint32 confirmDeadline, uint8 state, uint256 fundedAmount, uint256 platformFee, bytes32 deliveryProofHash, bytes32 joinCodeHash)",
   "function verifyJoinCode(uint256 _roomId, bytes _joinCode) external view returns (bool)",
   "function roomCount() external view returns (uint256)",
   "function owner() external view returns (address)",
@@ -239,15 +239,17 @@ export function parseRoom(raw) {
     collateralAmount: raw[5],
     createdAt: raw[6],
     joinedAt: raw[7],
-    deliveredAt: raw[8],
-    disputedAt: raw[9],
-    deliveryDeadline: raw[10],
-    confirmDeadline: raw[11],
-    state: raw[12],
-    fundedAmount: raw[13],
-    platformFee: raw[14],
-    deliveryProofHash: raw[15],
-    joinCodeHash: raw[16],
+    fundedAt: raw[8],
+    deliveredAt: raw[9],
+    disputedAt: raw[10],
+    deliveryDays: raw[11],
+    deliveryDeadline: raw[12],
+    confirmDeadline: raw[13],
+    state: raw[14],
+    fundedAmount: raw[15],
+    platformFee: raw[16],
+    deliveryProofHash: raw[17],
+    joinCodeHash: raw[18],
   }
 }
 
