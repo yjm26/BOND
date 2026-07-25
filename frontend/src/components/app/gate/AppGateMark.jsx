@@ -1,17 +1,22 @@
-export default function AppGateMark() {
+export default function AppGateMark({ compact = false }) {
+  const size = compact
+    ? 'h-[96px] w-[96px] sm:h-[112px] sm:w-[112px]'
+    : 'h-[120px] w-[120px] sm:h-[140px] sm:w-[140px] lg:h-[156px] lg:w-[156px]'
+
   return (
-    <div className="relative flex min-h-[260px] items-center justify-center lg:min-h-[520px] lg:justify-center">
+    <div className="relative mx-auto flex items-center justify-center">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(52vw,420px)] w-[min(52vw,420px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ede9df]/[0.045] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[180%] w-[180%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ede9df]/[0.04] blur-3xl"
       />
       <img
         src="/brand/bond-logo-white-512.png"
-        alt="BOND"
+        alt=""
+        aria-hidden="true"
         draggable="false"
-        width={400}
-        height={400}
-        className="relative h-[min(42vw,280px)] w-[min(42vw,280px)] select-none object-contain opacity-[0.96] sm:h-[320px] sm:w-[320px] lg:h-[380px] lg:w-[380px] xl:h-[420px] xl:w-[420px]"
+        width={156}
+        height={156}
+        className={`relative select-none object-contain opacity-[0.96] ${size}`}
       />
     </div>
   )
