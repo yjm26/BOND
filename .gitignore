@@ -26,6 +26,8 @@ sketches/
 .data-test/
 data/
 *.log
+.env.smoke.local
+scripts/.smoke-wallets.json
 
 # Design / notes — local only
 DESIGN.md
