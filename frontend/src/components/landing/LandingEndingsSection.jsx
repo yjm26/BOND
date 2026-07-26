@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { btnLandingOnDarkPrimary, btnLandingOnDarkSecondary } from '../../styles/buttons'
 
 const ENDINGS = [
   {
@@ -25,13 +26,13 @@ export default function LandingEndingsSection() {
   return (
     <section
       id="endings"
-      className="relative overflow-hidden bg-[#0a0a0a] px-6 py-16 text-[#fafafa] sm:px-10 sm:py-24 lg:px-14 lg:py-28"
+      className="relative overflow-hidden bg-[#0a0a0a] px-4 py-14 text-[#fafafa] sm:px-10 sm:py-16 lg:px-14 lg:py-20"
     >
       <div className="mx-auto max-w-[1080px]">
-        <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Endings</div>
-            <h2 className="mt-3 max-w-[16ch] text-[clamp(30px,4.4vw,44px)] font-medium leading-[1.02] tracking-[-0.055em]">
+            <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,40px)] font-medium leading-[1.05] tracking-[-0.05em]">
               How a room ends.
             </h2>
           </div>
@@ -44,13 +45,11 @@ export default function LandingEndingsSection() {
           {ENDINGS.map((item, index) => (
             <div
               key={item.key}
-              className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 py-7 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-baseline sm:gap-8 sm:py-9"
+              className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 py-6 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-baseline sm:gap-8 sm:py-7"
             >
-              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#525252]">
-                0{index + 1}
-              </div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#525252]">0{index + 1}</div>
               <div
-                className={`text-[clamp(28px,3.5vw,36px)] font-medium tracking-[-0.045em] ${
+                className={`text-[clamp(22px,3vw,30px)] font-medium tracking-[-0.04em] ${
                   item.tone === 'success'
                     ? 'text-[#8f9a88]'
                     : item.tone === 'danger'
@@ -68,16 +67,10 @@ export default function LandingEndingsSection() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3 border-t border-[#fafafa]/10 pt-8">
-          <Link
-            to="/app"
-            className="inline-flex h-11 items-center justify-center border border-[#fafafa] bg-[#fafafa] px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0a0a0a] transition duration-160 ease-out hover:bg-transparent hover:text-[#fafafa] active:scale-[0.97]"
-          >
+          <Link to="/app" className={btnLandingOnDarkPrimary}>
             Go to app
           </Link>
-          <Link
-            to="/docs"
-            className="inline-flex h-11 items-center justify-center border border-[#fafafa]/18 px-5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#fafafa]/70 transition duration-160 ease-out hover:border-[#fafafa]/40 hover:text-[#fafafa] active:scale-[0.97]"
-          >
+          <Link to="/docs" className={btnLandingOnDarkSecondary}>
             Docs
           </Link>
         </div>

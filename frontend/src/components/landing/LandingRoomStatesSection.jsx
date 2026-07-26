@@ -12,7 +12,7 @@ export default function LandingRoomStatesSection() {
   return (
     <section
       id="states"
-      className="bg-[#0a0a0a] px-6 py-16 text-[#fafafa] sm:px-10 sm:py-20 lg:px-14 lg:py-24"
+      className="bg-[#0a0a0a] px-4 py-14 text-[#fafafa] sm:px-10 sm:py-16 lg:px-14 lg:py-20"
     >
       <div className="mx-auto max-w-[1180px]">
         <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
@@ -40,7 +40,7 @@ export default function LandingRoomStatesSection() {
                   onMouseEnter={() => setActive(index)}
                   onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}
-                  className={`flex w-[min(78vw,280px)] shrink-0 snap-center flex-col border-[#fafafa]/10 px-4 py-5 text-left transition duration-160 ease-out sm:w-auto sm:min-h-[168px] sm:border-r sm:last:border-r-0 ${
+                  className={`flex w-[min(78vw,280px)] shrink-0 snap-center flex-col border-[#fafafa]/10 px-4 py-5 text-left transition duration-160 ease-out active:scale-[0.99] sm:w-auto sm:min-h-[156px] sm:border-r sm:last:border-r-0 ${
                     isActive ? 'bg-[#fafafa]/[0.06] outline outline-1 outline-[#fafafa]/18 -outline-offset-1' : ''
                   } ${
                     index < LANDING_ROOM_STATES.length - 1

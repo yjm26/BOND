@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import ConfirmModal from '../ConfirmModal'
+import { btnDanger, btnPrimary, btnSecondary } from '../../styles/buttons'
 
-const primaryButton = 'h-11 w-full border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition hover:bg-transparent hover:text-[var(--a-ink)] disabled:cursor-not-allowed disabled:opacity-40'
-const ghostButton = 'h-11 w-full border border-[var(--a-line)] px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--a-ink)]/64 transition hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)] disabled:cursor-not-allowed disabled:opacity-40'
-const dangerButton = 'h-11 w-full border border-[#b87333]/38 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#b87333] transition hover:bg-[#b87333]/10 disabled:cursor-not-allowed disabled:opacity-40'
+const primaryButton = btnPrimary
+const ghostButton = btnSecondary
+const dangerButton = btnDanger
 
 function ActionNote({ children, tone = 'muted' }) {
   const toneClass = tone === 'success' ? 'border-[#8f9a88]/24 bg-[#8f9a88]/10 text-[#8f9a88]' : tone === 'danger' ? 'border-[#b87333]/32 bg-[#b87333]/10 text-[#b87333]' : 'border-[var(--a-line)] bg-[var(--a-panel)] text-[var(--a-muted)]'

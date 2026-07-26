@@ -2,7 +2,7 @@ import HeroCtaGroup from './HeroCtaGroup'
 
 export default function HeroCopy({ wallet, onConnect }) {
   return (
-    <div className="relative flex w-full flex-col px-6 py-8 sm:px-10 lg:px-16 lg:py-16 xl:px-20">
+    <div className="relative flex w-full flex-col px-4 py-8 sm:px-10 lg:px-16 lg:py-16 xl:px-20">
       <div className="w-full pt-6 sm:pt-10 lg:pt-[8vh] xl:pt-[10vh]">
         <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">
           USDC escrow on Arc

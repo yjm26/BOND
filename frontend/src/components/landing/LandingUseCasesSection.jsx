@@ -7,7 +7,7 @@ export default function LandingUseCasesSection() {
   return (
     <section
       id="use"
-      className="bg-[#fafafa] px-6 py-16 text-[#0a0a0a] sm:px-10 sm:py-20 lg:px-14 lg:py-24"
+      className="bg-[#fafafa] px-4 py-14 text-[#0a0a0a] sm:px-10 sm:py-16 lg:px-14 lg:py-20"
     >
       <div className="mx-auto max-w-[1180px]">
         <div className="flex flex-col gap-6 border-b border-[#0a0a0a]/12 pb-8 sm:flex-row sm:items-end sm:justify-between">
@@ -26,7 +26,7 @@ export default function LandingUseCasesSection() {
           {LANDING_USE_CASES.map((row, index) => (
             <div
               key={row.id}
-              className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 border-b border-[#0a0a0a]/12 py-7 sm:grid-cols-[72px_minmax(0,0.9fr)_minmax(0,1.3fr)] sm:items-baseline sm:gap-8 sm:py-8"
+              className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 border-b border-[#0a0a0a]/12 py-6 sm:grid-cols-[72px_minmax(0,0.9fr)_minmax(0,1.3fr)] sm:items-baseline sm:gap-8 sm:py-7"
             >
               <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#737373]">
                 0{index + 1}

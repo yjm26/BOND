@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 export default function LandingCloseSection() {
   return (
-    <section className="border-t border-[#0a0a0a]/10 bg-[#fafafa] px-6 py-14 text-[#0a0a0a] sm:px-10 sm:py-16 lg:px-14">
+    <section className="border-t border-[#0a0a0a]/10 bg-[#fafafa] px-4 py-12 text-[#0a0a0a] sm:px-10 sm:py-14 lg:px-14">
       <div className="mx-auto max-w-[1080px]">
         <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Start</div>
         <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,40px)] font-medium leading-[1.05] tracking-[-0.05em]">
