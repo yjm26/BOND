@@ -1,12 +1,26 @@
-import { chromium } from 'playwright-core';
-import { readFileSync } from 'fs';
-const exe = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const markDataUri = readFileSync('C:\\Users\\rival\\shotdir\\mark_b64.txt', 'utf8').trim();
-const b = await chromium.launch({ executablePath: exe });
-const ctx = await b.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 2 });
-const p = await ctx.newPage();
+// Regenerate the Open Graph link-preview card (public/og-preview.png, 1200x630).
+//
+//   node scripts/generate-og.mjs
+//
+// Renders the card with headless Chromium, so it needs a local Chrome/Chromium.
+// Set CHROME_PATH to override the executable location.
+import { chromium } from 'playwright-core'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 
-// Right panel gets its own vertical rhythm: mark centered + a small labeled caption under it.
+const here = dirname(fileURLToPath(import.meta.url))
+const publicDir = resolve(here, '../public')
+const markPath = resolve(publicDir, 'brand/bond-logo-white-512.png')
+const outPath = resolve(publicDir, 'og-preview.png')
+
+const chromePath =
+  process.env.CHROME_PATH ||
+  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+
+const markDataUri =
+  'data:image/png;base64,' + readFileSync(markPath).toString('base64')
+
 const html = `<!doctype html><html><head><style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{width:1200px;height:630px;overflow:hidden}
@@ -32,7 +46,7 @@ const html = `<!doctype html><html><head><style>
       <div class="brand">BOND</div>
       <div class="tagline">Safe deals on Arc.</div>
       <div class="desc">Lock USDC, settle the deal in one room.</div>
-      <div class="mech mono">Fund → Deliver → Release → Dispute</div>
+      <div class="mech mono">Fund &rarr; Deliver &rarr; Release &rarr; Dispute</div>
     </div>
     <div class="right">
       <img class="mark" src="${markDataUri}" />
@@ -41,10 +55,17 @@ const html = `<!doctype html><html><head><style>
   </div>
   <div class="footer mono">Build on Arc Testnet</div>
   <div class="domain mono">usebond.xyz</div>
-</body></html>`;
+</body></html>`
 
-await p.setContent(html, { waitUntil: 'networkidle' });
-await p.waitForTimeout(1000);
-await p.screenshot({ path: 'C:\\Users\\rival\\og_final.png', clip: { x: 0, y: 0, width: 1200, height: 630 } });
-await b.close();
-console.log('ok');
+const browser = await chromium.launch({ executablePath: chromePath })
+const ctx = await browser.newContext({
+  viewport: { width: 1200, height: 630 },
+  deviceScaleFactor: 2,
+})
+const page = await ctx.newPage()
+await page.setContent(html, { waitUntil: 'networkidle' })
+await page.waitForTimeout(500)
+const buf = await page.screenshot({ clip: { x: 0, y: 0, width: 1200, height: 630 } })
+writeFileSync(outPath, buf)
+await browser.close()
+console.log('Wrote', outPath)

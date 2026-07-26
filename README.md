@@ -1,23 +1,22 @@
 # BOND
 
-BOND is an Arc-native settlement workspace for people who make deals with strangers on the internet.
+Escrow rooms for USDC deals on Arc.
 
-It is built for the messy middle of online trade: digital goods, account transfers, private service work, NFT/allowlist spots, OTC arrangements, and small USDC deals where both sides want a cleaner option than trusting a Discord middleman.
+BOND is a settlement app for online trades between people who don't know each other: digital goods, account transfers, freelance work, NFT/allowlist spots, and small OTC swaps. Instead of trusting a Discord middleman, both sides open a room, the buyer locks USDC in an escrow contract, and the funds only move on an explicit action — release, refund, or dispute.
 
-BOND does not try to make trust disappear. It makes the deal state explicit, keeps funds in an auditable escrow contract, and gives both parties a clear path to finish, refund, or escalate when something goes wrong.
+It doesn't remove the need for trust. It makes the state of the deal and the location of the money verifiable on-chain, and gives each side a defined next step when things stall.
 
-## What BOND does
+## What it does
 
-- Creates private escrow rooms on Arc Testnet.
-- Lets a buyer fund a room in USDC.
-- Lets the seller mark delivery.
-- Lets the buyer release funds or open a dispute.
-- Lets a seller escalate if the buyer goes silent after delivery.
-- Lets approved arbiters resolve disputes on-chain.
-- Keeps marketplace listings visible for 30 days unless taken or removed.
-- Shows human-readable profiles next to wallet addresses when users publish a BOND profile.
+- Opens private escrow rooms on Arc Testnet.
+- Buyer funds a room in USDC; funds sit in the contract until settled.
+- Seller marks delivery; buyer releases or disputes.
+- Seller can escalate if the buyer goes silent after delivery (12h response buffer).
+- Approved arbiters resolve disputes on-chain.
+- Marketplace listings stay visible for 30 days unless taken or removed.
+- Optional public profiles map a display name/socials to a wallet address.
 
-The product is intentionally quiet: clear room state, clear money movement, clear next action. No fake agent labels, no noisy crypto dashboard, no hidden signing.
+Read-only views never request a signature. Signatures are only for authenticated writes (posting a listing, room actions).
 
 ## Current network
 
@@ -70,18 +69,22 @@ That means the UI does not ask users to choose confusing deal types or arbitrary
 
 ```text
 .
-├── server.js                         # Production API + static frontend server
-├── render.yaml                       # Render single-service deploy blueprint
-├── frontend/                         # Vite/React app
-│   ├── public/brand/                 # BOND logo assets
-│   └── src/                          # Product UI, wallet, room, market code
-└── contract/                         # Hardhat project
-    ├── contracts/BoundTestnet.sol    # Bond escrow contract (Solidity: BoundTestnet)
-    ├── scripts/deploy-bound-testnet.js
-    └── test/BoundTestnet.test.js
+├── server.js              # HTTP entry: API routes + serves frontend/dist
+├── server/                # Backend modules
+│   ├── lib/               # auth, cors, storage, sanitize, http helpers
+│   └── routes/            # listings, offers, disputes, evidence, room index
+├── frontend/              # Vite + React app
+│   ├── public/brand/      # Logo + OG assets
+│   ├── scripts/           # generate-og.mjs (regenerate the link preview)
+│   └── src/               # UI, wallet, room, and market code
+├── contract/              # Hardhat project
+│   ├── contracts/BoundTestnet.sol
+│   ├── scripts/deploy-bound-testnet.js
+│   └── test/BoundTestnet.test.js
+├── scripts/               # smoke-e2e-room.js, check-smoke-balances.js
+├── render.yaml            # Render single-service blueprint
+└── nixpacks.toml
 ```
-
-Legacy prototype contracts, old deploy scripts, and old frontend-only deploy configs were intentionally removed so the repo reflects the current BOND product.
 
 ## Local development
 

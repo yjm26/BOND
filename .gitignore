@@ -24,6 +24,9 @@ sketches/
 
 # Local secrets / test wallets — never push
 local/
+frontend/encode.mjs
+frontend/gen_wallets.mjs
+frontend/*.local.mjs
 
 # Local data / test dumps
 .data-test/
