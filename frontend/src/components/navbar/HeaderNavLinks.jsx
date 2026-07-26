@@ -41,21 +41,18 @@ export default function HeaderNavLinks({ wallet, isAdmin, tone = 'light', mode =
   }
 
   return (
-    <div className="hidden items-center gap-6 md:flex">
-      <Link to="/market" className={navLink}>
-        Market
-      </Link>
-      <Link to="/docs" className={navLink}>
-        Docs
-      </Link>
-      <Link to="/app" className={navLink}>
-        App
-      </Link>
-      {isAdmin && (
-        <Link to="/arbiter" className="text-[13px] font-medium text-[#b87333] transition hover:text-[#a3a3a3]">
-          Disputes
+      <div className="hidden items-center gap-6 md:flex">
+        <Link to="/market" className={navLink}>
+          Market
         </Link>
-      )}
-    </div>
-  )
-}
+        <Link to="/docs" className={navLink}>
+          Docs
+        </Link>
+        {isAdmin && (
+          <Link to="/arbiter" className="text-[13px] font-medium text-[#b87333] transition hover:text-[#a3a3a3]">
+            Disputes
+          </Link>
+        )}
+      </div>
+    )
+  }
