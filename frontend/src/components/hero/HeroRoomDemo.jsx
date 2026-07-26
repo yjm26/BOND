@@ -83,7 +83,7 @@ export default function HeroRoomDemo() {
                               key={state}
                               type="button"
                               onClick={() => setRoomState(state)}
-                              className={`h-8 shrink-0 border px-2.5 font-mono text-[9px] uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] sm:h-7 ${
+                              className={`h-10 shrink-0 border px-2.5 font-mono text-[9px] uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] sm:h-7 ${
                                 on
                                   ? 'border-[#fafafa] bg-[#fafafa] text-[#0a0a0a]'
                                   : 'border-[#fafafa]/14 text-[#a3a3a3] hover:border-[#fafafa]/28 hover:text-[#fafafa]'

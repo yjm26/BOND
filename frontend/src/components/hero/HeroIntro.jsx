@@ -32,9 +32,9 @@ export default function HeroIntro() {
 
         <Link
           to="/docs"
-          className="shrink-0 font-mono text-[12px] tracking-[-0.01em] text-[#525252] transition duration-160 ease-out hover:text-[#0a0a0a] lg:pb-1"
+          className="shrink-0 self-start font-mono text-[12px] tracking-[-0.01em] text-[#525252] transition-colors duration-160 ease-out hover:text-[#0a0a0a] lg:self-end"
         >
-          How rooms work →
+          Read the flow →
         </Link>
       </div>
     </div>

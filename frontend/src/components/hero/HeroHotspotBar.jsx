@@ -11,10 +11,9 @@ export default function HeroHotspotBar({ hotspots, activeId, onSelect }) {
               <button
                 key={hotspot.id}
                 type="button"
-                onMouseEnter={() => onSelect(hotspot.id)}
                 onFocus={() => onSelect(hotspot.id)}
                 onClick={() => onSelect(on ? null : hotspot.id)}
-                className={`inline-flex h-9 shrink-0 items-center gap-2 border px-3 font-mono text-[11px] font-medium uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] ${
+                className={`inline-flex h-10 shrink-0 items-center gap-2 border px-3 font-mono text-[11px] font-medium uppercase tracking-[0.14em] transition duration-160 ease-out active:scale-[0.97] sm:h-9 ${
                   on
                     ? 'border-white bg-white text-black'
                     : 'border-white/25 bg-black text-white/80 hover:border-white/50 hover:text-white'
@@ -38,9 +37,8 @@ export default function HeroHotspotBar({ hotspots, activeId, onSelect }) {
             </>
           ) : (
             <p className="text-[13px] leading-[1.5] text-white/40">
-                          <span className="sm:hidden">Tap a label.</span>
-                          <span className="hidden sm:inline">Hover or tap a label.</span>
-                        </p>
+              Tap a label.
+            </p>
           )}
         </div>
       </div>
