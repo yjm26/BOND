@@ -30,7 +30,7 @@ BOND currently runs on Arc Testnet.
 | Backup RPC | `https://rpc.drpc.testnet.arc.network` |
 | Explorer | `https://testnet.arcscan.app` |
 | USDC token | `0x3600000000000000000000000000000000000000` |
-| Contract | `0xe07a76af62F0aEd25A0688e9e9A905ec3B600F01` (Phase A: deadline from fund) |
+| Contract | `0xb25433c4fA845Ff88883ea07543Fc2b561f56fbB` (Phase A: deadline from fund) |
 
 Contract source: `contract/contracts/BOND.sol`.
 

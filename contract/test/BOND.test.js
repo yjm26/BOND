@@ -373,6 +373,42 @@ describe('BOND', function () {
         .to.be.revertedWith('Not authorized')
     })
 
+    it('emits split and fee events with per-side amounts on arbiterSplit', async function () {
+      const ctx = await deployFixture()
+      const { bond, arbiter, buyer, seller, treasury } = ctx
+      const { roomId } = await createJoinFundDeliver(ctx)
+      await bond.connect(buyer).openDispute(roomId, 'partial issue', 'text', '', '')
+
+      const room = await bond.rooms(roomId)
+      const total = room.fundedAmount + room.collateralAmount
+      const arbiterFee = (total * (await bond.ARBITER_FEE_BPS())) / (await bond.BPS_DENOM())
+      const net = total - arbiterFee
+      const half = net / 2n
+
+      const tx = bond.connect(arbiter).arbiterSplit(roomId)
+      await expect(tx)
+        .to.emit(bond, 'DisputeSplit')
+        .withArgs(roomId, buyer.address, seller.address, half, net - half)
+      await expect(tx)
+        .to.emit(bond, 'FeesCollected')
+        .withArgs(roomId, treasury.address, room.platformFee, arbiterFee)
+    })
+
+    it('emits fee event on arbiterResolve', async function () {
+      const ctx = await deployFixture()
+      const { bond, arbiter, buyer, seller, treasury } = ctx
+      const { roomId } = await createJoinFundDeliver(ctx)
+      await bond.connect(buyer).openDispute(roomId, 'not delivered', 'text', '', '')
+
+      const room = await bond.rooms(roomId)
+      const total = room.fundedAmount + room.collateralAmount
+      const arbiterFee = (total * (await bond.ARBITER_FEE_BPS())) / (await bond.BPS_DENOM())
+
+      await expect(bond.connect(arbiter).arbiterResolve(roomId, seller.address))
+        .to.emit(bond, 'FeesCollected')
+        .withArgs(roomId, treasury.address, room.platformFee, arbiterFee)
+    })
+
     it('rejects deploying with arbiter equal to treasury', async function () {
       const [_, treasuryAcct] = await ethers.getSigners()
       const MockUSDC = await ethers.getContractFactory('MockUSDC')

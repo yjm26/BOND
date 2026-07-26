@@ -6,7 +6,7 @@
  *   2. Run flow:     node scripts/smoke-e2e-room.js
  *
  * Keys: local/smoke/.env (gitignored). Never commit private keys.
- * Contract: Phase A default 0xe07a76af62F0aEd25A0688e9e9A905ec3B600F01
+ * Contract: Phase A default 0xb25433c4fA845Ff88883ea07543Fc2b561f56fbB
  */
 const fs = require('fs')
 const path = require('path')
@@ -46,7 +46,7 @@ function loadEnv() {
 const env = loadEnv()
 
 const RPC = env.ARC_RPC_URL || 'https://rpc.blockdaemon.testnet.arc.network'
-const BOND = env.BOND_CONTRACT || '0xe07a76af62F0aEd25A0688e9e9A905ec3B600F01'
+const BOND = env.BOND_CONTRACT || '0xb25433c4fA845Ff88883ea07543Fc2b561f56fbB'
 const USDC = env.USDC_ADDRESS || '0x3600000000000000000000000000000000000000'
 const PRICE = ethers.parseUnits(env.SMOKE_PRICE_USDC || '0.1', 6)
 

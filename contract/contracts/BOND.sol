@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
@@ -118,6 +118,8 @@ contract BOND {
     event RoomExpired(uint256 indexed id);
     event RoomCancelled(uint256 indexed id, address indexed by);
     event DisputeResolved(uint256 indexed id, address indexed winner, uint256 amount);
+    event DisputeSplit(uint256 indexed id, address indexed buyer, address indexed seller, uint256 buyerAmount, uint256 sellerAmount);
+    event FeesCollected(uint256 indexed id, address indexed to, uint256 platformFee, uint256 arbiterFee);
     event MutualCancelRequested(uint256 indexed id, address indexed by);
     event MutualCancelExecuted(uint256 indexed id);
     event MutualCancelRevoked(uint256 indexed id, address indexed by);
@@ -261,10 +263,12 @@ contract BOND {
     }
 
     function _safeTransfer(address to, uint256 amount) internal {
+        if (amount == 0) return;
         require(usdc.transfer(to, amount), "USDC transfer failed");
     }
 
     function _safeTransferFrom(address from, address to, uint256 amount) internal {
+        if (amount == 0) return;
         require(usdc.transferFrom(from, to, amount), "USDC transferFrom failed");
     }
 
@@ -571,7 +575,7 @@ contract BOND {
     }
 
     // ─── Arbiter Resolve ───
-    function arbiterResolve(uint256 _roomId, address _winner) external onlyArbiter nonReentrant {
+    function arbiterResolve(uint256 _roomId, address _winner) external nonReentrant onlyArbiter {
         Room storage r = rooms[_roomId];
         require(r.state == State.Disputed, "Not disputed");
         require(_winner == _buyer(r) || _winner == _seller(r), "Invalid winner");
@@ -595,11 +599,12 @@ contract BOND {
 
         if (net > 0) _safeTransfer(_winner, net);
 
+        emit FeesCollected(_roomId, treasury, r.platformFee, arbiterFee);
         emit DisputeResolved(_roomId, _winner, net);
     }
 
     // ─── Arbiter Split ───
-    function arbiterSplit(uint256 _roomId) external onlyArbiter nonReentrant {
+    function arbiterSplit(uint256 _roomId) external nonReentrant onlyArbiter {
         Room storage r = rooms[_roomId];
         require(r.state == State.Disputed, "Not disputed");
 
@@ -621,7 +626,8 @@ contract BOND {
             _safeTransfer(seller, net - half);
         }
 
-        emit DisputeResolved(_roomId, address(0), net);
+        emit FeesCollected(_roomId, treasury, r.platformFee, arbiterFee);
+        emit DisputeSplit(_roomId, buyer, seller, half, net - half);
     }
 
     // ─── Cancel Room (creator, before join) ───
