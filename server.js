@@ -29,6 +29,10 @@ const CONTENT_TYPES = {
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
+  '.txt': 'text/plain; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.woff2': 'font/woff2',
 }
 
 function serveStatic(res, pathname) {
@@ -45,6 +49,14 @@ function serveStatic(res, pathname) {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
+      // Only SPA routes (extensionless paths) fall back to index.html.
+      // A missing file with an extension is a real 404 — never a soft-404,
+      // which would make crawlers index HTML as robots.txt/sitemap.xml/assets.
+      if (path.extname(filePath) && path.basename(filePath) !== 'index.html') {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
+        return res.end('Not found')
+      }
+
       fs.readFile(path.join(STATIC_DIR, 'index.html'), (indexErr, indexData) => {
         if (indexErr) {
           res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })

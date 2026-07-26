@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Wallet-gated app surfaces: no crawlable content, requires a signed session.
+Disallow: /app
+Disallow: /create
+Disallow: /rooms
+Disallow: /room/
+Disallow: /profile
+Disallow: /offers
+Disallow: /arbiter
+Disallow: /dev/
+
+Sitemap: https://usebond.xyz/sitemap.xml

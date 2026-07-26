@@ -49,6 +49,78 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://usebond.xyz/#website",
+            "url": "https://usebond.xyz/",
+            "name": "BOND",
+            "description": "USDC escrow rooms on Arc. Fund, deliver, release, or dispute.",
+            "inLanguage": "en"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://usebond.xyz/#app",
+            "name": "BOND",
+            "url": "https://usebond.xyz/",
+            "applicationCategory": "FinanceApplication",
+            "applicationSubCategory": "Escrow",
+            "operatingSystem": "Web",
+            "browserRequirements": "Requires an EVM wallet",
+            "description": "BOND locks USDC in on-chain escrow rooms for internet deals. Buyer funds, seller delivers, buyer releases or opens a dispute. Runs on Arc Testnet.",
+            "image": "https://usebond.xyz/og-preview.png",
+            "isAccessibleForFree": true,
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://usebond.xyz/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is BOND?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "BOND is an escrow app on Arc. A buyer locks USDC in an on-chain room, the seller delivers, and the buyer releases the funds or opens a dispute. Neither side holds the other's money."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "When is the seller paid?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The seller is paid when the buyer releases the room, or when an arbiter resolves a dispute in the seller's favor. Collateral is returned at settlement."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does BOND cost?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "A 1% platform fee goes to the treasury at settlement. Network gas is separate and is paid in native USDC on Arc."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which network does BOND run on?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Arc Testnet only. Gas is paid in native USDC, and room funding uses the USDC ERC-20 interface with 6 decimals."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
