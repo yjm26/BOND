@@ -34,16 +34,15 @@ export default function Footer() {
               <span>
                 <span className="block text-[15px] font-medium tracking-[-0.02em]">BOND</span>
                 <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.2em] text-[#fafafa]/40">
-                  Arc Testnet
-                </span>
-              </span>
-            </Link>
+                                  Build on Arc Testnet
+                                </span>
+                              </span>
+                            </Link>
 
-            <p className="mt-6 max-w-[380px] text-[14px] leading-[1.55] tracking-[-0.01em] text-[#a3a3a3]">
-              USDC escrow rooms for internet deals. Money settles on-chain; market is discovery only. Not mainnet —
-              treat all funds as test value.
-            </p>
-          </div>
+                            <p className="mt-6 max-w-[380px] text-[14px] leading-[1.55] tracking-[-0.01em] text-[#a3a3a3]">
+                              Escrow rooms and a market for deals that need locked USDC and a clear exit.
+                            </p>
+                          </div>
 
           <div className="grid grid-cols-2 gap-8 sm:gap-12">
             <div>
@@ -82,17 +81,17 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col gap-3 border-t border-[#fafafa]/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#fafafa]/35">
-            © BOND · Arc Testnet only · usebond.xyz
-          </span>
-          <a
-            href={explorerAddressUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="max-w-full truncate font-mono text-[10px] tracking-[0.04em] text-[#fafafa]/35 transition hover:text-[#fafafa]/60"
-          >
-            Contract {short}
-          </a>
-        </div>
+                      © BOND · Build on Arc Testnet
+                    </span>
+                    <a
+                      href={explorerAddressUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="max-w-full truncate font-mono text-[10px] tracking-[0.04em] text-[#fafafa]/35 transition hover:text-[#fafafa]/60"
+                    >
+                      {short}
+                    </a>
+
       </div>
     </footer>
   )
