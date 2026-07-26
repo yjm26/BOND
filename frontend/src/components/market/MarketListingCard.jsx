@@ -55,21 +55,21 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
       <div className="mt-auto pt-4">
         {isOwner ? (
           listing.taken ? (
-            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#b87333]">Room active</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--a-ink)]/40">Room active</span>
           ) : (
             <button
               onClick={(event) => { event.stopPropagation(); onDelete() }}
-              className="h-8 w-full border border-[#b87333]/40 px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#b87333] transition hover:bg-[#b87333]/10"
+              className="h-8 w-full border border-[var(--a-line-strong)] px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--a-ink)]/55 transition-[transform,background-color,border-color,color] duration-160 ease-out hover:border-[var(--a-ink)] hover:text-[var(--a-ink)] active:scale-[0.97]"
             >
-              Delete
+              Delete listing
             </button>
           )
         ) : listing.taken ? (
-          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#b87333]">Room in progress</span>
+          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--a-ink)]/40">Room in progress</span>
         ) : (
           <button
             onClick={(event) => { event.stopPropagation(); onOpenDeal() }}
-            className="h-8 w-full border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--a-inverse-ink)] transition hover:bg-transparent hover:text-[var(--a-ink)]"
+            className="h-8 w-full border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--a-inverse-ink)] transition-[transform,background-color,color] duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink)] active:scale-[0.97]"
           >
             {listing.role === 'buyer' ? 'Sell' : 'Open deal'}
           </button>
