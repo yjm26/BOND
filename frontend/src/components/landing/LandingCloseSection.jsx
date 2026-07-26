@@ -12,7 +12,7 @@ export default function LandingCloseSection() {
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           <Link
             to="/app"
-            className="group border border-[#0a0a0a]/14 bg-white p-5 transition duration-160 ease-out hover:border-[#0a0a0a]/32 active:scale-[0.995] sm:p-6"
+            className="group border border-[#0a0a0a]/14 bg-white p-5 transition-[transform,border-color] duration-160 ease-out hover:border-[#0a0a0a]/32 active:scale-[0.97] sm:p-6"
           >
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#737373]">Room</div>
             <div className="mt-2 text-[20px] font-medium tracking-[-0.035em] sm:text-[22px]">Open a room</div>
@@ -23,7 +23,7 @@ export default function LandingCloseSection() {
 
           <Link
             to="/market"
-            className="group border border-[#0a0a0a] bg-[#0a0a0a] p-5 text-[#fafafa] transition duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.995] sm:p-6"
+            className="group border border-[#0a0a0a] bg-[#0a0a0a] p-5 text-[#fafafa] transition-[transform,background-color,color] duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97] sm:p-6"
           >
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#fafafa]/45 transition group-hover:text-[#0a0a0a]/45">
               Market
