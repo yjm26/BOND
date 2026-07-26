@@ -12,12 +12,12 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners()
   if (!deployer) throw new Error('Missing PRIVATE_KEY env for deployer')
 
-  console.log('Deploying BoundTestnet with:', deployer.address)
+  console.log('Deploying BOND with:', deployer.address)
   console.log('USDC:', USDC_ADDRESS)
   console.log('Treasury:', TREASURY_ADDRESS)
   console.log('Arbiter:', ARBITER_ADDRESS)
 
-  const BondRoom = await hre.ethers.getContractFactory('BoundTestnet')
+  const BondRoom = await hre.ethers.getContractFactory('BOND')
   const contract = await BondRoom.deploy(
     USDC_ADDRESS,
     TREASURY_ADDRESS,
@@ -27,7 +27,7 @@ async function main() {
 
   await contract.waitForDeployment()
   const address = await contract.getAddress()
-  console.log('BoundTestnet deployed to:', address)
+  console.log('BOND deployed to:', address)
   console.log('Arcscan:', `https://testnet.arcscan.app/address/${address}`)
 }
 

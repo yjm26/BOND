@@ -1,3 +1,4 @@
+require('./load-deploy-env');
 require('@nomicfoundation/hardhat-toolbox');
 
 /** @type import('hardhat/config').HardhatUserConfig */

@@ -92,7 +92,8 @@ export default function RoomView({ wallet, connecting, onConnect }) {
   const isCreator = account === room?.creator?.toLowerCase()
   const isCounter = account === room?.counterparty?.toLowerCase()
   const isParticipant = isCreator || isCounter
-  const isAdmin = account === ownerAddr?.toLowerCase() || isActiveArbiter
+  // Contract enforces onlyArbiter on resolve/split — owner has no decision power in rooms.
+  const isAdmin = isActiveArbiter
   const role = isCreator
     ? room?.creatorIsSeller
       ? 'seller'

@@ -11,8 +11,8 @@ async function deployFixture() {
   const usdc = await MockUSDC.deploy()
   await usdc.waitForDeployment()
 
-  const BoundTestnet = await ethers.getContractFactory('BoundTestnet')
-  const bond = await BoundTestnet.deploy(await usdc.getAddress(), treasury.address, arbiter.address, 'BOND Arbiter')
+  const BOND = await ethers.getContractFactory('BOND')
+  const bond = await BOND.deploy(await usdc.getAddress(), treasury.address, arbiter.address, 'BOND Arbiter')
   await bond.waitForDeployment()
 
   return { owner, treasury, arbiter, seller, buyer, secondArbiter, stranger, usdc, bond }
@@ -32,7 +32,7 @@ async function createJoinFundDeliver(ctx) {
   return { roomId, price, fee }
 }
 
-describe('BoundTestnet', function () {
+describe('BOND', function () {
   it('charges funding tax to buyer on top of room price, not from seller payout', async function () {
     const ctx = await deployFixture()
     const { bond, usdc, seller, buyer, treasury } = ctx
@@ -330,10 +330,57 @@ describe('BoundTestnet', function () {
         .withArgs(treasury.address, buyer.address)
 
       await expect(bond.connect(owner).transferOwnership(buyer.address))
+        .to.emit(bond, 'OwnershipTransferStarted')
+        .withArgs(owner.address, buyer.address)
+
+      // two-step: owner unchanged until the pending owner accepts
+      expect(await bond.owner()).to.equal(owner.address)
+      expect(await bond.pendingOwner()).to.equal(buyer.address)
+
+      await expect(bond.connect(treasury).acceptOwnership())
+        .to.be.revertedWith('Not pending owner')
+
+      await expect(bond.connect(buyer).acceptOwnership())
         .to.emit(bond, 'OwnershipTransferred')
         .withArgs(owner.address, buyer.address)
 
       expect(await bond.owner()).to.equal(buyer.address)
+      expect(await bond.pendingOwner()).to.equal(ethers.ZeroAddress)
+    })
+
+    it('lets the owner cancel a pending ownership transfer', async function () {
+      const { bond, owner, buyer } = await deployFixture()
+
+      await bond.connect(owner).transferOwnership(buyer.address)
+      await expect(bond.connect(owner).cancelOwnershipTransfer())
+        .to.emit(bond, 'OwnershipTransferCanceled')
+        .withArgs(owner.address, buyer.address)
+
+      await expect(bond.connect(buyer).acceptOwnership())
+        .to.be.revertedWith('Not pending owner')
+      expect(await bond.owner()).to.equal(owner.address)
+    })
+
+    it('blocks the owner from resolving or splitting disputes directly', async function () {
+      const ctx = await deployFixture()
+      const { bond, owner, buyer, seller } = ctx
+      const { roomId } = await createJoinFundDeliver(ctx)
+      await bond.connect(buyer).openDispute(roomId, 'not as described', 'text', '', '')
+
+      await expect(bond.connect(owner).arbiterResolve(roomId, seller.address))
+        .to.be.revertedWith('Not authorized')
+      await expect(bond.connect(owner).arbiterSplit(roomId))
+        .to.be.revertedWith('Not authorized')
+    })
+
+    it('rejects deploying with arbiter equal to treasury', async function () {
+      const [_, treasuryAcct] = await ethers.getSigners()
+      const MockUSDC = await ethers.getContractFactory('MockUSDC')
+      const usdc = await MockUSDC.deploy()
+      const BOND = await ethers.getContractFactory('BOND')
+      await expect(
+        BOND.deploy(await usdc.getAddress(), treasuryAcct.address, treasuryAcct.address, 'BOND Arbiter'),
+      ).to.be.revertedWith('Arbiter must differ from treasury')
     })
 
     it('sets delivery deadline from fund time, not create time', async function () {

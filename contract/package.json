@@ -6,7 +6,7 @@
     "compile": "hardhat compile",
     "deploy": "npm run deploy:bound-testnet",
     "deploy:bound-testnet": "hardhat run scripts/deploy-bound-testnet.js --network arcTestnet",
-    "test:bound-testnet": "hardhat test test/BoundTestnet.test.js"
+    "test:bound-testnet": "hardhat test test/BOND.test.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

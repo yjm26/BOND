@@ -1,5 +1,5 @@
 /**
- * Deploy BoundTestnet (Phase A) to Arc Testnet.
+ * Deploy BOND (Phase A) to Arc Testnet.
  * Loads local/deploy/deploy.env (gitignored).
  */
 const hre = require('hardhat')
@@ -35,7 +35,7 @@ async function main() {
   console.log('Treasury', treasury)
   console.log('Arbiter', arbiter)
 
-  const Factory = await hre.ethers.getContractFactory('BoundTestnet')
+  const Factory = await hre.ethers.getContractFactory('BOND')
   const contract = await Factory.deploy(usdc, treasury, arbiter, arbiterName, {
     maxFeePerGas: 100000000000n,
     maxPriorityFeePerGas: 2000000000n,
@@ -43,7 +43,7 @@ async function main() {
   })
   await contract.waitForDeployment()
   const address = await contract.getAddress()
-  console.log('BoundTestnet (Phase A) deployed:', address)
+  console.log('BOND (Phase A) deployed:', address)
   console.log('ArcScan:', `https://testnet.arcscan.app/address/${address}`)
 
   const outDir = path.join(__dirname, '..', '..', 'local', 'deploy')

@@ -7,9 +7,10 @@ interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 }
 
-contract BoundTestnet {
+contract BOND {
     // ─── State ───
     address public owner;
+    address public pendingOwner;
     IERC20 public immutable usdc;
     address public treasury;
     address public arbiter;
@@ -131,6 +132,8 @@ contract BoundTestnet {
     );
     event EscalatedNoResponse(uint256 indexed id, uint32 confirmDeadline);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
+    event OwnershipTransferCanceled(address indexed currentOwner, address indexed canceledPending);
     event TreasuryUpdated(address indexed previousTreasury, address indexed newTreasury);
 
     // ─── Modifiers ───
@@ -139,8 +142,8 @@ contract BoundTestnet {
         _;
     }
 
-    modifier onlyOwnerOrArbiter() {
-        require(msg.sender == owner || isArbiter[msg.sender], "Not authorized");
+    modifier onlyArbiter() {
+        require(isArbiter[msg.sender], "Not authorized");
         _;
     }
 
@@ -161,6 +164,7 @@ contract BoundTestnet {
         require(_usdc != address(0), "Bad USDC");
         require(_treasury != address(0), "Bad treasury");
         require(_arbiter != address(0), "Bad arbiter");
+        require(_arbiter != _treasury, "Arbiter must differ from treasury");
         require(bytes(_arbiterName).length <= MAX_ARBITER_NAME_BYTES, "Arbiter name too long");
         owner = msg.sender;
         usdc = IERC20(_usdc);
@@ -214,9 +218,22 @@ contract BoundTestnet {
     function transferOwnership(address _new) external onlyOwner {
         require(_new != address(0), "Bad owner");
         require(_new != owner, "Owner unchanged");
+        pendingOwner = _new;
+        emit OwnershipTransferStarted(owner, _new);
+    }
+
+    function acceptOwnership() external {
+        require(msg.sender == pendingOwner, "Not pending owner");
         address previous = owner;
-        owner = _new;
-        emit OwnershipTransferred(previous, _new);
+        owner = msg.sender;
+        pendingOwner = address(0);
+        emit OwnershipTransferred(previous, msg.sender);
+    }
+
+    function cancelOwnershipTransfer() external onlyOwner {
+        require(pendingOwner != address(0), "No pending transfer");
+        emit OwnershipTransferCanceled(owner, pendingOwner);
+        pendingOwner = address(0);
     }
 
     // ─── Helpers ───
@@ -554,7 +571,7 @@ contract BoundTestnet {
     }
 
     // ─── Arbiter Resolve ───
-    function arbiterResolve(uint256 _roomId, address _winner) external onlyOwnerOrArbiter nonReentrant {
+    function arbiterResolve(uint256 _roomId, address _winner) external onlyArbiter nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Disputed, "Not disputed");
         require(_winner == _buyer(r) || _winner == _seller(r), "Invalid winner");
@@ -582,7 +599,7 @@ contract BoundTestnet {
     }
 
     // ─── Arbiter Split ───
-    function arbiterSplit(uint256 _roomId) external onlyOwnerOrArbiter nonReentrant {
+    function arbiterSplit(uint256 _roomId) external onlyArbiter nonReentrant {
         Room storage r = rooms[_roomId];
         require(r.state == State.Disputed, "Not disputed");
 

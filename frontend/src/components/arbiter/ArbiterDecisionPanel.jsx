@@ -1,7 +1,8 @@
 import { formatAddress } from '../../utils/constants'
 
 export default function ArbiterDecisionPanel({ room, role, resolving, txStatus, onResolve, onSplit }) {
-  const canAct = role === 'Owner' || role === 'Arbiter'
+  // Contract enforces onlyArbiter on resolve/split — Owner is read-only here.
+  const canAct = role === 'Arbiter'
   return (
     <div className="border border-[var(--a-line)] bg-[var(--a-surface)] p-5">
       <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-muted)]">Decision</div>
@@ -21,7 +22,7 @@ export default function ArbiterDecisionPanel({ room, role, resolving, txStatus, 
           <span className="mt-2 block text-[12px] text-[var(--a-muted)]">50/50 funded amount, collateral back to seller.</span>
         </button>
       </div>
-      {!canAct && <div className="mt-5 border border-[#b87333]/30 bg-[#b87333]/10 p-3 text-[12px] leading-[1.55] text-[#b87333]">Role {role || 'User'} can view room context only. Owner or active arbiter required for decisions.</div>}
+      {!canAct && <div className="mt-5 border border-[#b87333]/30 bg-[#b87333]/10 p-3 text-[12px] leading-[1.55] text-[#b87333]">Role {role || 'User'} can view room context only. Active arbiter required for decisions.</div>}
       {txStatus && <div className={`mt-5 border px-4 py-3 text-[13px] leading-[1.55] ${txStatus.type === 'ok' ? 'border-[#8f9a88]/28 bg-[#8f9a88]/10 text-[#8f9a88]' : txStatus.type === 'err' ? 'border-[#b87333]/35 bg-[#b87333]/10 text-[#b87333]' : 'border-[var(--a-muted)]/24 bg-[var(--a-muted)]/[0.07] text-[var(--a-muted)]'}`}>{txStatus.msg}</div>}
     </div>
   )

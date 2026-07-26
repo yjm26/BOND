@@ -140,6 +140,8 @@ export default function ArbiterDashboard({ wallet, connecting, connectError, onC
     [address, owner, isActiveArbiter],
   )
   const canUseDesk = role === 'Owner' || role === 'Arbiter'
+  // Contract is onlyArbiter on resolve/split — owner sees the desk read-only.
+  const canDecide = role === 'Arbiter'
   const selectedRoom = useMemo(
     () => disputes.find((room) => room.id === selectedId) || disputes[0] || null,
     [disputes, selectedId],

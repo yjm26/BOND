@@ -30,9 +30,9 @@ BOND currently runs on Arc Testnet.
 | Backup RPC | `https://rpc.drpc.testnet.arc.network` |
 | Explorer | `https://testnet.arcscan.app` |
 | USDC token | `0x3600000000000000000000000000000000000000` |
-| Contract | `0x57608180484B746F396851aE84f8f64F03Bb89dF` (Phase A: deadline from fund) |
+| Contract | `0xe07a76af62F0aEd25A0688e9e9A905ec3B600F01` (Phase A: deadline from fund) |
 
-Contract source: `contract/contracts/BoundTestnet.sol`.
+Contract source: `contract/contracts/BOND.sol`.
 
 **Delivery clock:** `deliveryDeadline = fundedAt + deliveryDays` (not from create).
 
@@ -78,9 +78,9 @@ That means the UI does not ask users to choose confusing deal types or arbitrary
 │   ├── scripts/           # generate-og.mjs (regenerate the link preview)
 │   └── src/               # UI, wallet, room, and market code
 ├── contract/              # Hardhat project
-│   ├── contracts/BoundTestnet.sol
+│   ├── contracts/BOND.sol
 │   ├── scripts/deploy-bound-testnet.js
-│   └── test/BoundTestnet.test.js
+│   └── test/BOND.test.js
 ├── scripts/               # smoke-e2e-room.js, check-smoke-balances.js
 ├── render.yaml            # Render single-service blueprint
 └── nixpacks.toml
