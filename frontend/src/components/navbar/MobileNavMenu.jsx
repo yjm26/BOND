@@ -58,20 +58,20 @@ export default function MobileNavMenu({
           )
         ) : (
           <>
-                      <Link to="/market" className={linkClass} onClick={onClose}>
-                        Market
-                      </Link>
-                      <Link to="/docs" className={linkClass} onClick={onClose}>
-                        Docs
-                      </Link>
-                    </>
-                  )}
-                  {isAdmin && mode !== 'app' && (
-                    <Link to="/arbiter" className={linkClass} onClick={onClose}>
-                      Disputes
-                    </Link>
-                  )}
-
+            <Link to="/market" className={linkClass} onClick={onClose}>
+              Market
+            </Link>
+            <Link to="/docs" className={linkClass} onClick={onClose}>
+              Docs
+            </Link>
+          </>
+        )}
+        {isAdmin && mode !== 'app' && (
+          <Link to="/arbiter" className={linkClass} onClick={onClose}>
+            Disputes
+          </Link>
+        )}
+        <div
           className={`mt-5 border px-4 py-3 font-mono text-[10px] uppercase tracking-[0.16em] ${
             dark
               ? 'border-[#fafafa]/14 bg-[#0a0a0a] text-[#fafafa]/55'
