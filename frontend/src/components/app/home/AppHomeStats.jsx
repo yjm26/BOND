@@ -1,13 +1,44 @@
 import { ROOM_FILTER_MAP } from '../../rooms/roomsConstants'
 
+const LIFECYCLE = ['Created', 'Funded', 'Delivered', 'Released']
+
 /**
- * Home "at a glance" — real room counts, not description.
- * Monochrome numerals. Disputed uses the copper accent already used app-wide.
+ * Home top-right slot — adaptive, always relevant.
+ * - 0 rooms: the room lifecycle as a dry mechanism strip (orient a first-timer,
+ *   no extra CTA — Create already lives in nav + action grid + open-rooms).
+ * - >=1 room: real at-a-glance counts. Monochrome numerals; disputed uses copper.
  */
 export default function AppHomeStats({ rooms, loading }) {
   const list = Array.isArray(rooms) ? rooms : []
   const count = (bucket) => list.filter((r) => ROOM_FILTER_MAP[bucket].includes(r.state)).length
   const disputed = list.filter((r) => r.state === 'Disputed').length
+
+  // Empty state → lifecycle, not zeroes.
+  if (!loading && list.length === 0) {
+    return (
+      <div className="flex flex-col border border-[var(--a-line-strong)] bg-[var(--a-chip)] p-5 sm:p-6">
+        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-muted)]">
+          Room lifecycle
+        </div>
+        <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+          {LIFECYCLE.map((step, i) => (
+            <span key={step} className="flex items-center gap-2 whitespace-nowrap">
+              <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--a-ink)]">
+                {step}
+              </span>
+              {i < LIFECYCLE.length - 1 && (
+                <span className="font-mono text-[11px] text-[color:var(--a-faint)]">→</span>
+              )}
+            </span>
+          ))}
+        </div>
+        <p className="mt-auto pt-5 text-[13px] leading-[1.55] text-[var(--a-muted)]">
+          Funds lock on <span className="text-[var(--a-ink)]">Funded</span> and stay locked until release. Refund or
+          dispute ends the room early.
+        </p>
+      </div>
+    )
+  }
 
   const stats = [
     { label: 'Active', value: count('active') },
