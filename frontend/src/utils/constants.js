@@ -1,8 +1,9 @@
 /** Contract-aligned timers (seconds). Prefer on-chain constants for authority. */
 export const TIMERS = {
-  joinDeadline: 1 * 24 * 3600, // JOIN_DL = 1 day
-  fundDeadline: 30 * 60, // FUND_DL = 30 minutes
+  joinDeadline: 1 * 24 * 3600, // JOIN_DL = 1 day from create
+  fundDeadline: 30 * 60, // FUND_DL = 30 minutes from join
   responseBuffer: 12 * 3600, // RESPONSE_BUFFER after delivery
+  // delivery window: 1–90 days from fund (fundedAt + deliveryDays) — on-chain deliveryDeadline
 }
 
 export const STATE_BADGE = {

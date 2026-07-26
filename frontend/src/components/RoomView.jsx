@@ -71,7 +71,7 @@ export default function RoomView({ wallet, connecting, onConnect }) {
     scheduleRoomRefresh,
   } = useRoomData(id, wallet)
 
-  const { countdown, canExpire, canBuyerRefund, canEscalate } = useRoomTimers(room)
+  const { countdown, countdownLabel, canExpire, canBuyerRefund, canEscalate } = useRoomTimers(room)
 
   const actions = useRoomActions({
     id,
@@ -183,7 +183,7 @@ export default function RoomView({ wallet, connecting, onConnect }) {
                           </div>
                           <aside className="grid content-start gap-5">
                             <RoomGuidePanel guide={guide} />
-                            <RoomCountdownPanel countdown={countdown} room={room} />
+                            <RoomCountdownPanel countdown={countdown} countdownLabel={countdownLabel} room={room} />
                             <RoomJoinCodePanel
                               joinCode={joinCode}
                               room={room}

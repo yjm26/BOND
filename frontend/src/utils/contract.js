@@ -151,7 +151,7 @@ export const CONTRACT_ABI = [
   "function refundedCount(address) external view returns (uint256)",
   "function collateralMultiplier(address _seller) external view returns (uint256)",
   // Events
-  "event RoomCreated(uint256 indexed id, address indexed creator, string item, uint256 price, uint256 collateral, bool creatorIsSeller, uint32 deliveryDeadline)",
+  "event RoomCreated(uint256 indexed id, address indexed creator, string item, uint256 price, uint256 collateral, bool creatorIsSeller, uint32 deliveryDays)",
   "event RoomJoined(uint256 indexed id, address indexed who)",
   "event RoomLeft(uint256 indexed id, address indexed who)",
   "event RoomFunded(uint256 indexed id, uint256 amount, uint256 fee, uint256 totalPaid)",

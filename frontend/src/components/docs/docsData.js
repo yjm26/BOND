@@ -66,7 +66,10 @@ export const ARC_RPC_ROWS = [
 export const ROOM_STATES = [
   ['Created', 'Room exists with terms and join-code hash. Waiting for the counterparty.'],
   ['Joined', 'Both parties are set. Buyer can fund within 30 minutes.'],
-  ['Funded', 'Price + 1% fee locked. Seller must deliver by the delivery deadline.'],
+  [
+    'Funded',
+    'Price + 1% fee locked. deliveryDeadline = fundedAt + delivery days. Seller must deliver by then.',
+  ],
   [
     'Delivered',
     'Seller marked delivery. Buyer can release or dispute. 12h buffer starts for seller escalate.',
@@ -83,7 +86,10 @@ export const ROOM_FACTS = [
   ['Amounts', 'Price and optional seller collateral use USDC 6-decimal units (ERC-20 interface).'],
   ['Join code', 'Plain code is off-chain. The contract stores keccak256(code).'],
   ['Proof', 'Delivery proof hash and dispute fields attach to the room.'],
-  ['Timers', 'Join 1 day · fund 30 min · delivery 1–90 days · response buffer 12h.'],
+  [
+    'Timers',
+    'Join 1 day (from create) · fund 30 min (from join) · delivery 1–90 days (from fund) · response buffer 12h.',
+  ],
   ['Cap', 'Max 3 non-terminal rooms per wallet (MAX_ACTIVE).'],
 ]
 
@@ -101,7 +107,10 @@ export const FEE_ROWS = [
   ['Arbiter fee', '5% of (funded + collateral) only when owner/arbiter resolves a dispute.'],
   ['Join deadline', '1 day after create (JOIN_DL).'],
   ['Fund deadline', '30 minutes after join (FUND_DL).'],
-  ['Delivery window', '1–90 days, set at create; becomes deliveryDeadline.'],
+  [
+    'Delivery window',
+    '1–90 days chosen at create; clock starts at fundRoom (fundedAt + deliveryDays → deliveryDeadline).',
+  ],
   ['Response buffer', '12 hours after markDelivered (RESPONSE_BUFFER). Seller escalate only after this.'],
   ['Listing expiry', '30 days for active market listings (API). Separate from escrow timers.'],
   ['Network gas', 'Separate from platform fee. Paid in USDC (native gas) on every transaction.'],
@@ -150,7 +159,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'What if the seller never delivers?',
-    a: 'If the room is still Funded after deliveryDeadline, the buyer can refund under contract rules.',
+    a: 'If the room is still Funded after deliveryDeadline (starts when the buyer funds, not at create), the buyer can refund under contract rules.',
   },
   {
     q: 'What if the buyer goes silent after delivery?',

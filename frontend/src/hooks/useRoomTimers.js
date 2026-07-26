@@ -1,27 +1,42 @@
 import { useEffect, useMemo, useState } from 'react'
+import { TIMERS } from '../utils/constants'
 
 /**
- * Countdown + capability flags derived from room timestamps (contract-aligned).
+ * Countdown + capability flags — Phase A contract:
+ * deliveryDeadline is set at fund (fundedAt + deliveryDays), not at create.
  */
 export function useRoomTimers(room) {
   const [countdown, setCountdown] = useState('')
+  const [countdownLabel, setCountdownLabel] = useState('')
 
   useEffect(() => {
     if (!room) {
       setCountdown('')
+      setCountdownLabel('')
       return undefined
     }
 
     let target = 0
-    if (room.state === 'Created' && room.createdAt) target = room.createdAt + 86400
-    else if (room.state === 'Joined' && room.joinedAt) target = room.joinedAt + 1800
-    else if (room.state === 'Funded' && room.deliveryDeadline) target = room.deliveryDeadline
-    else if (room.state === 'Delivered' && room.confirmDeadline) target = room.confirmDeadline
-    else if (room.state === 'Disputed') {
+    let label = ''
+    if (room.state === 'Created' && room.createdAt) {
+      target = room.createdAt + TIMERS.joinDeadline
+      label = 'Join window'
+    } else if (room.state === 'Joined' && room.joinedAt) {
+      target = room.joinedAt + TIMERS.fundDeadline
+      label = 'Fund window'
+    } else if (room.state === 'Funded' && room.deliveryDeadline) {
+      target = room.deliveryDeadline
+      label = 'Delivery deadline'
+    } else if (room.state === 'Delivered' && room.confirmDeadline) {
+      target = room.confirmDeadline
+      label = 'Response buffer'
+    } else if (room.state === 'Disputed') {
       setCountdown('Pending arbiter')
+      setCountdownLabel('Dispute')
       return undefined
     } else {
       setCountdown('')
+      setCountdownLabel('')
       return undefined
     }
 
@@ -41,10 +56,19 @@ export function useRoomTimers(room) {
       setCountdown(parts.join(' '))
     }
 
+    setCountdownLabel(label)
     tick()
     const interval = setInterval(tick, 1000)
     return () => clearInterval(interval)
-  }, [room?.state, room?.createdAt, room?.joinedAt, room?.deliveryDeadline, room?.confirmDeadline, room?.disputedAt])
+  }, [
+    room?.state,
+    room?.createdAt,
+    room?.joinedAt,
+    room?.fundedAt,
+    room?.deliveryDeadline,
+    room?.confirmDeadline,
+    room?.disputedAt,
+  ])
 
   const flags = useMemo(() => {
     if (!room) {
@@ -52,12 +76,15 @@ export function useRoomTimers(room) {
     }
     const now = Date.now() / 1000
     const canExpire =
-      (room.state === 'Created' && room.createdAt && now - room.createdAt > 86400) ||
-      (room.state === 'Joined' && room.joinedAt && now - room.joinedAt > 1800)
-    const canBuyerRefund = room.state === 'Funded' && room.deliveryDeadline && now > room.deliveryDeadline
-    const canEscalate = room.state === 'Delivered' && room.confirmDeadline && now > room.confirmDeadline
+      (room.state === 'Created' && room.createdAt && now - room.createdAt > TIMERS.joinDeadline) ||
+      (room.state === 'Joined' && room.joinedAt && now - room.joinedAt > TIMERS.fundDeadline)
+    // Phase A: refund only after on-chain deliveryDeadline (set at fund)
+    const canBuyerRefund =
+      room.state === 'Funded' && room.deliveryDeadline > 0 && now > room.deliveryDeadline
+    const canEscalate =
+      room.state === 'Delivered' && room.confirmDeadline > 0 && now > room.confirmDeadline
     return { canExpire, canBuyerRefund, canEscalate }
   }, [room, countdown])
 
-  return { countdown, ...flags }
+  return { countdown, countdownLabel, ...flags }
 }
