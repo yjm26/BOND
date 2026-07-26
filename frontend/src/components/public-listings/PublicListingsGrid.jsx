@@ -36,7 +36,9 @@ export default function PublicListingsGrid({ loading, listings, totalCount, onOp
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {listings.map((listing) => (
-          <PublicListingCard key={listing.id} listing={listing} onOpen={() => onOpen(listing)} />
+          <div key={listing.id} className="[content-visibility:auto] [contain-intrinsic-size:auto_200px]">
+            <PublicListingCard listing={listing} onOpen={() => onOpen(listing)} />
+          </div>
         ))}
       </div>
     </div>
