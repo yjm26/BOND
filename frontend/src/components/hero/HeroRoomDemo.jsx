@@ -63,7 +63,7 @@ export default function HeroRoomDemo() {
     <div className="relative w-full max-w-[1080px]">
       <div className="pointer-events-none absolute -inset-x-10 -bottom-16 -top-8 hidden rounded-[40%] bg-[radial-gradient(ellipse_at_center,rgba(10,10,10,0.14),transparent_68%)] sm:block" />
 
-      <div className="relative rounded-[2px] border border-[#0a0a0a]/35 bg-[#000000] p-[3px] shadow-[0_1px_0_rgba(255,255,255,0.75)_inset,0_18px_50px_rgba(0,0,0,0.16),0_2px_0_rgba(10,10,10,0.04)]">
+      <div className="relative rounded-[3px] border border-[#0a0a0a]/40 bg-[#000000] p-[3px] shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_2px_4px_rgba(0,0,0,0.08),0_8px_16px_rgba(0,0,0,0.10),0_18px_36px_rgba(0,0,0,0.14),0_40px_80px_rgba(0,0,0,0.20)]">
         <div className="relative overflow-hidden border border-[#fafafa]/14 bg-[#000000] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="border-b border-[#fafafa]/12 bg-[#111111] px-3 py-2.5 sm:px-4">
                       <div className="flex items-center gap-2">

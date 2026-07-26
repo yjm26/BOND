@@ -32,9 +32,10 @@ export default function HeroIntro() {
 
         <Link
           to="/docs"
-          className="shrink-0 self-start font-mono text-[12px] tracking-[-0.01em] text-[#525252] transition-colors duration-160 ease-out hover:text-[#0a0a0a] lg:self-end"
+          className="group shrink-0 self-start font-mono text-[12px] tracking-[-0.01em] text-[#525252] transition-colors duration-160 ease-out hover:text-[#0a0a0a] lg:self-end"
         >
-          Read the flow →
+          Read the flow{' '}
+          <span className="inline-block transition-transform duration-200 ease-out group-hover:translate-x-0.5">→</span>
         </Link>
       </div>
     </div>

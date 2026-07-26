@@ -13,7 +13,7 @@ export default function LandingUseCasesSection() {
         <div className="flex flex-col gap-6 border-b border-[#0a0a0a]/12 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Use</div>
-            <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.05em]">
+            <h2 className="mt-3 max-w-[16ch] text-balance text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.05em]">
               For deals you already make in chat.
             </h2>
           </div>

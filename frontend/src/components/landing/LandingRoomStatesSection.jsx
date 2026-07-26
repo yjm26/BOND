@@ -18,7 +18,7 @@ export default function LandingRoomStatesSection() {
         <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8f8f8f]">States</div>
-            <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.05em]">
+            <h2 className="mt-3 max-w-[16ch] text-balance text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.05em]">
               Each state has one next action.
             </h2>
           </div>
