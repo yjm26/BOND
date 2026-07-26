@@ -8,9 +8,8 @@ export default function MarketListingCard({ listing, wallet, onOpenDeal, onDelet
   return (
     <div
       onClick={onExpand}
-      className="group relative flex min-h-[188px] cursor-pointer flex-col border border-[var(--a-line)] bg-[var(--a-surface)] p-4 shadow-[0_16px_40px_rgba(0,0,0,0.22)] transition hover:-translate-y-px hover:border-[var(--a-muted)]/34 hover:bg-[var(--a-surface)] focus-within:border-[var(--a-muted)]/50"
+      className="group relative flex min-h-[188px] cursor-pointer flex-col border border-[var(--a-line)] bg-[var(--a-surface)] p-5 transition-[transform,border-color] duration-160 ease-out hover:-translate-y-0.5 hover:border-[var(--a-muted)]/45 focus-within:border-[var(--a-line-strong)]"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--a-inverse-bg)]/18 transition group-hover:bg-[var(--a-muted)]/45" />
       <div className="flex items-start justify-between gap-3">
         <div className="truncate font-mono text-[9px] uppercase tracking-[0.18em] text-[color:var(--a-faint)]">
           {listing.category || 'Other'} / {timeAgo(listing.createdAt)}
