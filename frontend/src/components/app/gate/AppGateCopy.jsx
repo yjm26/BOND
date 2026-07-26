@@ -10,13 +10,21 @@ export default function AppGateCopy({ connecting, connectError, onConnect }) {
           Checking the wallet session in this tab. If this hangs, use the button below.
         </p>
       )}
+      {!connecting && (
+        <p className="mx-auto mt-5 max-w-[44ch] text-[14px] leading-[1.6] text-[var(--a-muted)]">
+          Connecting only reads your address — no signature, no&nbsp;gas. You sign later, only to fund or settle a room.
+        </p>
+      )}
       <button
         type="button"
         onClick={onConnect}
         disabled={false}
-        className="mt-8 inline-flex h-12 items-center justify-center border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-7 font-mono text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink)] active:scale-[0.97]"
+        className="group mt-8 inline-flex h-[52px] items-center justify-center gap-2 border border-[var(--a-ink)] bg-[var(--a-inverse-bg)] px-8 font-mono text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--a-inverse-ink)] transition duration-160 ease-out hover:bg-transparent hover:text-[var(--a-ink)] active:scale-[0.97]"
       >
         {connecting ? 'Connecting… · tap to retry' : 'Connect wallet'}
+        {!connecting && (
+          <span className="inline-block transition-transform duration-200 ease-out group-hover:translate-x-0.5">→</span>
+        )}
       </button>
       {connectError && (
         <div className="mx-auto mt-5 max-w-[480px] border border-[#7f1d1d]/40 bg-[#7f1d1d]/10 px-4 py-3 text-left text-[13px] leading-[1.55] text-[#b91c1c]">

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import PublicListingCard from './PublicListingCard'
 
 function SkeletonGrid() {
@@ -24,6 +25,21 @@ export default function PublicListingsGrid({ loading, listings, totalCount, onOp
           <p className="mt-3 max-w-[380px] text-[14px] leading-[1.6] text-[#525252]">
             Market is discovery only. Escrow starts when a room is created and funded on Arc.
           </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              to="/app"
+              className="group inline-flex h-11 items-center justify-center gap-2 border border-[#0a0a0a] bg-[#0a0a0a] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#fafafa] transition-[transform,background-color,color] duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97]"
+            >
+              Open a room
+              <span className="inline-block transition-transform duration-200 ease-out group-hover:translate-x-0.5">→</span>
+            </Link>
+            <Link
+              to="/docs"
+              className="inline-flex h-11 items-center justify-center border border-[#0a0a0a]/18 px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0a0a0a]/70 transition-colors duration-160 ease-out hover:border-[#0a0a0a] hover:text-[#0a0a0a] active:scale-[0.97]"
+            >
+              How rooms work
+            </Link>
+          </div>
         </div>
       )
     }

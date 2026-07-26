@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { API_URL } from '../../lib/api'
 import PublicListingDetail from './PublicListingDetail'
 import PublicListingsFilters from './PublicListingsFilters'
@@ -35,17 +34,7 @@ export default function PublicListings() {
   return (
     <section className="min-h-screen bg-[#fafafa] px-6 pb-20 pt-[92px] text-[#0a0a0a] sm:px-10 lg:px-14">
       <div className="mx-auto max-w-[1180px]">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0 flex-1">
-            <PublicListingsHeader />
-          </div>
-          <Link
-            to="/app"
-            className="inline-flex h-11 shrink-0 items-center justify-center border border-[#0a0a0a] bg-[#0a0a0a] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[#fafafa] transition duration-160 ease-out hover:bg-transparent hover:text-[#0a0a0a] active:scale-[0.97] sm:mb-10"
-          >
-            Go to app
-          </Link>
-        </div>
+        <PublicListingsHeader />
 
         <PublicListingsFilters
           search={view.search}
