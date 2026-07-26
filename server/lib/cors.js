@@ -5,6 +5,8 @@ const ALLOWED_ORIGINS = [
   'https://bond-4us7.onrender.com',
   'https://arc-escrow-agent.onrender.com',
   'https://bond.yjm26.xyz',
+  'https://usebond.xyz',
+  'https://www.usebond.xyz',
 ]
 
 function corsHeaders(origin) {
