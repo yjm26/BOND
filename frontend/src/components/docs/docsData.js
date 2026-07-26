@@ -84,14 +84,14 @@ export const ROOM_STATES = [
 export const ROOM_FACTS = [
   ['Parties', 'Buyer, seller, and creator are wallet addresses stored on-chain.'],
   ['Amounts', 'Price and optional seller collateral use USDC 6-decimal units (ERC-20 interface).'],
-  ['Join code', 'Plain code is off-chain. The contract stores keccak256(code).'],
-  ['Proof', 'Delivery proof hash and dispute fields attach to the room.'],
-  [
-    'Timers',
-    'Join 1 day (from create) · fund 30 min (from join) · delivery 1–90 days (from fund) · response buffer 12h.',
-  ],
-  ['Cap', 'Max 3 non-terminal rooms per wallet (MAX_ACTIVE).'],
-]
+  ['Join code', 'Plain code is off-chain (10 chars). Contract stores keccak256(code). Share only with the counterparty.'],
+    ['Proof', 'Delivery proof hash and dispute fields attach to the room.'],
+    [
+      'Timers',
+      'Join 1 day (from create) · fund 30 min (from join) · delivery 1–90 days (from fund) · response buffer 12h.',
+    ],
+    ['Cap', 'Max 3 non-terminal rooms per wallet (MAX_ACTIVE).'],
+  ]
 
 export const MARKET_FACTS = [
   ['Role', 'Market is off-chain discovery. Escrow only starts when a room is created.'],
@@ -136,12 +136,23 @@ export const SECURITY_FACTS = [
   ['Money path', 'USDC moves only via BOND contract functions. Market API cannot transfer funds.'],
   ['Keys', 'App never asks for a private key or seed. SIWE is for API writes only.'],
   ['SIWE scope', 'Listings, offers, profiles, room-index, evidence notes — not room fund/release.'],
-  ['Arbiter power', 'Owner/active arbiter resolve disputed rooms only. Paths are fixed (buyer/seller/split).'],
+  [
+    'Arbiter / owner',
+    'While Disputed, owner or active arbiter can resolve to buyer, seller, or split. That is trusted ops, not cryptographic fairness. Protect those keys; prefer multisig off-chain policy on real value.',
+  ],
+  [
+    'Join code',
+    '10-character private code. Contract stores keccak256 only. Anyone with the plain code can join while Created — do not post publicly.',
+  ],
   [
     'USDC decimals',
     'Escrow amounts: 6dp ERC-20 interface. Gas: native USDC 18dp in wallet config. Do not mix.',
   ],
   ['Testnet', `Arc Testnet chainId ${CHAIN_ID}. Not mainnet. No production-value funds.`],
+  [
+    'Contract',
+    `Phase A: ${CONTRACT_ADDRESS} — deliveryDeadline from fund; nonReentrant on state changes.`,
+  ],
 ]
 
 export const FAQ_ITEMS = [

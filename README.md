@@ -31,9 +31,22 @@ BOND currently runs on Arc Testnet.
 | Backup RPC | `https://rpc.drpc.testnet.arc.network` |
 | Explorer | `https://testnet.arcscan.app` |
 | USDC token | `0x3600000000000000000000000000000000000000` |
-| Contract | `0x57608180484B746F396851aE84f8f64F03Bb89dF` |
+| Contract | `0x57608180484B746F396851aE84f8f64F03Bb89dF` (Phase A: deadline from fund) |
 
 Contract source: `contract/contracts/BoundTestnet.sol`.
+
+**Delivery clock:** `deliveryDeadline = fundedAt + deliveryDays` (not from create).
+
+**Smoke E2E (local keys only):**
+
+```bash
+node scripts/smoke-e2e-room.js --addresses   # print fund targets
+node scripts/smoke-e2e-room.js               # create→join→fund→deliver→release (0.1 USDC)
+```
+
+Keys live in `local/smoke/` (gitignored). Never commit private keys.
+
+**Disputed rooms:** owner/active arbiter can resolve or split. Treat those keys as high-trust ops, not pure code trust.
 
 ## Product flow
 

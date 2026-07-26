@@ -256,19 +256,35 @@ export function parseRoom(raw) {
 export const STATE_NAMES = ['Created', 'Joined', 'Funded', 'Delivered', 'Released', 'Disputed', 'Refunded', 'Expired', 'Cancelled'];
 
 
+export const JOIN_CODE_LENGTH = 10
+
+/** Ambiguous-safe alphabet; length JOIN_CODE_LENGTH for invite codes. */
 export function generateJoinCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-  return code;
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = ''
+  for (let i = 0; i < JOIN_CODE_LENGTH; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
+}
+
+export function isValidJoinCodeFormat(code) {
+  if (!code || typeof code !== 'string') return false
+  const t = code.trim().toUpperCase()
+  if (t.length !== JOIN_CODE_LENGTH) return false
+  return /^[A-Z2-9]+$/.test(t)
 }
 
 export function hashJoinCode(code) {
-  return ethers.solidityPackedKeccak256(['string'], [code]);
+  return ethers.solidityPackedKeccak256(['string'], [code])
 }
 
 export function createInviteLink(roomId, joinCode) {
-  return `${window.location.origin}/room/${roomId}?code=${joinCode}`;
+  return `${window.location.origin}/room/${roomId}?code=${joinCode}`
+}
+
+export function explorerAddressUrl(address = CONTRACT_ADDRESS) {
+  return `https://testnet.arcscan.app/address/${address}`
 }
 
 /// Override wallet nonce with on-chain nonce to prevent MetaMask/AppKit desync.

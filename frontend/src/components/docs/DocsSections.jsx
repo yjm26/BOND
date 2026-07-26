@@ -325,11 +325,16 @@ export function SecuritySection() {
     <Section
       eyebrow="Security"
       title="What the system does and does not guarantee."
-      intro="The contract enforces who can move locked USDC and when. It does not judge whether delivery quality is good. That is buyer release, dispute evidence, and arbiter judgment."
+      intro="The contract enforces who can move locked USDC and when. It does not judge delivery quality. Disputed rooms trust owner/arbiter keys."
     >
       <FactGrid items={SECURITY_FACTS} />
 
-      <Callout title="Ops" danger>
+      <Callout title="Disputed funds" danger>
+        After dispute or escalate, USDC stays locked until owner or an active arbiter calls resolve/split. Paths are
+        fixed (buyer, seller, or half), but the decision is human/key-controlled — not automatic fairness.
+      </Callout>
+
+      <Callout title="Ops">
         JSON file storage is fine for testnet with a persistent disk. Concurrent writes and multi-instance deploys need a
         real database before any mainnet claim.
       </Callout>

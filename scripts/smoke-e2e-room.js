@@ -2,10 +2,11 @@
  * BOND smoke E2E on Arc Testnet — tiny room (default 0.1 USDC).
  *
  * Usage:
- *   1. Fund the two addresses printed by: node scripts/smoke-e2e-room.mjs --addresses
- *   2. node scripts/smoke-e2e-room.mjs
+ *   1. Fund wallets: node scripts/smoke-e2e-room.js --addresses
+ *   2. Run flow:     node scripts/smoke-e2e-room.js
  *
- * Loads keys from .env.smoke.local (gitignored). Never commit that file.
+ * Keys: local/smoke/.env (gitignored). Never commit private keys.
+ * Contract: Phase A default 0x57608180484B746F396851aE84f8f64F03Bb89dF
  */
 const fs = require('fs')
 const path = require('path')
@@ -45,7 +46,7 @@ function loadEnv() {
 const env = loadEnv()
 
 const RPC = env.ARC_RPC_URL || 'https://rpc.blockdaemon.testnet.arc.network'
-const BOND = env.BOND_CONTRACT || '0x1A3ea0d24ff15a90417508F38ABD8E173921082A'
+const BOND = env.BOND_CONTRACT || '0x57608180484B746F396851aE84f8f64F03Bb89dF'
 const USDC = env.USDC_ADDRESS || '0x3600000000000000000000000000000000000000'
 const PRICE = ethers.parseUnits(env.SMOKE_PRICE_USDC || '0.1', 6)
 
