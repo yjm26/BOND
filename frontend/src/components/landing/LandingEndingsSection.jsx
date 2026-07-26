@@ -26,12 +26,12 @@ export default function LandingEndingsSection() {
   return (
     <section
       id="endings"
-      className="relative overflow-hidden bg-[#0a0a0a] px-4 py-14 text-[#fafafa] sm:px-10 sm:py-16 lg:px-14 lg:py-20"
+      className="relative overflow-hidden border-t border-[#fafafa]/10 bg-[#0a0a0a] px-4 pt-11 pb-14 text-[#fafafa] sm:px-10 sm:pt-12 sm:pb-16 lg:px-14 lg:pt-16 lg:pb-20"
     >
       <div className="mx-auto max-w-[1080px]">
         <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">Endings</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8f8f8f]">Endings</div>
             <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,40px)] font-medium leading-[1.05] tracking-[-0.05em]">
               How a room ends.
             </h2>
@@ -47,7 +47,7 @@ export default function LandingEndingsSection() {
               key={item.key}
               className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-3 gap-y-2 py-6 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-baseline sm:gap-8 sm:py-7"
             >
-              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#525252]">0{index + 1}</div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#6b6b6b]">0{index + 1}</div>
               <div
                 className={`text-[clamp(22px,3vw,30px)] font-medium tracking-[-0.04em] ${
                   item.tone === 'success'

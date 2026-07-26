@@ -12,32 +12,37 @@ export default function LandingRoomStatesSection() {
   return (
     <section
       id="states"
-      className="bg-[#0a0a0a] px-4 py-14 text-[#fafafa] sm:px-10 sm:py-16 lg:px-14 lg:py-20"
+      className="bg-[#0a0a0a] px-4 pt-14 pb-10 text-[#fafafa] sm:px-10 sm:pt-16 sm:pb-12 lg:px-14 lg:pt-20 lg:pb-14"
     >
       <div className="mx-auto max-w-[1180px]">
         <div className="flex flex-col gap-6 border-b border-[#fafafa]/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#737373]">States</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8f8f8f]">States</div>
             <h2 className="mt-3 max-w-[16ch] text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.05em]">
               Each state has one next action.
             </h2>
           </div>
           <p className="max-w-[280px] text-[14px] leading-[1.5] text-[#a3a3a3] sm:text-right">
             <span className="sm:hidden">Tap a step for the detail line.</span>
-            <span className="hidden sm:inline">Hover or tap a step for the detail line.</span>
+            <span className="hidden sm:inline">Tap a step for the detail line.</span>
           </p>
         </div>
 
         {/* Mobile: horizontal snap rail. sm+: 5-col grid. */}
         <div className="mt-8 sm:mt-9">
-          <div className="-mx-6 flex gap-0 overflow-x-auto overscroll-x-contain border-y border-[#fafafa]/10 px-6 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:border sm:border-[#fafafa]/10 sm:px-0 sm:snap-none">
+          <div className="relative">
+            {/* right-edge peek fade — signals swipe on mobile only. Solid for the first ~70% so the peeking label ("02 · JOINE…") reads as a soft hint, not a mid-word crop. */}
+            <div
+              className="pointer-events-none absolute inset-y-0 -right-4 z-10 w-40 sm:hidden"
+              style={{ background: 'linear-gradient(to left, #0a0a0a 0%, #0a0a0a 72%, transparent 100%)' }}
+            />
+            <div className="-mx-6 flex gap-0 overflow-x-auto overscroll-x-contain border-y border-[#fafafa]/14 px-6 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:border sm:border-[#fafafa]/14 sm:px-0 sm:snap-none">
             {LANDING_ROOM_STATES.map((step, index) => {
               const isActive = index === active
               return (
                 <button
                   key={step.id}
                   type="button"
-                  onMouseEnter={() => setActive(index)}
                   onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}
                   className={`flex w-[min(78vw,280px)] shrink-0 snap-center flex-col border-[#fafafa]/10 px-4 py-5 text-left transition duration-160 ease-out active:scale-[0.99] sm:w-auto sm:min-h-[156px] sm:border-r sm:last:border-r-0 ${
@@ -49,7 +54,7 @@ export default function LandingRoomStatesSection() {
                   }`}
                   style={{ transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)' }}
                 >
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#fafafa]/35">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#fafafa]/50">
                     0{index + 1} · {step.label}
                   </div>
                   <div className="mt-3 text-[18px] font-medium tracking-[-0.03em]">{step.label}</div>
@@ -62,6 +67,7 @@ export default function LandingRoomStatesSection() {
                 </button>
               )
             })}
+            </div>
           </div>
           <div className="mt-3 flex justify-center gap-1.5 sm:hidden" aria-hidden="true">
             {LANDING_ROOM_STATES.map((step, index) => (
