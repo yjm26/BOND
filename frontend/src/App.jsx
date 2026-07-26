@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { createAppKit } from '@reown/appkit/react'
 import { useAppKit, useAppKitAccount, useAppKitProvider, useDisconnect } from '@reown/appkit/react'
@@ -7,18 +7,21 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
 import ToastContainer from './components/ToastContainer'
+import RouteFallback from './components/RouteFallback'
 import { loadProfile } from './components/app/profile/profileStorage'
+// Eager: first-paint path (landing + app gate). Everything else is lazy-loaded per route.
 import AppPage from './pages/AppPage'
-import ArbiterPage from './pages/ArbiterPage'
-import CreateRoomPage from './pages/CreateRoomPage'
-import DocsPage from './pages/DocsPage'
 import LandingPage from './pages/LandingPage'
-import LandingSectionPrototypesPage from './pages/LandingSectionPrototypesPage'
-import MarketPage, { ListingsRedirect } from './pages/MarketPage'
-import OffersRedirectPage from './pages/OffersRedirectPage'
-import ProfilePage from './pages/ProfilePage'
-import RoomDetailPage from './pages/RoomDetailPage'
-import RoomsIndexPage from './pages/RoomsIndexPage'
+// Lazy: loaded only when the route is visited → keeps the initial bundle small.
+const ArbiterPage = lazy(() => import('./pages/ArbiterPage'))
+const CreateRoomPage = lazy(() => import('./pages/CreateRoomPage'))
+const DocsPage = lazy(() => import('./pages/DocsPage'))
+const LandingSectionPrototypesPage = lazy(() => import('./pages/LandingSectionPrototypesPage'))
+const MarketPage = lazy(() => import('./pages/MarketPage'))
+const OffersRedirectPage = lazy(() => import('./pages/OffersRedirectPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const RoomDetailPage = lazy(() => import('./pages/RoomDetailPage'))
+const RoomsIndexPage = lazy(() => import('./pages/RoomsIndexPage'))
 import { ToastProvider } from './contexts/ToastContext'
 import { useAppThemeRouteSync } from './contexts/ThemeContext'
 import { reconnectWallet } from './lib/wallet'
@@ -318,10 +321,11 @@ export default function App() {
         />
         <ErrorBoundary>
           <PageTransition>
-            <Routes>
+            <Suspense fallback={<RouteFallback />}>
+              <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/dev/section-3" element={<LandingSectionPrototypesPage />} />
-              <Route path="/listings" element={<ListingsRedirect />} />
+              <Route path="/listings" element={<Navigate to="/market" replace />} />
               <Route
                 path="/app"
                 element={
@@ -398,7 +402,8 @@ export default function App() {
                   </ProfileRequiredRoute>
                 }
               />
-            </Routes>
+              </Routes>
+            </Suspense>
           </PageTransition>
         </ErrorBoundary>
         <RouteFooter wallet={wallet} profileReady={profileReady} />
