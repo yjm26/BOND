@@ -37,7 +37,7 @@ export default function LandingEndingsSection() {
             </h2>
           </div>
           <p className="max-w-[240px] text-[14px] leading-[1.5] text-[#a3a3a3] sm:text-right">
-            Settlement stays on-chain — not “we’ll sort it in DMs.”
+            Settlement stays on-chain, not in DMs.
           </p>
         </div>
 
