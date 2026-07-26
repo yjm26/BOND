@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import useOwnedRooms from '../../../hooks/useOwnedRooms'
 import AppHomeOpenRoomRow from './AppHomeOpenRoomRow'
 import { getOpenRooms } from './appHomeRooms'
 
@@ -17,9 +16,8 @@ function OpenRoomsSkeleton() {
   )
 }
 
-export default function AppHomeOpenRooms({ wallet }) {
-  const { rooms, loading } = useOwnedRooms(wallet)
-  const openRooms = getOpenRooms(rooms)
+export default function AppHomeOpenRooms({ rooms, loading }) {
+  const openRooms = getOpenRooms(Array.isArray(rooms) ? rooms : [])
 
   return (
     <section className="border-t border-[var(--a-line)]">

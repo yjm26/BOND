@@ -1,6 +1,8 @@
+import useOwnedRooms from '../../hooks/useOwnedRooms'
 import AppHomeActionGrid from './home/AppHomeActionGrid'
 import AppHomeOpenRooms from './home/AppHomeOpenRooms'
 import AppHomeProfilePanel from './home/AppHomeProfilePanel'
+import AppHomeStats from './home/AppHomeStats'
 import useDisputeAccess from './useDisputeAccess'
 import { visibleAppActions } from './appHomeData'
 
@@ -8,6 +10,7 @@ export default function AppHome({ wallet, profile }) {
   const name = profile?.displayName || 'BOND member'
   const canAccessDisputes = useDisputeAccess(wallet)
   const actions = visibleAppActions(canAccessDisputes)
+  const { rooms, loading: roomsLoading } = useOwnedRooms(wallet)
 
   return (
     <section className="min-h-screen bg-[var(--a-bg)] px-4 pt-[88px] pb-6 text-[var(--a-ink)] sm:px-6 lg:px-8">
@@ -23,19 +26,11 @@ export default function AppHome({ wallet, profile }) {
 
           <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-2 lg:p-5">
             <AppHomeProfilePanel profile={profile} name={name} />
-            <div className="border border-[var(--a-line-strong)] bg-[var(--a-chip)] p-5 sm:p-6">
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--a-muted)]">Build on Arc</div>
-              <p className="mt-4 max-w-[420px] text-[14px] leading-[1.6] text-[color:var(--a-soft)]">
-                Money moves through explicit room actions: fund, release, refund, dispute.
-              </p>
-              <div className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--a-faint)]">
-                Wallet {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}
-              </div>
-            </div>
+            <AppHomeStats rooms={rooms} loading={roomsLoading} />
           </div>
 
           <AppHomeActionGrid actions={actions} />
-          <AppHomeOpenRooms wallet={wallet} />
+          <AppHomeOpenRooms rooms={rooms} loading={roomsLoading} />
         </main>
       </div>
     </section>
