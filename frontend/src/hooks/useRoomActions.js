@@ -11,6 +11,7 @@ import {
   getUsdc,
   waitForTx,
 } from '../utils/contract'
+import { humanizeTxError } from '../utils/txErrors'
 import { deliveryProofHash } from '../utils/deliveryProof'
 import { postEvidence } from '../lib/evidenceApi'
 import { registerDispute } from '../lib/disputesApi'
@@ -37,71 +38,85 @@ export function useRoomActions({
   const { addToast } = useToast()
 
   async function doAction(fn, label, successMsg) {
-    setTxPending(true)
-    setStatus({ type: 'info', msg: label })
-    addToast(label, 'info')
+      setTxPending(true)
+      setStatus({ type: 'info', msg: label })
+      addToast(label, 'info')
 
-    try {
-      const RETRIES = 2
-      for (let attempt = 0; attempt <= RETRIES; attempt++) {
-        try {
-          const signer = await wallet.provider.getSigner()
-          await ensureArcChain(signer)
-          const addr = await signer.getAddress()
-          const nonce = await getLatestNonce(addr, wallet.provider)
-          const gas = { ...ARC_GAS, nonce }
-          const contract = getContract(signer)
-          const tx = await fn(contract, gas)
-          setStatus({ type: 'info', msg: `Wallet signed. Waiting for Arc confirmation: ${tx.hash.slice(0, 10)}…` })
-          addToast(`Pending on Arc · ${tx.hash.slice(0, 10)}…`, 'info')
+      try {
+        const RETRIES = 2
+        for (let attempt = 0; attempt <= RETRIES; attempt++) {
+          try {
+            const signer = await wallet.provider.getSigner()
+            await ensureArcChain(signer)
+            const addr = await signer.getAddress()
+            const nonce = await getLatestNonce(addr, wallet.provider)
+            const gas = { ...ARC_GAS, nonce }
+            const contract = getContract(signer)
+            const tx = await fn(contract, gas)
+            setStatus({ type: 'info', msg: `Wallet signed. Waiting for Arc confirmation: ${tx.hash.slice(0, 10)}…` })
+            addToast(`Pending on Arc · ${tx.hash.slice(0, 10)}…`, 'info')
 
-          const stuckTimer = setTimeout(async () => {
-            try {
-              const found = await ARC_READ_PROVIDER.getTransaction(tx.hash)
-              if (!found) {
-                addToast('TX not found on-chain — clear wallet activity and retry.', 'err')
-                setStatus({ type: 'err', msg: 'TX stuck in wallet. Clear wallet activity and retry.' })
+            const stuckTimer = setTimeout(async () => {
+              try {
+                const found = await ARC_READ_PROVIDER.getTransaction(tx.hash)
+                if (!found) {
+                  addToast('TX not found on-chain — clear wallet activity and retry.', 'err')
+                  setStatus({ type: 'err', msg: 'TX stuck in wallet. Clear wallet activity and retry.' })
+                }
+              } catch {
+                /* ignore */
               }
-            } catch { /* ignore */ }
-          }, 15000)
+            }, 15000)
 
-          const receipt = await waitForTx(wallet.provider, tx.hash, 120000)
-          clearTimeout(stuckTimer)
-          if (receipt.status === 0) {
-            setStatus({ type: 'err', msg: 'TX reverted on-chain' })
-            addToast('Transaction reverted on-chain', 'err')
-            return false
-          }
-          setStatus({ type: 'ok', msg: successMsg })
-          addToast(successMsg, 'ok')
-          scheduleRoomRefresh()
-          return true
-        } catch (err) {
-          const msg = err.reason || err.message || String(err)
-          if (msg.includes('denied') || msg.includes('User rejected') || msg.includes('revert') || msg.includes('execution reverted')) {
-            setStatus({ type: '', msg: '' })
-            if (!msg.includes('denied') && !msg.includes('User rejected')) {
-              addToast(msg.slice(0, 120), 'err')
+            const receipt = await waitForTx(wallet.provider, tx.hash, 120000)
+            clearTimeout(stuckTimer)
+            if (receipt.status === 0) {
+              setStatus({ type: 'err', msg: 'Transaction reverted on Arc.' })
+              addToast('Transaction reverted on Arc.', 'err')
+              return false
             }
+            setStatus({ type: 'ok', msg: successMsg })
+            addToast(successMsg, 'ok')
+            scheduleRoomRefresh()
+            return true
+          } catch (err) {
+            const { kind, message } = humanizeTxError(err)
+            if (kind === 'reject') {
+              setStatus({ type: '', msg: '' })
+              return false
+            }
+            if (
+              kind === 'revert' ||
+              kind === 'role' ||
+              kind === 'join' ||
+              kind === 'window' ||
+              kind === 'deadline' ||
+              kind === 'cap' ||
+              kind === 'approve' ||
+              kind === 'balance' ||
+              kind === 'chain'
+            ) {
+              setStatus({ type: 'err', msg: message })
+              addToast(message, 'err')
+              return false
+            }
+            if (attempt < RETRIES) {
+              const delay = 1000 * Math.pow(2, attempt)
+              addToast(`Retrying in ${delay / 1000}s… (${attempt + 1}/${RETRIES})`, 'info')
+              await new Promise((r) => setTimeout(r, delay))
+              continue
+            }
+            console.error('TX failed:', err)
+            setStatus({ type: 'err', msg: message })
+            addToast(message, 'err')
             return false
           }
-          if (attempt < RETRIES) {
-            const delay = 1000 * Math.pow(2, attempt)
-            addToast(`Retrying in ${delay / 1000}s… (${attempt + 1}/${RETRIES})`, 'info')
-            await new Promise((r) => setTimeout(r, delay))
-            continue
-          }
-          console.error('TX failed:', err)
-          setStatus({ type: 'err', msg: msg.slice(0, 100) })
-          addToast(msg.slice(0, 120), 'err')
-          return false
         }
+        return false
+      } finally {
+        setTxPending(false)
       }
-      return false
-    } finally {
-      setTxPending(false)
     }
-  }
 
   const handleJoin = async () => {
     if (!joinCode) {

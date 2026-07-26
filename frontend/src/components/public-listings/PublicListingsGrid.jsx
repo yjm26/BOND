@@ -18,15 +18,15 @@ export default function PublicListingsGrid({ loading, listings, totalCount, onOp
   if (loading) return <SkeletonGrid />
 
   if (!listings.length) {
-    return (
-      <div className="mt-10 border border-[#0a0a0a]/12 bg-white px-5 py-10 sm:px-8">
-        <h2 className="text-[28px] font-medium tracking-[-0.05em] text-[#0a0a0a]">No listings yet.</h2>
-        <p className="mt-3 max-w-[380px] text-[14px] leading-[1.6] text-[#525252]">
-          Nothing posted right now. Go to the app to add one.
-        </p>
-      </div>
-    )
-  }
+      return (
+        <div className="mt-10 border border-[#0a0a0a]/12 bg-white px-5 py-10 sm:px-8">
+          <h2 className="text-[28px] font-medium tracking-[-0.05em] text-[#0a0a0a]">No public listings</h2>
+          <p className="mt-3 max-w-[380px] text-[14px] leading-[1.6] text-[#525252]">
+            Market is discovery only. Escrow starts when a room is created and funded on Arc.
+          </p>
+        </div>
+      )
+    }
 
   return (
     <div className="mt-8">
