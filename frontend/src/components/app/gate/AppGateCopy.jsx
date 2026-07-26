@@ -10,11 +10,6 @@ export default function AppGateCopy({ connecting, connectError, onConnect }) {
           Checking the wallet session in this tab. If this hangs, use the button below.
         </p>
       )}
-      {!connecting && (
-        <p className="mx-auto mt-5 max-w-[44ch] text-[14px] leading-[1.6] text-[var(--a-muted)]">
-          Connecting only reads your address — no signature, no&nbsp;gas. You sign later, only to fund or settle a room.
-        </p>
-      )}
       <button
         type="button"
         onClick={onConnect}
