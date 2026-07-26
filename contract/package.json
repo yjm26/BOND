@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
-    "deploy": "npm run deploy:bound-testnet",
-    "deploy:bound-testnet": "hardhat run scripts/deploy-bound-testnet.js --network arcTestnet",
-    "test:bound-testnet": "hardhat test test/BOND.test.js"
+    "test": "hardhat test test/BOND.test.js",
+    "deploy": "hardhat run scripts/deploy-phase-a.js --network arcTestnet",
+    "verify": "node scripts/verify-arcscan.mjs"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

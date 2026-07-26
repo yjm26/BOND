@@ -7,7 +7,7 @@
     "start": "node server.js",
     "build": "npm run render-build",
     "render-build": "npm install --prefix frontend && npm run build --prefix frontend",
-    "test": "npm run test:bound-testnet --prefix contract"
+    "test": "npm test --prefix contract"
   },
   "engines": {
     "node": ">=20"

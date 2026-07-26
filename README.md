@@ -2,228 +2,118 @@
 
 Escrow rooms for USDC deals on Arc.
 
-BOND is a settlement app for online trades between people who don't know each other: digital goods, account transfers, freelance work, NFT/allowlist spots, and small OTC swaps. Instead of trusting a Discord middleman, both sides open a room, the buyer locks USDC in an escrow contract, and the funds only move on an explicit action — release, refund, or dispute.
+Two strangers agree on a trade. The buyer locks USDC in a contract, the seller delivers, then the buyer releases the funds or opens a dispute. Nobody hands money to a middleman, and the state of the deal is on-chain instead of in a Discord thread.
 
-It doesn't remove the need for trust. It makes the state of the deal and the location of the money verifiable on-chain, and gives each side a defined next step when things stall.
+Live at [usebond.xyz](https://usebond.xyz). Arc Testnet only.
 
-## What it does
+## How a room works
 
-- Opens private escrow rooms on Arc Testnet.
-- Buyer funds a room in USDC; funds sit in the contract until settled.
-- Seller marks delivery; buyer releases or disputes.
-- Seller can escalate if the buyer goes silent after delivery (12h response buffer).
-- Approved arbiters resolve disputes on-chain.
-- Marketplace listings stay visible for 30 days unless taken or removed.
-- Optional public profiles map a display name/socials to a wallet address.
+```
+Created → Joined → Funded → Delivered → Released
+                                     ↘ Disputed → arbiter resolves or splits
+```
 
-Read-only views never request a signature. Signatures are only for authenticated writes (posting a listing, room actions).
+- The buyer's USDC sits in the contract from **Funded** until the room closes.
+- Money only moves on an explicit action: release, refund, mutual cancel, or an arbiter decision.
+- Delivery deadline counts from **funding**, not from room creation.
+- If the buyer goes quiet for 12 hours after delivery, the seller can escalate to an arbiter.
 
-## Current network
+Nothing here removes the need to pick a decent counterparty. What it removes is having to trust them with the money while the deal is in flight.
 
-BOND currently runs on Arc Testnet.
+## Contract
 
-| Item | Value |
+| | |
 | --- | --- |
-| Chain | Arc Testnet |
-| Chain ID | `5042002` |
-| Primary RPC | `https://rpc.blockdaemon.testnet.arc.network` |
-| Backup RPC | `https://rpc.drpc.testnet.arc.network` |
-| Explorer | `https://testnet.arcscan.app` |
-| USDC token | `0x3600000000000000000000000000000000000000` |
-| Contract | `0xb25433c4fA845Ff88883ea07543Fc2b561f56fbB` (Phase A: deadline from fund) |
+| Address | [`0xb25433c4fA845Ff88883ea07543Fc2b561f56fbB`](https://testnet.arcscan.app/address/0xb25433c4fA845Ff88883ea07543Fc2b561f56fbB) |
+| Chain | Arc Testnet (`5042002`) |
+| USDC | `0x3600000000000000000000000000000000000000` |
+| Source | [`contract/contracts/BOND.sol`](contract/contracts/BOND.sol) |
 
-Contract source: `contract/contracts/BOND.sol`.
+Fees: 1% funding fee to the treasury, 5% arbiter fee on disputed rooms only.
 
-**Delivery clock:** `deliveryDeadline = fundedAt + deliveryDays` (not from create).
+**Access control**
 
-**Smoke E2E (local keys only):**
+- `owner` can set the treasury and add/remove arbiters. It **cannot** resolve disputes or move room funds.
+- Only an active arbiter can resolve or split a disputed room.
+- The arbiter address is deliberately separate from the treasury, so the address that earns fees isn't the one judging disputes.
+- Ownership transfer is two-step (`transferOwnership` → `acceptOwnership`), so a typo can't brick the contract.
 
-```bash
-node scripts/smoke-e2e-room.js --addresses   # print fund targets
-node scripts/smoke-e2e-room.js               # create→join→fund→deliver→release (0.1 USDC)
+Arbiters are still trusted humans. On a disputed room they decide where the money goes — that's an operational trust assumption, not something the code removes.
+
+## Stack
+
+```
+server.js       HTTP entry: /api/* routes + serves frontend/dist
+server/         auth, cors, storage, sanitize + route modules
+frontend/       Vite + React app (wallet, rooms, market, docs)
+contract/       Hardhat project: BOND.sol, tests, deploy + verify scripts
+scripts/        smoke-e2e-room.js, check-smoke-balances.js
 ```
 
-Keys live in `local/smoke/` (gitignored). Never commit private keys.
+On-chain holds the money and the room state. The API holds everything that isn't money: listings, offers, profiles, notifications, evidence, and the address → room index.
 
-**Disputed rooms:** owner/active arbiter can resolve or split. Treat those keys as high-trust ops, not pure code trust.
-
-## Product flow
-
-A room moves through a small set of states:
-
-1. **Created** — a room exists, waiting for the counterparty.
-2. **Joined** — both parties are in, waiting for funding.
-3. **Funded** — buyer funds are locked in escrow.
-4. **Delivered** — seller marks the item or work as delivered.
-5. **Released / Refunded / Disputed / Cancelled** — the room closes or moves to arbiter review.
-
-The current contract keeps the buyer response buffer internal and fixed:
-
-```text
-RESPONSE_BUFFER = 12 hours
-```
-
-That means the UI does not ask users to choose confusing deal types or arbitrary review-day presets. Buyer settlement stays simple: if the buyer confirms, the deal settles.
-
-## Repository layout
-
-```text
-.
-├── server.js              # HTTP entry: API routes + serves frontend/dist
-├── server/                # Backend modules
-│   ├── lib/               # auth, cors, storage, sanitize, http helpers
-│   └── routes/            # listings, offers, disputes, evidence, room index
-├── frontend/              # Vite + React app
-│   ├── public/brand/      # Logo + OG assets
-│   ├── scripts/           # generate-og.mjs (regenerate the link preview)
-│   └── src/               # UI, wallet, room, and market code
-├── contract/              # Hardhat project
-│   ├── contracts/BOND.sol
-│   ├── scripts/deploy-bound-testnet.js
-│   └── test/BOND.test.js
-├── scripts/               # smoke-e2e-room.js, check-smoke-balances.js
-├── render.yaml            # Render single-service blueprint
-└── nixpacks.toml
-```
-
-## Local development
-
-Prerequisites:
-
-- Node.js 20+
-- npm
-- A wallet that can connect to Arc Testnet
-- Test USDC for Arc Testnet
-
-Install and run the frontend/API together:
+## Running it
 
 ```bash
 npm install
 npm run render-build
-PORT=4100 npm start
+PORT=4100 npm start          # http://localhost:4100
 ```
 
-Open:
-
-```text
-http://localhost:4100
-```
-
-For frontend-only development:
+Frontend only:
 
 ```bash
 npm install --prefix frontend
 npm run dev --prefix frontend
 ```
 
-## Contracts
-
-Install contract dependencies:
+Contract:
 
 ```bash
 npm install --prefix contract
-```
-
-Compile:
-
-```bash
 npm run compile --prefix contract
+npm test --prefix contract   # 21 tests
 ```
 
-Run targeted tests:
+Deploy and verify read `local/deploy/deploy.env` (gitignored — `PRIVATE_KEY`, `TREASURY_ADDRESS`, `ARBITER_ADDRESS`, `ARBITER_NAME`):
 
 ```bash
-npm run test:bound-testnet --prefix contract
+npm run deploy --prefix contract
+npm run verify --prefix contract
 ```
 
-Deploying requires a local `.env` inside `contract/` or an exported environment. Never commit private keys.
-
-Expected environment values:
-
-```text
-PRIVATE_KEY=...
-USDC_ADDRESS=0x3600000000000000000000000000000000000000
-TREASURY_ADDRESS=...
-ARBITER_ADDRESS=...
-ARBITER_NAME=BOND Arbiter
-```
-
-Deploy:
+End-to-end against a real deployment, using throwaway keys in `local/smoke/`:
 
 ```bash
-npm run deploy:bound-testnet --prefix contract
+node scripts/smoke-e2e-room.js --addresses   # print wallets to fund
+node scripts/smoke-e2e-room.js               # create → join → fund → deliver → release
 ```
 
-## API storage
+## Storage
 
-The backend stores MVP data as JSON files under:
+The API writes JSON files to `DATA_DIR` (`listings.json`, `offers.json`, `profiles.json`, `disputes.json`, `evidence.json`, `notifications.json`, `room_codes.json`, `room_index.json`).
 
-```text
-DATA_DIR
+On Render, attach a persistent disk and set `DATA_DIR=/data`. Without one, listings and profiles disappear on restart. Escrow rooms survive regardless — those live on-chain.
+
+For anything longer-lived, move this to Postgres.
+
+## Deploy
+
+One Render Web Service from the repo root:
+
+```
+Build:  npm install && npm run render-build
+Start:  npm start
+Health: /api/health
 ```
 
-If `DATA_DIR` is not set, it falls back to the repo directory. For production on Render, attach a persistent disk and set:
-
-```text
-DATA_DIR=/data
-```
-
-Files:
-
-| File | Purpose |
-| --- | --- |
-| `listings.json` | marketplace listings |
-| `offers.json` | offers / counters |
-| `notifications.json` | in-app notifications |
-| `room_codes.json` | invite codes for market handoff |
-| `profiles.json` | public display profiles |
-| `evidence.json` | off-chain evidence by room |
-| `disputes.json` | dispute desk case register |
-| `room_index.json` | address → roomIds for My Rooms |
-
-Server code is modular under `server/lib/*` and `server/routes/*`; `server.js` is the thin HTTP entry.
-
-Without persistent storage, marketplace listings, offers, notifications, room codes, profiles, evidence, disputes, and room index can disappear when the service restarts or gets redeployed.
-
-For a longer-lived production setup, move this storage to Postgres, Supabase, or Neon.
-
-## Deploy on Render
-
-Current Render app:
-
-```text
-https://bond-4us7.onrender.com/
-```
-
-This repo is designed for one Render Web Service from the repo root.
-
-Render settings:
-
-```text
-Runtime: Node
-Build Command: npm install && npm run render-build
-Start Command: npm start
-Health Check Path: /api/health
-```
-
-`server.js` serves both:
-
-- `/api/*` backend routes
-- `frontend/dist` static app
-
-That keeps API calls same-origin and avoids separate CORS/deployment plumbing.
-
-## Security notes
-
-- Never commit `.env` files or private keys.
-- Wallet signatures are only requested for actions that need wallet-authenticated writes.
-- Read-only views should not request signatures.
-- Changing wallets resets the current BOND session and requires a clean reconnect.
-- Arbiters are owner-managed in the current testnet contract.
+`server.js` serves the API and the built frontend together, which keeps requests same-origin and avoids separate CORS setup.
 
 ## Status
 
-BOND is testnet software. It is useful for demos, product validation, and Arc-native escrow testing, but it is not a mainnet funds product yet.
+Testnet software. The money paths have tests and a smoke run, but this hasn't been audited and it isn't a mainnet product yet.
+
+Never commit `.env` files or private keys. Read-only views never ask for a signature; signatures are only for authenticated writes.
 
 ## License
 
