@@ -31,16 +31,18 @@ async function verifySignature({ address, signature, nonce, domain }) {
     if (!stored || stored.expires <= Date.now() || stored.nonce !== nonce) return null
 
     const domainCandidates = [
-      domain,
-      'bond-4us7.onrender.com',
-      'arc-escrow-agent.onrender.com',
-      'bond.yjm26.xyz',
-      'bond.arc.network',
-      'localhost:5173',
-      'localhost:4100',
-      'localhost:3001',
-      'localhost:3000',
-    ].filter(Boolean)
+          domain,
+          'usebond.xyz',
+          'www.usebond.xyz',
+          'bond-4us7.onrender.com',
+          'arc-escrow-agent.onrender.com',
+          'bond.yjm26.xyz',
+          'bond.arc.network',
+          'localhost:5173',
+          'localhost:4100',
+          'localhost:3001',
+          'localhost:3000',
+        ].filter(Boolean)
 
     for (const d of [...new Set(domainCandidates)]) {
       const msg = `${d} wants you to sign in with your Ethereum account:\n${address}\n\nNonce: ${nonce}`
