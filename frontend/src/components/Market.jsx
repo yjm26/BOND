@@ -144,6 +144,7 @@ export default function Market({ wallet }) {
               onOpenDeal={setOfferTarget}
               onDelete={handleDelete}
               onExpand={setExpandedListing}
+              onPostListing={() => { setShowForm(true); setShowOffers(false); setSearchParams({}) }}
             />
 
             {showOffers && wallet && <MarketOffersModal wallet={wallet} API_URL={API_URL} onClose={() => { setShowOffers(false); setSearchParams({}) }} />}

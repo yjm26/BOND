@@ -11,7 +11,7 @@ export default function MarketFilters({ search, sort, filter, onSearchChange, on
       </div>
       <div className="mt-3 flex gap-2 overflow-x-auto border-t border-[var(--a-line)] pt-3">
         {CATEGORIES.map((category) => (
-          <button key={category} onClick={() => onFilterChange(category)} className={`whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition ${filter === category ? 'border-[var(--a-ink)] bg-[var(--a-inverse-bg)] text-[var(--a-inverse-ink)]' : 'border-[var(--a-line)] bg-transparent text-[var(--a-ink)]/52 hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)]'}`}>{category !== 'All' && <span className="mr-1 opacity-60">{CATEGORY_ICON[category]}</span>}{category}</button>
+          <button key={category} onClick={() => onFilterChange(category)} className={`whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition-[transform,background-color,border-color,color] duration-160 ease-out active:scale-[0.96] ${filter === category ? 'border-[var(--a-ink)] bg-[var(--a-inverse-bg)] text-[var(--a-inverse-ink)]' : 'border-[var(--a-line)] bg-transparent text-[var(--a-ink)]/52 hover:border-[var(--a-line-strong)] hover:text-[var(--a-ink)]'}`}>{category !== 'All' && <span className="mr-1 opacity-60">{CATEGORY_ICON[category]}</span>}{category}</button>
         ))}
       </div>
     </div>
